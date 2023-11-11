@@ -1,0 +1,48 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./api:/go/src
+      - api-go-cache:/go/pkg
+    ports:
+      - '3000:3000'
+    expose: 
+      - '3000'
+    environment:
+      - ADDR=0.0.0.0
+      - DATABASE_URL=postgres://scheduler:scheduler@db:5432/scheduler?sslmode=disable&connect_timeout=10
+      - TEST_DATABASE_URL=postgres://scheduler:scheduler@db:5432/scheduler_test?sslmode=disable&connect_timeout=10
+    depends_on:
+      - db
+    networks:
+      - dbnet
+    restart: unless-stopped
+
+  db:
+    image: postgres:15.4
+    networks:
+      - dbnet
+    environment:
+      POSTGRES_USER: scheduler
+      POSTGRES_PASSWORD: scheduler
+      POSTGRES_DB: scheduler
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d scheduler -u scheduler" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres-data:
+  api-go-cache:
+
+networks:
+  dbnet:
