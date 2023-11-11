@@ -1,5 +1,26 @@
 version: '3'
 services:
+  web:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./ui:/home/node/app
+      # - api-go-cache:/go/pkg
+    ports:
+      - '4000:4000'
+    expose: 
+      - '4000'
+    environment:
+      - ADDR=0.0.0.03000
+      - PORT=4000
+      - FAST_REFRESH=true
+    depends_on:
+      - api
+    networks:
+      - apinet
+    restart: unless-stopped
+
   api:
     build:
       context: ./api
@@ -19,6 +40,7 @@ services:
       - db
     networks:
       - dbnet
+      - apinet
     restart: unless-stopped
 
   db:
@@ -46,3 +68,4 @@ volumes:
 
 networks:
   dbnet:
+  apinet:
