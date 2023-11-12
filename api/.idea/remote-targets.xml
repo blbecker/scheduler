@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <option name="projectDefaultTargetUuid" value="1a13c9b3-44d7-40a7-8707-a92a1bca448d" />
+    <targets>
+      <target name="api" type="docker-compose" uuid="1a13c9b3-44d7-40a7-8707-a92a1bca448d">
+        <config>
+          <option name="targetPlatform">
+            <TargetPlatform />
+          </option>
+          <option name="configurationFiles">
+            <list>
+              <option value="$PROJECT_DIR$/../docker-compose.yml" />
+            </list>
+          </option>
+          <option name="serviceName" value="api" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goPath" value="/go" />
+            <option name="goRoot" value="/usr/local/go/bin/go" />
+            <option name="goVersion" value="go1.20.11 linux/amd64" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is the UI for the Scheduler application project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+[Color Palette](https://coolors.co/ccdbdc-d00000-ffba08-3f88c5-263d42)
 
 ## Getting Started
 

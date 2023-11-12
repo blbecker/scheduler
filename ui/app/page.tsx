@@ -1,80 +1,43 @@
-'use client';
+import {Card, Col, Divider, Layout, MenuProps, Row, theme} from 'antd';
 
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import {
-  Breadcrumb,
-  Layout,
-  Menu,
-  MenuProps,
-  theme
-} from 'antd';
-const { Header, Content, Footer, Sider } = Layout;
+import React from 'react';
+import Sidebar from "@/app/components/sidebar";
+import NavHeader from "@/app/components/header";
 
-import { useState } from 'react';
+const {Header, Content, Sider} = Layout;
 
-
-
-type MenuItem = Required<MenuProps>['items'][number];
-
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[],
-): MenuItem {
-  return {
+const items1: MenuProps['items'] = ['1', '2', '3'].map((key) => ({
     key,
-    icon,
-    children,
-    label,
-  } as MenuItem;
-}
-
-const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined />),
-  getItem('Option 2', '2', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [
-    getItem('Tom', '3'),
-    getItem('Bill', '4'),
-    getItem('Alex', '5'),
-  ]),
-  getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-  getItem('Files', '9', <FileOutlined />),
-];
+    label: `nav ${key}`,
+}));
 
 const Home = function Home() {
-  const [collapsed, setCollapsed] = useState(false);
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
+    const {
+        token: {colorBgContainer},
+    } = theme.useToken();
 
-  return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-        <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
-      </Sider>
-      <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }} />
-        <Content style={{ margin: '0 16px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
-          <div style={{ padding: 24, minHeight: 360, background: colorBgContainer }}>
-            Bill is a cat.
-          </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>Ant Design ©2023 Created by Ant UED</Footer>
-      </Layout>
-    </Layout>
-  );
+    return (
+        <Layout>
+            <NavHeader/>
+            <Layout>
+                <Sidebar/>
+                <Layout style={{padding: '0 24px 24px'}}>
+                    <Divider orientation="left">Home Panel</Divider>
+                    <Row gutter={16}>
+                        <Col className="gutter-row" span={6}>
+                            <Card title='Some Data'>Some data goes here</Card>
+                        </Col>
+                        <Col className="gutter-row" span={6}>
+                            <Card title='More Data'>Some more data goes here</Card>
+                        </Col>
+                        <Col className="gutter-row" span={12}>
+                            <Card title='Last of the data'>Lying data goes here</Card>
+                        </Col>
+                    </Row>
+                </Layout>
+            </Layout>
+        </Layout>
+    );
 }
 
 export default Home;
