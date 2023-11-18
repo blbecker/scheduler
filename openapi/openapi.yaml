@@ -9,4 +9,9 @@ paths:
     get:
       responses:
         '404':
+          description: Not found
+  /endpoint3:
+    get:
+      responses:
+        '200':
           description: OK
