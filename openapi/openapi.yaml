@@ -1,17 +1,56 @@
 openapi: '3.0.3'
 info:
   title: Scheduler Application
-  version: '1.0.0'
+  version: '1.0.1'
 servers:
   - url: https://api.server.test/v1
 paths:
-  /user:
+  /users/{id}:
     get:
-      responses:
-        '404':
-          description: Not found
-  /endpoint3:
-    get:
+      tags:
+        - Users
+      summary: Gets a user by ID.
+      description: >
+        A detailed description of the operation.
+        Use markdown for rich text representation,
+        such as **bold**, *italic*, and [links](https://swagger.io).
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
-          description: OK
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      externalDocs:
+        description: Learn more about user operations provided by this API.
+        url: http://api.example.com/docs/user-operations/
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

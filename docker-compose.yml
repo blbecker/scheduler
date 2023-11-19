@@ -28,6 +28,7 @@ services:
     volumes:
       - ./api:/go/src
       - api-go-cache:/go/pkg
+      - ./openapi:/openapi
     ports:
       - '3000:3000'
     expose: 
