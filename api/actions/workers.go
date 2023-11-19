@@ -2,6 +2,7 @@ package actions
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gobuffalo/buffalo"
@@ -47,6 +48,8 @@ func (v WorkersResource) List(c buffalo.Context) error {
 	if err := q.All(workers); err != nil {
 		return err
 	}
+
+	log.Default().Printf("Returning %i workers", len(*workers))
 
 	return responder.Wants("html", func(c buffalo.Context) error {
 		// Add the paginator to the context so it can be used in the template.

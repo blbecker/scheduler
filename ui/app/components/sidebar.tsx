@@ -1,3 +1,4 @@
+'use client';
 import {LaptopOutlined, NotificationOutlined, UserOutlined,} from '@ant-design/icons';
 import {Layout, Menu, MenuProps, theme} from 'antd';
 import React, {FC} from 'react';

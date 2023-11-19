@@ -1,96 +1,51 @@
+'use server';
+
 import {Layout, Menu, MenuProps, Space, Table, Tag, theme} from 'antd';
 import React, {FC} from 'react';
 import {ColumnsType} from "antd/lib/table";
+import {iWorker} from "@/app/models/worker";
 
+async function getWorkers() {
+    const res = await fetch('http://api:3000/workers', { cache: 'no-store' })
+    // The return value is *not* serialized
+    // You can return Date, Map, Set, etc.
 
-interface DataType {
-    key: string;
-    name: string;
-    age: number;
-    address: string;
-    tags: string[];
+    if (!res.ok) {
+        // This will activate the closest `error.js` Error Boundary
+        throw new Error('Failed to fetch data')
+    }
+
+    return res.json()
 }
 
-const columns: ColumnsType<DataType> = [
+const columns: ColumnsType<iWorker> = [
     {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        render: (text) => <a>{text}</a>,
+        title: 'Family Name',
+        dataIndex: 'family_name',
+        key: 'familyName',
     },
     {
-        title: 'Age',
-        dataIndex: 'age',
-        key: 'age',
+        title: 'Given Name',
+        dataIndex: 'given_name',
+        key: 'familyName',
     },
-    {
-        title: 'Address',
-        dataIndex: 'address',
-        key: 'address',
-    },
-    {
-        title: 'Tags',
-        key: 'tags',
-        dataIndex: 'tags',
-        render: (_, { tags }) => (
-            <>
-                {tags.map((tag) => {
-                    let color = tag.length > 5 ? 'geekblue' : 'green';
-                    if (tag === 'loser') {
-                        color = 'volcano';
-                    }
-                    return (
-                        <Tag color={color} key={tag}>
-                            {tag.toUpperCase()}
-                        </Tag>
-                    );
-                })}
-            </>
-        ),
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        render: (_, record) => (
-            <Space size="middle">
-                <a>Invite {record.name}</a>
-                <a>Delete</a>
-            </Space>
-        ),
-    },
+
 ];
 
-const data: DataType[] = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-        tags: ['nice', 'developer'],
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-        tags: ['loser'],
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sydney No. 1 Lake Park',
-        tags: ['cool', 'teacher'],
-    },
-];
+const UserTable: FC = async () => {
+    // const {
+    //     token: {colorBgContainer},
+    // } = theme.useToken();
 
-const UserTable: FC = () => {
-    const {
-        token: {colorBgContainer},
-    } = theme.useToken();
+    // const data = await getWorkers()
+    let data = '[{"given_name":"Tony","family_name":"Stark"},{"given_name":"Bruce","family_name":"Banner"}]'
+    const worker: iWorker[] = JSON.parse(data)
+
+    // let datastring = data.len
+
     return (
         <>
-            <Table columns={columns} dataSource={data} />
+            <Table columns={columns} dataSource={worker}/>
         </>
     );
 };
