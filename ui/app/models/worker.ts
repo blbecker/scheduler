@@ -1,5 +1,6 @@
 export interface iWorker {
-    familyName: string;
-    givenName: string;
+    worker_id: string
+    family_name: string;
+    given_name: string;
 }
 

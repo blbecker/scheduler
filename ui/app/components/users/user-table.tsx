@@ -1,12 +1,12 @@
 'use server';
 
-import {Layout, Menu, MenuProps, Space, Table, Tag, theme} from 'antd';
+import {Table} from 'antd';
 import React, {FC} from 'react';
 import {ColumnsType} from "antd/lib/table";
 import {iWorker} from "@/app/models/worker";
 
 async function getWorkers() {
-    const res = await fetch('http://api:3000/workers', { cache: 'no-store' })
+    const res = await fetch('http://api:3000/workers', {cache: 'no-store'})
     // The return value is *not* serialized
     // You can return Date, Map, Set, etc.
 
@@ -19,6 +19,11 @@ async function getWorkers() {
 }
 
 const columns: ColumnsType<iWorker> = [
+    {
+        title: 'ID',
+        dataIndex: 'id',
+        key: 'id',
+    },
     {
         title: 'Family Name',
         dataIndex: 'family_name',
@@ -37,15 +42,11 @@ const UserTable: FC = async () => {
     //     token: {colorBgContainer},
     // } = theme.useToken();
 
-    // const data = await getWorkers()
-    let data = '[{"given_name":"Tony","family_name":"Stark"},{"given_name":"Bruce","family_name":"Banner"}]'
-    const worker: iWorker[] = JSON.parse(data)
-
-    // let datastring = data.len
+    const data = await getWorkers()
 
     return (
         <>
-            <Table columns={columns} dataSource={worker}/>
+            <Table columns={columns} dataSource={data}/>
         </>
     );
 };
