@@ -3,7 +3,7 @@ import {Card, Col, Divider, Layout, MenuProps, Row, theme} from 'antd';
 import React from 'react';
 import Sidebar from "@/app/components/sidebar";
 import NavHeader from "@/app/components/nav-header";
-import UserTable from "@/app/components/users/user-table";
+import WorkerTable from "@/app/components/workers/worker-table";
 
 const {Content, Sider} = Layout;
 
@@ -40,7 +40,7 @@ const Admin = function Admin() {
                     <Divider orientation='left'>Workers</Divider>
                     <Row gutter={[{ xs: 8, sm: 16, md: 24, lg: 32 },{ xs: 8, sm: 16, md: 24, lg: 32 }]}>
                         <Col className="gutter-row" span={24}>
-                            <UserTable/>
+                            <WorkerTable/>
                         </Col>
                     </Row>
                 </Layout>
