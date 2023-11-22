@@ -46,7 +46,7 @@ jobs:
             echo -e "GO PATH: $GOPATH\nPATH: $PATH"
             which gocov-xml
             buffalo test -coverprofile=coverage.out ./...
-            gocov convert cover.out | gocov-xml > coverage.xml
+            gocov convert coverage.out | gocov-xml > coverage.xml
         
         - name: Code Coverage Report
           uses: irongut/CodeCoverageSummary@v1.3.0
