@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
 
   db:
-    image: postgres:15.4
+    image: postgres:15.4@sha256:d1168ad5397bf9c94cc417c530469805a8767ed585481d93f174461ac8557e3a
     networks:
       - dbnet
     environment:

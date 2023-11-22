@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.17
+FROM golang:1.20-alpine3.17@sha256:ecccf4963ae76531a65b9029326c803212c20119dcf924f8157e59f6aa664b35
 
 RUN go install -tags sqlite github.com/gobuffalo/cli/cmd/buffalo@v0.18.14 && \
     buffalo version
