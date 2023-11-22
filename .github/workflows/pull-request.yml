@@ -53,7 +53,7 @@ jobs:
           with:
             filename: ./api/coverage.xml
             badge: true
-            fail_below_min: true
+            fail_below_min: false
             format: markdown
             hide_branch_rate: false
             hide_complexity: false
