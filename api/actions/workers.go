@@ -49,7 +49,7 @@ func (v WorkersResource) List(c buffalo.Context) error {
 		return err
 	}
 
-	log.Default().Printf("Returning %i workers", len(*workers))
+	log.Default().Printf("Returning %v workers", len(*workers))
 
 	return responder.Wants("html", func(c buffalo.Context) error {
 		// Add the paginator to the context so it can be used in the template.
