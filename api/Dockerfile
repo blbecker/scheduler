@@ -1,6 +1,6 @@
 # This is a multi-stage Dockerfile and requires >= Docker 17.05
 # https://docs.docker.com/engine/userguide/eng-image/multistage-build/
-FROM gobuffalo/buffalo:v0.18.14 as builder
+FROM gobuffalo/buffalo:v0.18.14@sha256:8d018ea5cdc612cf6155a006deedb3e34c29fd6ff78f3285edeebf578e78323d as builder
 
 ENV GOPROXY http://proxy.golang.org
 
@@ -17,7 +17,7 @@ RUN go mod download
 ADD . .
 RUN buffalo build --static -o /bin/app
 
-FROM alpine
+FROM alpine@sha256:eece025e432126ce23f223450a0326fbebde39cdf496a85d8c016293fc851978
 RUN apk add --no-cache bash
 RUN apk add --no-cache ca-certificates
 
