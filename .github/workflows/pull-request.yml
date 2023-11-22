@@ -18,6 +18,7 @@ jobs:
 
         - name: Setup testing dependencies
           run: |
+            pushd api
             go get github.com/axw/gocov/gocov
             go get github.com/AlekSi/gocov-xml
             go mod download
