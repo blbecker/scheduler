@@ -29,19 +29,19 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4.1.1
 
-        - name: Setup testing dependencies
-          run: |
-            cd api
-            go install github.com/axw/gocov/gocov
-            go install github.com/AlekSi/gocov-xml
+        # - name: Setup testing dependencies
+        #   run: |
+        #     cd api
+        #     go get github.com/axw/gocov/gocov && go install github.com/axw/gocov/gocov
+        #     go get github.com/AlekSi/gocov-xml && go install github.com/AlekSi/gocov-xml
 
         - name: Execute buffalo test (probably)
           env:
             TEST_DATABASE_URL: postgres://scheduler:password@postgres:5432/scheduler_test?sslmode=disable&connect_timeout=10
           run: |
             cd api
-            which gocov || go install github.com/axw/gocov/gocov
-            which gocov-xml || go install github.com/AlekSi/gocov-xml
+            which gocov || go get github.com/axw/gocov/gocov && go install github.com/axw/gocov/gocov
+            which gocov-xml || go get github.com/AlekSi/gocov-xml && go install github.com/AlekSi/gocov-xml
 
             echo -e "GO PATH: $GOPATH\nPATH: $PATH"
             which gocov-xml
