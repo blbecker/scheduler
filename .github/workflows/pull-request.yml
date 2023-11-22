@@ -18,14 +18,14 @@ jobs:
 
         - name: Setup testing dependencies
           run: |
-            pushd api
+            cd api
             go get github.com/axw/gocov/gocov
             go get github.com/AlekSi/gocov-xml
             go mod download
 
         - name: Execute buffalo test (probably)
           run: |
-            pushd api
+            cd api
             buffalo test -coverprofile=coverage.out ./...
             gocov convert cover.out | gocov-xml > coverage.xml
         
