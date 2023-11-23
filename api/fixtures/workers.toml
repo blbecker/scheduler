@@ -1,0 +1,29 @@
+[[scenario]]
+name = "many workers"
+
+[[scenario.table]]
+name = "workers"
+
+[[scenario.table.row]]
+id = "<%= uuid() %>"
+given_name = "Bruce"
+family_name = "Banner"
+date_of_birth = "<%= now() %>"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+
+[[scenario.table.row]]
+id = "<%= uuid() %>"
+given_name = "Peter"
+family_name = "Parker"
+date_of_birth = "<%= now() %>"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"
+
+[[scenario.table.row]]
+id = "<%= uuid() %>"
+given_name = "Tony"
+family_name = "Stark"
+date_of_birth = "<%= now() %>"
+created_at = "<%= now() %>"
+updated_at = "<%= now() %>"

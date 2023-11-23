@@ -1,0 +1,7 @@
+create_table("workers") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("given_name", "string", {})
+	t.Column("family_name", "string", {})
+	t.Column("date_of_birth", "timestamp", {})
+	t.Timestamps()
+}

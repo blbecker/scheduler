@@ -1,12 +1,15 @@
 FROM golang:1.20-alpine3.17@sha256:ecccf4963ae76531a65b9029326c803212c20119dcf924f8157e59f6aa664b35
 
 RUN go install -tags sqlite github.com/gobuffalo/cli/cmd/buffalo@v0.18.14 && \
+    go install -tags sqlite github.com/gobuffalo/pop/v6/soda@v6.1.1 && \
     buffalo version
 
 RUN apk add bind-tools git bash wget postgresql-client && \
     wget https://raw.githubusercontent.com/cippaciong/buffalo_bash_completion/master/buffalo_completion.sh -O $HOME/buffalo_completion.sh && \
     echo source /root/buffalo_completion.sh >> $HOME/.bashrc
 
+COPY ./scripts /scripts
+
 WORKDIR /go/src
 
-CMD buffalo dev
+CMD /scripts/entrypoint.dev.sh

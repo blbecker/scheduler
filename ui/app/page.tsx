@@ -2,7 +2,7 @@ import {Card, Col, Divider, Layout, MenuProps, Row, theme} from 'antd';
 
 import React from 'react';
 import Sidebar from "@/app/components/sidebar";
-import NavHeader from "@/app/components/header";
+import NavHeader from "@/app/components/nav-header";
 
 const {Header, Content, Sider} = Layout;
 
@@ -12,9 +12,9 @@ const items1: MenuProps['items'] = ['1', '2', '3'].map((key) => ({
 }));
 
 const Home = function Home() {
-    const {
-        token: {colorBgContainer},
-    } = theme.useToken();
+    // const {
+    //     token: {colorBgContainer},
+    // } = theme.useToken();
 
     return (
         <Layout>

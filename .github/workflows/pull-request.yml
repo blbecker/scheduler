@@ -1,0 +1,92 @@
+name: "Scheduler (Build/Test)"
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+    api_tests:
+      runs-on: ubuntu-latest
+      container:
+        image: gobuffalo/buffalo:v0.18.14
+        ports:
+          - 80
+        # volumes:
+        #   - my_docker_volume:/volume_mount
+        # options: --cpus 1
+      services:
+        postgres:
+          image: postgres:15.4
+          env:
+            POSTGRES_USER: scheduler
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: scheduler_test
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-start-period 10s
+            --health-timeout 5s
+            --health-retries 10
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4.1.1
+
+        # - name: Setup testing dependencies
+        #   run: |
+        #     cd api
+        #     go get github.com/axw/gocov/gocov && go install github.com/axw/gocov/gocov
+        #     go get github.com/AlekSi/gocov-xml && go install github.com/AlekSi/gocov-xml
+
+        - name: Execute buffalo test (probably)
+          env:
+            TEST_DATABASE_URL: postgres://scheduler:password@postgres:5432/scheduler_test?sslmode=disable&connect_timeout=10
+          run: |
+            cd api
+            which gocov || go get github.com/axw/gocov/gocov && go install github.com/axw/gocov/gocov
+            which gocov-xml || go get github.com/AlekSi/gocov-xml && go install github.com/AlekSi/gocov-xml
+
+            echo -e "GO PATH: $GOPATH\nPATH: $PATH"
+            which gocov-xml
+            buffalo test -coverprofile=coverage.out ./...
+            gocov convert coverage.out | gocov-xml > coverage.xml
+        
+        - name: Code Coverage Report
+          uses: irongut/CodeCoverageSummary@v1.3.0
+          with:
+            filename: ./api/coverage.xml
+            badge: true
+            fail_below_min: false
+            format: markdown
+            hide_branch_rate: false
+            hide_complexity: false
+            indicators: true
+            output: both
+            thresholds: '60 80'
+
+        - name: Add Coverage PR Comment
+          uses: marocchino/sticky-pull-request-comment@v2
+          if: github.event_name == 'pull_request'
+          with:
+            header: apitest
+            recreate: true
+            path: code-coverage-results.md
+    ui_lint:
+      runs-on: ubuntu-latest
+      container:
+        image: node:21.2.0
+        ports:
+          - 80
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4.1.1
+
+        - name: Execute linter
+          run: |
+            cd ui
+            npm install
+            npm run lint

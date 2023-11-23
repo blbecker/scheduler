@@ -12,7 +12,7 @@ services:
     expose: 
       - '4000'
     environment:
-      - ADDR=0.0.0.03000
+      - ADDR=0.0.0.0:3000
       - PORT=4000
       - FAST_REFRESH=true
     depends_on:
@@ -28,6 +28,7 @@ services:
     volumes:
       - ./api:/go/src
       - api-go-cache:/go/pkg
+      - ./openapi:/openapi
     ports:
       - '3000:3000'
     expose: 
