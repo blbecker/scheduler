@@ -57,7 +57,7 @@ const error = ref<string | null>(null);
 onMounted(async () => {
   try {
     console.log('Loading shift details for ID:', route.params.id);
-    const response = await api.get(`/shifts/${route.params.id}`);
+    const response = await api.get(`/shifts/${shiftId.value}`);
     shift.value = response.data;
     console.log('Loaded shift:', shift.value);
   } catch (err) {
