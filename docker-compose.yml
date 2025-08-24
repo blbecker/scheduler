@@ -6,3 +6,10 @@ services:
     volumes:
       - ./ui/scheduler_ui:/app
       - /app/node_modules
+
+  api:
+    build: ./api/
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api/:/app
