@@ -18,8 +18,21 @@ export default defineComponent({
   setup() {
     const shifts = ref<Shift[]>([]);
     onMounted(async () => {
-      console.log('Got shifts');
-      shifts.value = await getShifts();
+      console.log('Fetching shifts...');
+      try {
+        const fetchedShifts = await getShifts();
+        console.log('Successfully fetched shifts:', {
+          count: fetchedShifts.length,
+          firstShift: fetchedShifts[0] || 'No shifts available'
+        });
+        shifts.value = fetchedShifts;
+      } catch (error) {
+        console.error('Failed to fetch shifts:', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date().toISOString()
+        });
+        throw error;
+      }
     });
 
     return { shifts };
