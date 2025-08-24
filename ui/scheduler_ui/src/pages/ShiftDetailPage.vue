@@ -44,7 +44,13 @@ import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 
 const route = useRoute();
-const shift = ref<any>(null);
+interface Shift {
+  id: string;
+  status: string;
+  // Add other shift properties as needed
+}
+
+const shift = ref<Shift | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
