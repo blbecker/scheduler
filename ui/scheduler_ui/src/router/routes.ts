@@ -9,10 +9,15 @@ const routes: RouteRecordRaw[] = [
         path: '',
         component: () => import('pages/IndexPage.vue'),
       },
+    ],
+  },
+  {
+    path: '/shift',
+    component: () => import('layouts/ShiftLayout.vue'),
+    children: [
       {
-        path: 'shifts',
-        name: 'shifts',
-        component: () => import('pages/ShiftsPage.vue'),
+        path: 'list',
+        component: () => import('pages/Shifts.vue'),
       },
     ],
   },
