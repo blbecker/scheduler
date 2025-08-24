@@ -2,7 +2,6 @@ import type { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
   {
-    # "/shifts" isn't loading. Does the path or the import need to be defined differently? AI!
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -12,6 +11,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'shifts',
+        name: 'shifts',
         component: () => import('pages/ShiftsPage.vue'),
       },
     ],
