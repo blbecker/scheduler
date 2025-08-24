@@ -50,6 +50,14 @@ interface Shift {
   // Add other shift properties as needed
 }
 
+const shiftId = computed(() => {
+  const id = route.params.id;
+  if (Array.isArray(id)) {
+    return id[0]; // Take first element if it's an array
+  }
+  return id || ''; // Fallback to empty string if undefined
+});
+
 const shift = ref<Shift | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
