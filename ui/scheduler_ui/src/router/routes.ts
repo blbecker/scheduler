@@ -12,18 +12,28 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/shifts',
-    component: () => import('layouts/ShiftLayout.vue'),
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/ShiftsPage.vue'),
-        name: 'shifts',
+        component: () => import('pages/IndexPage.vue'),
       },
       {
-        path: ':id',
-        component: () => import('pages/ShiftDetailPage.vue'),
-        name: 'shift-detail',
+        path: 'shifts',
+        component: () => import('layouts/ShiftLayout.vue'),
+        children: [
+          {
+            path: '',
+            component: () => import('pages/ShiftsPage.vue'),
+            name: 'shifts',
+          },
+          {
+            path: ':id',
+            component: () => import('pages/ShiftDetailPage.vue'),
+            name: 'shift-detail',
+          },
+        ],
       },
     ],
   },

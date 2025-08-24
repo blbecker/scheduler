@@ -46,6 +46,12 @@ onMounted(() => {
 
 const linksList: EssentialLinkProps[] = [
   {
+    title: 'Shifts',
+    caption: 'View shifts',
+    icon: 'schedule',
+    link: '/shifts',
+  },
+  {
     title: 'Docs',
     caption: 'quasar.dev',
     icon: 'school',
