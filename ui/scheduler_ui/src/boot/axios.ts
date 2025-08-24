@@ -29,7 +29,7 @@ api.interceptors.request.use((config) => {
   return config;
 }, (error) => {
   console.error('Request Error:', error);
-  return Promise.reject(error);
+  return Promise.reject(new Error(error));
 });
 
 // Add response interceptor
@@ -46,7 +46,7 @@ api.interceptors.response.use((response) => {
     message: error.message,
     response: error.response?.data
   });
-  return Promise.reject(error);
+  return Promise.reject(new Error(error.message || 'An error occurred'));
 });
 
 export default defineBoot(({ app }) => {
