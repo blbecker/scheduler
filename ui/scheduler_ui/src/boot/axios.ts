@@ -18,6 +18,37 @@ const api = axios.create({
   baseURL: process.env.API_URL || 'http://localhost:8000',
 });
 
+// Add request interceptor
+api.interceptors.request.use((config) => {
+  console.log('Request:', {
+    method: config.method?.toUpperCase(),
+    url: config.url,
+    params: config.params,
+    data: config.data
+  });
+  return config;
+}, (error) => {
+  console.error('Request Error:', error);
+  return Promise.reject(error);
+});
+
+// Add response interceptor
+api.interceptors.response.use((response) => {
+  console.log('Response:', {
+    status: response.status,
+    statusText: response.statusText,
+    data: response.data
+  });
+  return response;
+}, (error) => {
+  console.error('Response Error:', {
+    status: error.response?.status,
+    message: error.message,
+    response: error.response?.data
+  });
+  return Promise.reject(error);
+});
+
 export default defineBoot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
