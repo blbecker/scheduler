@@ -19,14 +19,30 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <component :is="Component" />
+        <div v-if="!Component" class="text-negative">
+          No component matched the route!
+        </div>
+      </router-view>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+onMounted(() => {
+  console.log('MainLayout mounted, current route:', {
+    path: route.path,
+    name: route.name,
+    matched: route.matched
+  });
+});
 
 const linksList: EssentialLinkProps[] = [
   {
