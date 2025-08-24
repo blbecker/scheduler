@@ -9,7 +9,6 @@
   </q-page>
 </template>
 
-# Add logging to this function so that I can debug client connections AI!
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { getShifts } from 'src/services/schedulerService';
