@@ -3,37 +3,23 @@ import type { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    // component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/ShiftLayout.vue'),
     children: [
       {
         path: '',
-        component: () => import('pages/IndexPage.vue'),
+        component: () => import('pages/ShiftListPage.vue'),
       },
     ],
   },
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    path: '/shifts',
+    // component: () => import('layouts/ShiftLayout.vue'),
+    component: () => import('layouts/ShiftLayout.vue'),
     children: [
       {
-        path: '',
-        component: () => import('pages/IndexPage.vue'),
-      },
-      {
-        path: 'shifts',
-        component: () => import('layouts/ShiftLayout.vue'),
-        children: [
-          {
-            path: '',
-            component: () => import('pages/ShiftsPage.vue'),
-            name: 'shifts',
-          },
-          {
-            path: ':id',
-            component: () => import('pages/ShiftDetailPage.vue'),
-            name: 'shift-detail',
-          },
-        ],
+        path: 'list',
+        component: () => import('pages/ShiftListPage.vue'),
       },
     ],
   },
