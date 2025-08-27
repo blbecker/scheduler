@@ -14,11 +14,10 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/shifts',
-    // component: () => import('layouts/ShiftLayout.vue'),
     component: () => import('layouts/ShiftLayout.vue'),
     children: [
       {
-        path: 'list',
+        path: '',
         component: () => import('pages/ShiftListPage.vue'),
       },
     ],
