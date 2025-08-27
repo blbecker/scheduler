@@ -5,13 +5,11 @@
       <div class="q-mt-sm">Loading shift details...</div>
     </div>
 
-    <div v-else-if="error" class="text-negative q-pa-md">
-      Error loading shift: {{ error }}
-    </div>
+    <div v-else-if="error" class="text-negative q-pa-md">Error loading shift: {{ error }}</div>
 
     <div v-else-if="shift" class="q-pa-md">
       <h2 class="text-h4">Shift Details</h2>
-      
+
       <q-card class="q-mt-md">
         <q-card-section>
           <div class="row q-col-gutter-md">
@@ -27,7 +25,8 @@
               <q-item>
                 <q-item-section>
                   <q-item-label caption>Status</q-item-label>
-                  <q-item-label>{{ shift.status }}</q-item-label>
+                  <q-item-label>{{ shift.reversed_id }}</q-item-label>
+                  <q-item-label>{{ shift.flerp }}</q-item-label>
                 </q-item-section>
               </q-item>
             </div>
@@ -43,12 +42,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 
+import type { Shift } from '../models/shift.ts';
+
 const route = useRoute();
-interface Shift {
-  id: string;
-  status: string;
-  // Add other shift properties as needed
-}
 
 const shiftId = computed(() => {
   const id = route.params.id;
@@ -65,7 +61,7 @@ const error = ref<string | null>(null);
 onMounted(async () => {
   try {
     console.log('Loading shift details for ID:', route.params.id);
-    const response = await api.get(`/shifts/${shiftId.value}`);
+    const response = await api.get(`v1/shift/${shiftId.value}`);
     shift.value = response.data;
     console.log('Loaded shift:', shift.value);
   } catch (err) {
