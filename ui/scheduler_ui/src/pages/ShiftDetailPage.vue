@@ -42,7 +42,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 
-import type { Shift } from 'src/models/shift';
+import { Shift } from 'src/components/models';
 
 const route = useRoute();
 
