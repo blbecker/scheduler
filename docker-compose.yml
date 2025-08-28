@@ -13,6 +13,12 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/app
+    environment:
+      POSTGRES_USER: scheduler_user
+      POSTGRES_PASSWORD: scheduler_pass
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: scheduler_db
 
   worker:
     build: ./api
