@@ -14,11 +14,11 @@ services:
     volumes:
       - ./api:/app
     environment:
-      POSTGRES_USER: scheduler_user
-      POSTGRES_PASSWORD: scheduler_pass
-      POSTGRES_HOST: db
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: scheduler_db
+      PG_USER: scheduler_user
+      PG_PASS: scheduler_pass
+      PG_HOST: PG_USERdb
+      PG_PORT: 5432
+      PG_DB: scheduler_db
 
   worker:
     build: ./api
