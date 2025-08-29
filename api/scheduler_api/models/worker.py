@@ -1,6 +1,7 @@
 from datetime import date
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy.orm import Mapped
 from uuid import UUID, uuid4
 from .associations import WorkerSkillLink, ShiftWorkerLink
 
@@ -18,9 +19,9 @@ class Worker(SQLModel, table=True):
     phone: Optional[str] = None
 
     # relations
-    skills: List["Skill"] = Relationship(
+    skills: Mapped[list["Skill"]] = Relationship(
         back_populates="workers", link_model=WorkerSkillLink
     )
-    shifts: List["Shift"] = Relationship(
+    shifts: Mapped[list["Shift"]] = Relationship(
         back_populates="workers", link_model=ShiftWorkerLink
     )
