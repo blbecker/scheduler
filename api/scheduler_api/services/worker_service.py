@@ -2,6 +2,8 @@
 from typing import List, Optional
 from scheduler_api.models import Worker
 from scheduler_api.repositories.worker_repository import WorkerRepository
+from sqlmodel import Session
+from typing import List, Dict
 
 
 class WorkerService:
@@ -17,8 +19,7 @@ class WorkerService:
     def create_worker(self, name: str, birthdate, email: str = None) -> Worker:
         worker = Worker(name=name, birthdate=birthdate, email=email)
         return self.repo.add(worker)
-from sqlmodel import Session
-from typing import List, Dict
+
 
 class WorkerService:
     def __init__(self, session: Session):
