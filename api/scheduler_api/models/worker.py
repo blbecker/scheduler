@@ -16,7 +16,6 @@ class Worker(SQLModel, table=True):
     email: Optional[str] = None
     phone: Optional[str] = None
 
-    # Update these relationships to use the link objects from associations.py AI!
     # relations
-    skills: List["Skill"] = Relationship(back_populates="workers")
-    shifts: List["Shift"] = Relationship(back_populates="workers")
+    skills: List["Skill"] = Relationship(back_populates="workers", link_model=WorkerSkillLink)
+    shifts: List["Shift"] = Relationship(back_populates="workers", link_model=ShiftWorkerLink)
