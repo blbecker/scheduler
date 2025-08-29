@@ -18,5 +18,9 @@ class Worker(SQLModel, table=True):
     phone: Optional[str] = None
 
     # relations
-    skills: List["Skill"] = Relationship(back_populates="workers", link_model=WorkerSkillLink)
-    shifts: List["Shift"] = Relationship(back_populates="workers", link_model=ShiftWorkerLink)
+    skills: List["Skill"] = Relationship(
+        back_populates="workers", link_model=WorkerSkillLink
+    )
+    shifts: List["Shift"] = Relationship(
+        back_populates="workers", link_model=ShiftWorkerLink
+    )
