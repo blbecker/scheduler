@@ -11,6 +11,8 @@ services:
     build: ./api/
     ports:
       - "8000:8000"
+    depends_on:
+      - db
     volumes:
       - ./api:/app
     environment:
@@ -25,8 +27,6 @@ services:
     command: celery -A scheduler_api worker --loglevel=info
     volumes:
       - ./api:/app
-    environment:
-      DJANGO_SETTING_MODULE: scheduler_api.settings
 
   redis:
     image: redis:7-alpine

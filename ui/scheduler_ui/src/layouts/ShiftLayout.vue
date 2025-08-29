@@ -13,9 +13,7 @@
     <q-page-container>
       <router-view v-slot="{ Component }">
         <component :is="Component" />
-        <div v-if="!Component" class="text-negative">
-          No shift component matched the route!
-        </div>
+        <div v-if="!Component" class="text-negative">No shift component matched the route!</div>
       </router-view>
     </q-page-container>
   </q-layout>

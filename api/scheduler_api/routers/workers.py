@@ -7,8 +7,8 @@ from ..repositories.worker_repository import WorkerRepository
 router = APIRouter()
 
 
-def get_worker_repo(session: Session = Depends(get_session)) -> WorkerRepository:
-    return WorkerRepository(session)
+def get_worker_repo() -> WorkerRepository:
+    return WorkerRepository()
 
 
 @router.get("/")

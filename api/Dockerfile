@@ -13,12 +13,10 @@ RUN pip install -r requirements.txt
 # copy source
 COPY . .
 
-# env vars for Django dev
-ENV PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=scheduler_api.settings
+ENV PYTHONUNBUFFERED=1
 
 # expose dev port
 EXPOSE 8000
 
 # run dev server with autoreload
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uvicorn", "scheduler_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
