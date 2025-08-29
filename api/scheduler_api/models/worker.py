@@ -2,6 +2,7 @@ from datetime import date
 from typing import List, Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
+from .associations import WorkerSkillLink, ShiftWorkerLink
 
 if TYPE_CHECKING:
     from .skill import Skill
