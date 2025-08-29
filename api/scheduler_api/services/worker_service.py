@@ -17,3 +17,13 @@ class WorkerService:
     def create_worker(self, name: str, birthdate, email: str = None) -> Worker:
         worker = Worker(name=name, birthdate=birthdate, email=email)
         return self.repo.add(worker)
+from sqlmodel import Session
+from typing import List, Dict
+
+class WorkerService:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def list_workers(self) -> List[Dict]:
+        # TODO: Implement actual database query
+        return [{"id": 1, "name": "Sample Worker"}]
