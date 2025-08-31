@@ -14,16 +14,18 @@ DATABASE_URL = f"postgresql+psycopg2://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{
 _engine = None
 _SessionLocal = None
 
+
 def _initialize_db():
     global _engine, _SessionLocal
-    if _engine is None:
+    if _SessionLocal is None:
         _engine = create_engine(DATABASE_URL, echo=True, future=True)
         _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
 
+
 def init_db() -> None:
-    """Create tables if not exist (only during early dev)."""
     _initialize_db()
     # SQLModel.metadata.create_all(_engine)
+
 
 def get_session() -> Session:
     _initialize_db()

@@ -1,7 +1,6 @@
 from datetime import date
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy.orm import Mapped
 from uuid import UUID, uuid4
 from .associations import WorkerSkillLink, ShiftWorkerLink
 

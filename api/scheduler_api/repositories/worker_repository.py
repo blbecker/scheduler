@@ -30,7 +30,7 @@ class WorkerRepository:
             existing_worker = session.get(Worker, worker.id)
             if existing_worker is None:
                 return None
-            worker_data = worker.dict(exclude_unset=True)
+            worker_data = worker.model_dump(exclude_unset=True)
             for key, value in worker_data.items():
                 setattr(existing_worker, key, value)
             session.add(existing_worker)

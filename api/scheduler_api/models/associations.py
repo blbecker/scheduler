@@ -1,7 +1,5 @@
-from sqlmodel import SQLModel, Field, ForeignKey
-from typing import Optional
+from sqlmodel import SQLModel, Field
 from uuid import UUID
-from typing import List, Optional, TYPE_CHECKING
 
 
 class WorkerSkillLink(SQLModel, table=True):
