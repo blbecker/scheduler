@@ -48,6 +48,9 @@ jobs:
         working-directory: ./ui/scheduler_ui
         run: pnpm run lint
 
+      - name: Test JavaScript code
+        working-directory: ./ui/scheduler_ui
+        run: pnpm run test:unit:ci
   build-docker:
     runs-on: ubuntu-latest
     needs: lint-and-test
