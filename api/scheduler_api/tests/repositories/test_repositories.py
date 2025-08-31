@@ -52,6 +52,7 @@ def test_worker_repository_get_by_id(worker_repo, mock_session):
     mock_session.get.return_value = expected_worker
 
     # Test
+    # Patch the _SessionLocal object in scheduler_api.db to bind in the mocked session AI!
     with patch("scheduler_api.db.get_session", return_value=mock_session):
         result = worker_repo.get_by_id(worker_id)
 
