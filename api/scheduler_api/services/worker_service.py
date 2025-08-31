@@ -4,7 +4,6 @@ from scheduler_api.models import Worker
 from scheduler_api.repositories.worker_repository import WorkerRepository
 
 
-# Add functions to update and delete workers AI!
 class WorkerService:
     def __init__(self, repo: WorkerRepository):
         self.repo = repo
@@ -18,3 +17,10 @@ class WorkerService:
     def create_worker(self, name: str, birthdate, email: str = None) -> Worker:
         worker = Worker(name=name, birthdate=birthdate, email=email)
         return self.repo.add(worker)
+
+    def update_worker(self, worker_id: int, name: str, birthdate, email: str = None) -> Optional[Worker]:
+        worker = Worker(id=worker_id, name=name, birthdate=birthdate, email=email)
+        return self.repo.update(worker)
+
+    def delete_worker(self, worker_id: int) -> bool:
+        return self.repo.delete(worker_id)
