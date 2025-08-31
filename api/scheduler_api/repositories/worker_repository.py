@@ -8,9 +8,6 @@ from scheduler_api.db import get_session
 class WorkerRepository:
 
     def get_all(self) -> List[Worker]:
-        # statement = select(Hero).where(Hero.name == "Spider-Boy")
-        # hero = session.exec(statement).first()
-        # print(hero)
         with get_session() as session:
             return session.query(Worker).all()
 
