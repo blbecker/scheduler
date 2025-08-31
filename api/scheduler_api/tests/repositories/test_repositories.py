@@ -45,7 +45,6 @@ def test_worker_repository_get_all(worker_repo, mock_session):
     assert result == expected_workers
 
 
-# Mock the get_session function to return the mock session to inject it into the repository AI!
 def test_worker_repository_get_by_id(worker_repo, mock_session):
     # Setup
     worker_id = UUID(int=1)
