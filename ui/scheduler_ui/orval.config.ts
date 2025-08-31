@@ -9,6 +9,7 @@ export default defineConfig({
       target: 'src/scheduler_api.ts',
       schemas: 'src/models',
       client: 'vue-query',
+      baseUrl: 'https://localhost:8000',
       mock: true,
     },
 
