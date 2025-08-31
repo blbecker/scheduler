@@ -1,0 +1,49 @@
+services:
+  ui:
+    build: ./ui/
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./ui/scheduler_ui:/app
+      - /app/node_modules
+
+  api:
+    build: ./api/
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - ./api:/app
+    environment:
+      PG_USER: scheduler_user
+      PG_PASS: scheduler_pass
+      PG_HOST: db
+      PG_PORT: 5432
+      PG_DB: scheduler_db
+
+  worker:
+    build: ./api
+    command: celery -A scheduler_api worker --loglevel=info
+    volumes:
+      - ./api:/app
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: scheduler_db
+      POSTGRES_USER: scheduler_user
+      POSTGRES_PASSWORD: scheduler_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+# Add the PG data volume
+volumes:
+  pgdata:
