@@ -32,9 +32,7 @@ def create_worker(worker: Worker, repo: WorkerRepository = Depends(get_worker_re
 
 @router.put("/{worker_id}")
 def update_worker(
-    worker_id: UUID, 
-    worker: Worker, 
-    repo: WorkerRepository = Depends(get_worker_repo)
+    worker_id: UUID, worker: Worker, repo: WorkerRepository = Depends(get_worker_repo)
 ):
     service = WorkerService(repo)
     # TODO: Implement update logic

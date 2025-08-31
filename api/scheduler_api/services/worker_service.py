@@ -18,7 +18,9 @@ class WorkerService:
         worker = Worker(name=name, birthdate=birthdate, email=email)
         return self.repo.add(worker)
 
-    def update_worker(self, worker_id: int, name: str, birthdate, email: str = None) -> Optional[Worker]:
+    def update_worker(
+        self, worker_id: int, name: str, birthdate, email: str = None
+    ) -> Optional[Worker]:
         worker = Worker(id=worker_id, name=name, birthdate=birthdate, email=email)
         return self.repo.update(worker)
 
