@@ -36,10 +36,9 @@ jobs:
         working-directory: ./api
         run: pytest
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: "20"
+          version: 10
 
       - name: Install Node.js dependencies
         working-directory: ./ui/scheduler_ui
