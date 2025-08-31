@@ -1,9 +1,8 @@
 from datetime import datetime
-from typing import List, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
 from .associations import ShiftWorkerLink, ShiftSkillLink
-from sqlalchemy.orm import Mapped
 
 if TYPE_CHECKING:
     from .skill import Skill
