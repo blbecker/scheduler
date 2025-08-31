@@ -10,7 +10,8 @@ class SkillRepository:
 
     def get_all(self) -> List[Skill]:
         with self._get_session() as session:
-            return session.exec(select(Skill)).all()
+            stmt = select(Skill)
+            return session.exec(stmt).all()
 
     def get_by_id(self, skill_id: int) -> Optional[Skill]:
         with self._get_session() as session:

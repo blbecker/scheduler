@@ -10,7 +10,8 @@ class ShiftRepository:
 
     def get_all(self) -> List[Shift]:
         with self._get_session() as session:
-            return session.query(Shift).all()
+            stmt = select(Shift)
+            return session.exec(stmt).all()
 
     def get_by_id(self, shift_id: int) -> Optional[Shift]:
         with self._get_session() as session:

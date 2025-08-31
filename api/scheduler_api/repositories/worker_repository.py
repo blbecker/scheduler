@@ -10,7 +10,7 @@ class WorkerRepository:
 
     def get_all(self) -> List[Worker]:
         with self._get_session() as session:
-            return session.query(Worker).all()
+            return session.exec(select(Worker)).all()
 
     def get_by_id(self, worker_id: int) -> Optional[Worker]:
         with self._get_session() as session:

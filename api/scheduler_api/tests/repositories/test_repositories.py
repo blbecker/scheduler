@@ -184,12 +184,13 @@ def shift_repo(mock_session):
 
 def test_worker_repository_get_all(worker_repo, mock_session):
     expected_workers = [Worker(id=UUID(int=1), name="John Doe")]
-    mock_session.query.return_value.all.return_value = expected_workers
+    mock_session.exec.return_value.all.return_value = expected_workers
 
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch("scheduler_api.repositories.worker_repository.WorkerRepository._get_session", 
+              return_value=mock_session):
         result = worker_repo.get_all()
 
-    mock_session.query.assert_called_once_with(Worker)
+    mock_session.exec.assert_called_once()
     assert result == expected_workers
 
 
