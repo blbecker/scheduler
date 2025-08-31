@@ -11,6 +11,7 @@ PG_PASS = os.getenv("PG_PASS", "scheduler_pass")
 
 DATABASE_URL = f"postgresql+psycopg2://{PG_USER}:{PG_PASS}@{PG_HOST}:{PG_PORT}/{PG_DB}"
 
+# LazyLoad the instantiation of the engine and sessionlocal. Create them the ifirst type that get_session is called. AI!
 engine = create_engine(DATABASE_URL, echo=True, future=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
