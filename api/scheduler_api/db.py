@@ -1,7 +1,6 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from sqlmodel import SQLModel
 
 PG_HOST = os.getenv("PG_HOST", "db")
 PG_PORT = os.getenv("PG_PORT", "5432")

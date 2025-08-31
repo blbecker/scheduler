@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
-from sqlmodel import Session
 from ..services.worker_service import WorkerService
 from ..repositories.worker_repository import WorkerRepository
 from ..models.worker import Worker

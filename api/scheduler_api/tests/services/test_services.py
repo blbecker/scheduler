@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from uuid import UUID
 from datetime import date
 from scheduler_api.models import Worker, Skill, Shift
