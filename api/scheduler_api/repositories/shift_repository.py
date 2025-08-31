@@ -4,6 +4,7 @@ from scheduler_api.models import Shift
 from scheduler_api.db import get_session
 
 
+# Extract the get_session function into a field to allow for mocking AI!
 class ShiftRepository:
     def get_all(self) -> List[Shift]:
         with get_session() as session:
