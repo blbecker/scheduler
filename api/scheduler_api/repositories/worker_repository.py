@@ -1,6 +1,5 @@
 # scheduler_api/repositories/worker_repository.py
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Worker
 from scheduler_api.db import get_session
 
