@@ -45,6 +45,7 @@ def test_worker_repository_get_all(worker_repo, mock_session):
     assert result == expected_workers
 
 
+# Mock the get_session function to return the mock session to inject it into the repository AI!
 def test_worker_repository_get_by_id(worker_repo, mock_session):
     # Setup
     worker_id = UUID(int=1)
@@ -139,6 +140,8 @@ def test_shift_repository_get_all(shift_repo, mock_session):
     # Verify
     mock_session.exec.assert_called_once()
     assert result == expected_shifts
+
+
 import pytest
 from unittest.mock import MagicMock, patch
 from uuid import UUID
@@ -153,30 +156,36 @@ from ...repositories.worker_repository import WorkerRepository
 from ...repositories.skill_repository import SkillRepository
 from ...repositories.shift_repository import ShiftRepository
 
+
 @pytest.fixture
 def mock_session():
     return MagicMock(spec=Session)
+
 
 @pytest.fixture
 def worker_repo(mock_session):
     return WorkerRepository()
 
+
 @pytest.fixture
 def skill_repo(mock_session):
     return SkillRepository()
+
 
 @pytest.fixture
 def shift_repo(mock_session):
     return ShiftRepository()
 
+
 def test_worker_repository_get_all(worker_repo, mock_session):
     expected_workers = [Worker(id=UUID(int=1), name="John Doe")]
     mock_session.query.return_value.all.return_value = expected_workers
-    
-    with patch('scheduler_api.db.get_session', return_value=mock_session):
+
+    with patch("scheduler_api.db.get_session", return_value=mock_session):
         result = worker_repo.get_all()
-    
+
     mock_session.query.assert_called_once_with(Worker)
     assert result == expected_workers
+
 
 # Rest of your test cases...
