@@ -11,6 +11,7 @@ def get_worker_repo() -> WorkerRepository:
     return WorkerRepository()
 
 
+# Add routes to create a worker, update a worker, delete a worker, and retrieve a worker following good RESTful API practices AI!
 @router.get("/")
 def list_workers(repo: WorkerRepository = Depends(get_worker_repo)):
     service = WorkerService(repo)
