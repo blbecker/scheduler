@@ -126,7 +126,7 @@ def test_skill_repository_get_all(skill_repo, mock_session):
         result = skill_repo.get_all()
 
     # Verify
-    mock_session.exec.assert_called_once()
+    mock_session.exec.assert_called_once_with(select(Skill))
     assert result == expected_skills
 
 
@@ -143,7 +143,7 @@ def test_shift_repository_get_all(shift_repo, mock_session):
         result = shift_repo.get_all()
 
     # Verify
-    mock_session.exec.assert_called_once()
+    mock_session.exec.assert_called_once_with(select(Shift))
     assert result == expected_shifts
 
 
