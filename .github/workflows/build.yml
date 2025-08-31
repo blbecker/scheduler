@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   lint-and-test:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Install Python dependencies
         working-directory: ./api
@@ -38,15 +38,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "20"
 
       - name: Install Node.js dependencies
         working-directory: ./ui/scheduler_ui
-        run: npm install
+        run: pnpm install
 
       - name: Lint JavaScript code
         working-directory: ./ui/scheduler_ui
-        run: npm run lint
+        run: pnpm run lint
 
   build-docker:
     runs-on: ubuntu-latest

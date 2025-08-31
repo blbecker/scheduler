@@ -7,17 +7,21 @@ from scheduler_api.services.worker_service import WorkerService
 from scheduler_api.services.skill_service import SkillService
 from scheduler_api.services.shift_service import ShiftService
 
+
 @pytest.fixture
 def mock_worker_repo():
     return MagicMock()
+
 
 @pytest.fixture
 def mock_skill_repo():
     return MagicMock()
 
+
 @pytest.fixture
 def mock_shift_repo():
     return MagicMock()
+
 
 def test_worker_service_get_all(mock_worker_repo):
     # Setup
@@ -34,6 +38,7 @@ def test_worker_service_get_all(mock_worker_repo):
     mock_worker_repo.get_all.assert_called_once()
     assert result == expected_workers
 
+
 def test_worker_service_get_by_id(mock_worker_repo):
     # Setup
     worker_id = UUID(int=1)
@@ -48,6 +53,7 @@ def test_worker_service_get_by_id(mock_worker_repo):
     mock_worker_repo.get_by_id.assert_called_once_with(worker_id)
     assert result == expected_worker
 
+
 def test_skill_service_get_all(mock_skill_repo):
     # Setup
     expected_skills = [Skill(id=UUID(int=1), name="Python")]
@@ -60,6 +66,7 @@ def test_skill_service_get_all(mock_skill_repo):
     # Verify
     mock_skill_repo.get_all.assert_called_once()
     assert result == expected_skills
+
 
 def test_shift_service_get_all(mock_shift_repo):
     # Setup
