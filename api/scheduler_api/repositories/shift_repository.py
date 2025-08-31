@@ -1,5 +1,4 @@
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Shift
 from scheduler_api.db import get_session
 
@@ -10,8 +9,7 @@ class ShiftRepository:
 
     def get_all(self) -> List[Shift]:
         with self._get_session() as session:
-            stmt = select(Shift)
-            return session.exec(stmt).all()
+            return session.query(Shift).all()
 
     def get_by_id(self, shift_id: int) -> Optional[Shift]:
         with self._get_session() as session:

@@ -1,6 +1,5 @@
 # scheduler_api/repositories/worker_repository.py
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Worker
 from scheduler_api.db import get_session
 
@@ -11,8 +10,7 @@ class WorkerRepository:
 
     def get_all(self) -> List[Worker]:
         with self._get_session() as session:
-            stmt = select(Worker)
-            return session.exec(stmt).all()
+            return session.query(Worker).all()
 
     def get_by_id(self, worker_id: int) -> Optional[Worker]:
         with self._get_session() as session:

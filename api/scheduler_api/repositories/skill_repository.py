@@ -1,5 +1,4 @@
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Skill
 from scheduler_api.db import get_session
 
@@ -10,8 +9,7 @@ class SkillRepository:
 
     def get_all(self) -> List[Skill]:
         with self._get_session() as session:
-            stmt = select(Skill)
-            return session.exec(stmt).all()
+            return session.query(Skill).all()
 
     def get_by_id(self, skill_id: int) -> Optional[Skill]:
         with self._get_session() as session:
