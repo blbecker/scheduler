@@ -11,8 +11,37 @@ def get_worker_repo() -> WorkerRepository:
     return WorkerRepository()
 
 
-# Add routes to create a worker, update a worker, delete a worker, and retrieve a worker following good RESTful API practices AI!
 @router.get("/")
 def list_workers(repo: WorkerRepository = Depends(get_worker_repo)):
     service = WorkerService(repo)
     return service.list_workers()
+
+
+@router.get("/{worker_id}")
+def get_worker(worker_id: UUID, repo: WorkerRepository = Depends(get_worker_repo)):
+    service = WorkerService(repo)
+    return service.get_worker(worker_id)
+
+
+@router.post("/", status_code=201)
+def create_worker(worker: Worker, repo: WorkerRepository = Depends(get_worker_repo)):
+    service = WorkerService(repo)
+    return service.create_worker(worker.name, worker.birthdate, worker.email)
+
+
+@router.put("/{worker_id}")
+def update_worker(
+    worker_id: UUID, 
+    worker: Worker, 
+    repo: WorkerRepository = Depends(get_worker_repo)
+):
+    service = WorkerService(repo)
+    # TODO: Implement update logic
+    raise HTTPException(status_code=501, detail="Not implemented")
+
+
+@router.delete("/{worker_id}", status_code=204)
+def delete_worker(worker_id: UUID, repo: WorkerRepository = Depends(get_worker_repo)):
+    service = WorkerService(repo)
+    # TODO: Implement delete logic
+    raise HTTPException(status_code=501, detail="Not implemented")
