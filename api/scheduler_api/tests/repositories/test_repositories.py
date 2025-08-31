@@ -139,3 +139,44 @@ def test_shift_repository_get_all(shift_repo, mock_session):
     # Verify
     mock_session.exec.assert_called_once()
     assert result == expected_shifts
+import pytest
+from unittest.mock import MagicMock, patch
+from uuid import UUID
+from datetime import date
+from sqlmodel import Session
+
+# Local imports
+from ...models.worker import Worker
+from ...models.skill import Skill
+from ...models.shift import Shift
+from ...repositories.worker_repository import WorkerRepository
+from ...repositories.skill_repository import SkillRepository
+from ...repositories.shift_repository import ShiftRepository
+
+@pytest.fixture
+def mock_session():
+    return MagicMock(spec=Session)
+
+@pytest.fixture
+def worker_repo(mock_session):
+    return WorkerRepository()
+
+@pytest.fixture
+def skill_repo(mock_session):
+    return SkillRepository()
+
+@pytest.fixture
+def shift_repo(mock_session):
+    return ShiftRepository()
+
+def test_worker_repository_get_all(worker_repo, mock_session):
+    expected_workers = [Worker(id=UUID(int=1), name="John Doe")]
+    mock_session.query.return_value.all.return_value = expected_workers
+    
+    with patch('scheduler_api.db.get_session', return_value=mock_session):
+        result = worker_repo.get_all()
+    
+    mock_session.query.assert_called_once_with(Worker)
+    assert result == expected_workers
+
+# Rest of your test cases...
