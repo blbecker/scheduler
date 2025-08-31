@@ -4,25 +4,27 @@ from scheduler_api.models import Shift
 from scheduler_api.db import get_session
 
 
-# Extract the get_session function into a field to allow for mocking AI!
 class ShiftRepository:
+    def _get_session(self):
+        return get_session()
+
     def get_all(self) -> List[Shift]:
-        with get_session() as session:
-            return session.exec(select(Shift)).all()
+        with self._get_session() as session:
+            return session.query(Shift).all()
 
     def get_by_id(self, shift_id: int) -> Optional[Shift]:
-        with get_session() as session:
+        with self._get_session() as session:
             return session.get(Shift, shift_id)
 
     def add(self, shift: Shift) -> Shift:
-        with get_session() as session:
+        with self._get_session() as session:
             session.add(shift)
             session.commit()
             session.refresh(shift)
             return shift
 
     def update(self, shift: Shift) -> Optional[Shift]:
-        with get_session() as session:
+        with self._get_session() as session:
             existing_shift = session.get(Shift, shift.id)
             if existing_shift is None:
                 return None
@@ -35,7 +37,7 @@ class ShiftRepository:
             return existing_shift
 
     def delete(self, shift_id: int) -> bool:
-        with get_session() as session:
+        with self._get_session() as session:
             shift = session.get(Shift, shift_id)
             if shift is None:
                 return False

@@ -14,21 +14,6 @@ def mock_session():
     return MagicMock(spec=Session)
 
 
-@pytest.fixture
-def worker_repo(mock_session):
-    return WorkerRepository()
-
-
-@pytest.fixture
-def skill_repo(mock_session):
-    return SkillRepository()
-
-
-@pytest.fixture
-def shift_repo(mock_session):
-    return ShiftRepository()
-
-
 def test_worker_repository_get_all(worker_repo, mock_session):
     # Setup
     expected_workers = [
@@ -37,7 +22,10 @@ def test_worker_repository_get_all(worker_repo, mock_session):
     mock_session.query.return_value.all.return_value = expected_workers
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.worker_repository.WorkerRepository._get_session",
+        return_value=mock_session,
+    ):
         result = worker_repo.get_all()
 
     # Verify
@@ -52,7 +40,10 @@ def test_worker_repository_get_by_id(worker_repo, mock_session):
     mock_session.get.return_value = expected_worker
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.worker_repository.WorkerRepository._get_session",
+        return_value=mock_session,
+    ):
         result = worker_repo.get_by_id(worker_id)
 
     # Verify
@@ -65,7 +56,10 @@ def test_worker_repository_add(worker_repo, mock_session):
     worker = Worker(name="John Doe", birthdate=date(1990, 1, 1))
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.worker_repository.WorkerRepository._get_session",
+        return_value=mock_session,
+    ):
         result = worker_repo.add(worker)
 
     # Verify
@@ -83,7 +77,10 @@ def test_worker_repository_update(worker_repo, mock_session):
     mock_session.get.return_value = existing_worker
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.worker_repository.WorkerRepository._get_session",
+        return_value=mock_session,
+    ):
         result = worker_repo.update(updated_worker)
 
     # Verify
@@ -102,7 +99,10 @@ def test_worker_repository_delete(worker_repo, mock_session):
     mock_session.get.return_value = worker
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.worker_repository.WorkerRepository._get_session",
+        return_value=mock_session,
+    ):
         result = worker_repo.delete(worker_id)
 
     # Verify
@@ -119,7 +119,10 @@ def test_skill_repository_get_all(skill_repo, mock_session):
     mock_session.exec.return_value.all.return_value = expected_skills
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.skill_repository.SkillRepository._get_session",
+        return_value=mock_session,
+    ):
         result = skill_repo.get_all()
 
     # Verify
@@ -133,7 +136,10 @@ def test_shift_repository_get_all(shift_repo, mock_session):
     mock_session.exec.return_value.all.return_value = expected_shifts
 
     # Test
-    with patch("scheduler_api.db.get_session", return_value=mock_session):
+    with patch(
+        "scheduler_api.repositories.shift_repository.ShiftRepository._get_session",
+        return_value=mock_session,
+    ):
         result = shift_repo.get_all()
 
     # Verify

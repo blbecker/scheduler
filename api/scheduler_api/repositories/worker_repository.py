@@ -5,24 +5,26 @@ from scheduler_api.db import get_session
 
 
 class WorkerRepository:
+    def _get_session(self):
+        return get_session()
 
     def get_all(self) -> List[Worker]:
-        with get_session() as session:
+        with self._get_session() as session:
             return session.query(Worker).all()
 
     def get_by_id(self, worker_id: int) -> Optional[Worker]:
-        with get_session() as session:
+        with self._get_session() as session:
             return session.get(Worker, worker_id)
 
     def add(self, worker: Worker) -> Worker:
-        with get_session() as session:
+        with self._get_session() as session:
             session.add(worker)
             session.commit()
             session.refresh(worker)
             return worker
 
     def update(self, worker: Worker) -> Optional[Worker]:
-        with get_session() as session:
+        with self._get_session() as session:
             existing_worker = session.get(Worker, worker.id)
             if existing_worker is None:
                 return None
@@ -35,7 +37,7 @@ class WorkerRepository:
             return existing_worker
 
     def delete(self, worker_id: int) -> bool:
-        with get_session() as session:
+        with self._get_session() as session:
             worker = session.get(Worker, worker_id)
             if worker is None:
                 return False
