@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from uuid import UUID
 from datetime import date
-from sqlmodel import Session
+from sqlmodel import Session, select
 from scheduler_api.models import Worker, Skill, Shift
 from scheduler_api.repositories.worker_repository import WorkerRepository
 from scheduler_api.repositories.skill_repository import SkillRepository
