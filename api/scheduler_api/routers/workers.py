@@ -45,5 +45,6 @@ def update_worker(
 @router.delete("/{worker_id}", status_code=204)
 def delete_worker(worker_id: UUID, repo: WorkerRepository = Depends(get_worker_repo)):
     service = WorkerService(repo)
-    # TODO: Implement delete logic
-    raise HTTPException(status_code=501, detail="Not implemented")
+    if not service.delete_worker(worker_id):
+        raise HTTPException(status_code=404, detail="Worker not found")
+    return None
