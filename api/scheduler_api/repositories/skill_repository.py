@@ -19,3 +19,25 @@ class SkillRepository:
             session.commit()
             session.refresh(skill)
             return skill
+
+    def update(self, skill: Skill) -> Optional[Skill]:
+        with get_session() as session:
+            existing_skill = session.get(Skill, skill.id)
+            if existing_skill is None:
+                return None
+            skill_data = skill.dict(exclude_unset=True)
+            for key, value in skill_data.items():
+                setattr(existing_skill, key, value)
+            session.add(existing_skill)
+            session.commit()
+            session.refresh(existing_skill)
+            return existing_skill
+
+    def delete(self, skill_id: int) -> bool:
+        with get_session() as session:
+            skill = session.get(Skill, skill_id)
+            if skill is None:
+                return False
+            session.delete(skill)
+            session.commit()
+            return True
