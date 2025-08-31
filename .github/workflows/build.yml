@@ -1,0 +1,1 @@
+# Implement a github actions workflow that will run on PRs and main. It should lint the code in ui/ using a javascript linter, the code in api/ using black and flake8, and run the tests in api/ using pytest. It should also build the docker images for ui and api to ensure they build correctly. AI!
