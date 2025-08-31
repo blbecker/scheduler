@@ -27,16 +27,19 @@ def get_worker(worker_id: UUID, repo: WorkerRepository = Depends(get_worker_repo
 @router.post("/", status_code=201)
 def create_worker(worker: Worker, repo: WorkerRepository = Depends(get_worker_repo)):
     service = WorkerService(repo)
-    return service.create_worker(worker.name, worker.birthdate, worker.email)
+    return service.create_worker(worker)
 
 
 @router.put("/{worker_id}")
 def update_worker(
     worker_id: UUID, worker: Worker, repo: WorkerRepository = Depends(get_worker_repo)
 ):
+    worker.id = worker_id
     service = WorkerService(repo)
-    # TODO: Implement update logic
-    raise HTTPException(status_code=501, detail="Not implemented")
+    updated_worker = service.update_worker(worker)
+    if updated_worker is None:
+        raise HTTPException(status_code=404, detail="Worker not found")
+    return updated_worker
 
 
 @router.delete("/{worker_id}", status_code=204)

@@ -14,14 +14,10 @@ class WorkerService:
     def get_worker(self, worker_id: int) -> Optional[Worker]:
         return self.repo.get_by_id(worker_id)
 
-    def create_worker(self, name: str, birthdate, email: str = None) -> Worker:
-        worker = Worker(name=name, birthdate=birthdate, email=email)
+    def create_worker(self, worker: Worker) -> Worker:
         return self.repo.add(worker)
 
-    def update_worker(
-        self, worker_id: int, name: str, birthdate, email: str = None
-    ) -> Optional[Worker]:
-        worker = Worker(id=worker_id, name=name, birthdate=birthdate, email=email)
+    def update_worker(self, worker: Worker) -> Optional[Worker]:
         return self.repo.update(worker)
 
     def delete_worker(self, worker_id: int) -> bool:
