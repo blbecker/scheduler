@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { getShifts } from 'src/services/schedulerService';
-import type { Shift } from 'src/services/schedulerService';
+import { getShifts } from 'src/services/shiftService';
+import type { Shift } from 'src/services/shiftService';
 export default defineComponent({
   setup() {
     const shifts = ref<Shift[]>([]);

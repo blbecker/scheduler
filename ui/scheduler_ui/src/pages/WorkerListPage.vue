@@ -1,9 +1,13 @@
 <template>
   <q-page>
     <q-list>
-      <q-item v-for="shift in shifts" :key="shift.id">
-        <q-item-section>{{ shift.title }}</q-item-section>
-        <q-item-section>{{ shift.completed ? 'Done' : 'Pending' }}</q-item-section>
+      <q-item v-for="worker in workers" :key="worker.id">
+        <q-item-section>{{ worker.name }}</q-item-section>
+        <q-item-section>
+          <q-badge v-for="skillId in worker.skills" :key="skillId" class="q-mr-xs">
+            {{ skillId }}
+          </q-badge>
+        </q-item-section>
       </q-item>
     </q-list>
   </q-page>
@@ -11,22 +15,22 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { getShifts } from 'src/services/schedulerService';
-import type { Shift } from 'src/services/schedulerService';
+import { getWorkers } from 'src/services/workerService';
+import type { Worker } from 'src/services/workerService';
 export default defineComponent({
   setup() {
-    const shifts = ref<Shift[]>([]);
+    const workers = ref<Worker[]>([]);
     onMounted(async () => {
-      console.log('Fetching shifts...');
+      console.log('Fetching workers...');
       try {
-        const fetchedShifts = await getShifts();
-        console.log('Successfully fetched shifts:', {
-          count: fetchedShifts.length,
-          firstShift: fetchedShifts[0] || 'No shifts available',
+        const fetchedWorkers = await getWorkers();
+        console.log('Successfully fetched workers:', {
+          count: fetchedWorkers.length,
+          firstWorker: fetchedWorkers[0] || 'No workers available',
         });
-        shifts.value = fetchedShifts;
+        workers.value = fetchedWorkers;
       } catch (error) {
-        console.error('Failed to fetch shifts:', {
+        console.error('Failed to fetch workers:', {
           error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString(),
         });
@@ -34,7 +38,7 @@ export default defineComponent({
       }
     });
 
-    return { shifts };
+    return { workers };
   },
 });
 </script>

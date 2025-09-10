@@ -1,9 +1,8 @@
 <template>
   <q-page>
     <q-list>
-      <q-item v-for="shift in shifts" :key="shift.id">
-        <q-item-section>{{ shift.title }}</q-item-section>
-        <q-item-section>{{ shift.completed ? 'Done' : 'Pending' }}</q-item-section>
+      <q-item v-for="skill in skills" :key="skill.id">
+        <q-item-section>{{ skill.name }}</q-item-section>
       </q-item>
     </q-list>
   </q-page>
@@ -11,22 +10,22 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { getShifts } from 'src/services/schedulerService';
-import type { Shift } from 'src/services/schedulerService';
+import { getSkills } from 'src/services/skillService';
+import type { Skill } from 'src/services/skillService';
 export default defineComponent({
   setup() {
-    const shifts = ref<Shift[]>([]);
+    const skills = ref<Skill[]>([]);
     onMounted(async () => {
-      console.log('Fetching shifts...');
+      console.log('Fetching skills...');
       try {
-        const fetchedShifts = await getShifts();
-        console.log('Successfully fetched shifts:', {
-          count: fetchedShifts.length,
-          firstShift: fetchedShifts[0] || 'No shifts available',
+        const fetchedSkills = await getSkills();
+        console.log('Successfully fetched skills:', {
+          count: fetchedSkills.length,
+          firstSkill: fetchedSkills[0] || 'No skills available',
         });
-        shifts.value = fetchedShifts;
+        skills.value = fetchedSkills;
       } catch (error) {
-        console.error('Failed to fetch shifts:', {
+        console.error('Failed to fetch skills:', {
           error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString(),
         });
@@ -34,7 +33,7 @@ export default defineComponent({
       }
     });
 
-    return { shifts };
+    return { skills };
   },
 });
 </script>
