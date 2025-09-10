@@ -4,7 +4,7 @@ from ..services.worker_service import WorkerService
 from ..repositories.worker_repository import WorkerRepository
 from ..models.worker import Worker
 
-router = APIRouter()
+router = APIRouter(prefix="/workers", tags=["workers"])
 
 
 def get_worker_repo() -> WorkerRepository:

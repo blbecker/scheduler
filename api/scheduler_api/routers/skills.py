@@ -4,7 +4,7 @@ from ..services.skill_service import SkillService
 from ..repositories.skill_repository import SkillRepository
 from ..models.skill import Skill
 
-router = APIRouter()
+router = APIRouter(prefix="/skills", tags=["skills"])
 
 
 def get_skill_repo() -> SkillRepository:
