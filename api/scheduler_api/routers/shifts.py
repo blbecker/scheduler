@@ -13,7 +13,7 @@ def get_shift_repo() -> ShiftRepository:
 
 @router.get("/")
 def list_shifts(repo: ShiftRepository = Depends(get_shift_repo)):
-    service = ShiftService(ShiftRepository(session))
+    service = ShiftService(repo)
     return service.list_shifts()
 
 
