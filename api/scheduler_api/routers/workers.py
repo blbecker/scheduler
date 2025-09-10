@@ -3,12 +3,13 @@ from uuid import UUID
 from ..services.worker_service import WorkerService
 from ..repositories.worker_repository import WorkerRepository
 from ..models.worker import Worker
+from ..db import get_session
 
 router = APIRouter(prefix="/workers", tags=["workers"])
 
 
 def get_worker_repo() -> WorkerRepository:
-    return WorkerRepository()
+    return WorkerRepository(get_session())
 
 
 @router.get("/")

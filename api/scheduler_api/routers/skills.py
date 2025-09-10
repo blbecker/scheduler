@@ -3,12 +3,13 @@ from uuid import UUID
 from ..services.skill_service import SkillService
 from ..repositories.skill_repository import SkillRepository
 from ..models.skill import Skill
+from ..db import get_session
 
 router = APIRouter(prefix="/skills", tags=["skills"])
 
 
 def get_skill_repo() -> SkillRepository:
-    return SkillRepository()
+    return SkillRepository(get_session())
 
 
 @router.get("/")

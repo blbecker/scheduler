@@ -3,12 +3,13 @@ from uuid import UUID
 from ..services.shift_service import ShiftService
 from ..repositories.shift_repository import ShiftRepository
 from ..models.shift import Shift
+from ..db import get_session
 
 router = APIRouter(prefix="/shifts", tags=["shifts"])
 
 
 def get_shift_repo() -> ShiftRepository:
-    return ShiftRepository()
+    return ShiftRepository(get_session())
 
 
 @router.get("/")
