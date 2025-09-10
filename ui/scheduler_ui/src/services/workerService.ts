@@ -1,4 +1,4 @@
-import { api } from 'boot/axios';
+import { getWorkers as clientGetWorkers, createWorker as clientCreateWorker, updateWorker as clientUpdateWorker, deleteWorker as clientDeleteWorker } from '../clients/workerClient';
 
 export interface Worker {
   id: number;
@@ -7,20 +7,20 @@ export interface Worker {
 }
 
 export async function getWorkers(): Promise<Worker[]> {
-  const response = await api.get<Worker[]>('/v1/workers/');
+  const response = await clientGetWorkers();
   return response.data;
 }
 
 export async function createWorker(payload: Omit<Worker, 'id'>): Promise<Worker> {
-  const response = await api.post<Worker>('/v1/workers/', payload);
+  const response = await clientCreateWorker(payload);
   return response.data;
 }
 
 export async function updateWorker(workerId: number, payload: Partial<Worker>): Promise<Worker> {
-  const response = await api.patch<Worker>(`/v1/workers/${workerId}/`, payload);
+  const response = await clientUpdateWorker(workerId, payload);
   return response.data;
 }
 
 export async function deleteWorker(workerId: number): Promise<void> {
-  await api.delete(`/v1/workers/${workerId}/`);
+  await clientDeleteWorker(workerId);
 }

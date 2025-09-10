@@ -1,4 +1,4 @@
-import { api } from 'boot/axios';
+import { getShifts as clientGetShifts, createShift as clientCreateShift, updateShift as clientUpdateShift } from '../clients/shiftClient';
 
 export interface Shift {
   id: number;
@@ -7,16 +7,16 @@ export interface Shift {
 }
 
 export async function getShifts(): Promise<Shift[]> {
-  const response = await api.get<Shift[]>('/v1/shifts/');
+  const response = await clientGetShifts();
   return response.data;
 }
 
 export async function createShift(payload: Omit<Shift, 'id'>): Promise<Shift> {
-  const response = await api.post<Shift>('/v1/shifts/', payload);
+  const response = await clientCreateShift(payload);
   return response.data;
 }
 
 export async function updateShift(shiftId: number, payload: Partial<Shift>): Promise<Shift> {
-  const response = await api.patch<Shift>(`/v1/shifts/${shiftId}/`, payload);
+  const response = await clientUpdateShift(shiftId, payload);
   return response.data;
 }
