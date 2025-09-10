@@ -1,9 +1,5 @@
 import { getSkills as clientGetSkills, createSkill as clientCreateSkill, updateSkill as clientUpdateSkill, deleteSkill as clientDeleteSkill } from '../clients/skillClient';
-
-export interface Skill {
-  id: number;
-  name: string;
-}
+import type { Skill } from '../models/skill';
 
 export async function getSkills(): Promise<Skill[]> {
   const response = await clientGetSkills();

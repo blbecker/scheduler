@@ -1,10 +1,5 @@
 import { getWorkers as clientGetWorkers, createWorker as clientCreateWorker, updateWorker as clientUpdateWorker, deleteWorker as clientDeleteWorker } from '../clients/workerClient';
-
-export interface Worker {
-  id: number;
-  name: string;
-  skills: number[];
-}
+import type { Worker } from '../models/worker';
 
 export async function getWorkers(): Promise<Worker[]> {
   const response = await clientGetWorkers();

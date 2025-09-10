@@ -1,10 +1,5 @@
 import { getShifts as clientGetShifts, createShift as clientCreateShift, updateShift as clientUpdateShift } from '../clients/shiftClient';
-
-export interface Shift {
-  id: number;
-  title: string;
-  completed: boolean;
-}
+import type { Shift } from '../models/shift';
 
 export async function getShifts(): Promise<Shift[]> {
   const response = await clientGetShifts();
