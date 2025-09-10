@@ -1,25 +1,31 @@
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
+from sqlmodel import Field, Session, SQLModel, select
 from ..services.shift_service import ShiftService
 from ..repositories.shift_repository import ShiftRepository
 from ..models.shift import Shift
+from ..db import get_session
 
 router = APIRouter()
 
 
-def get_shift_repo() -> ShiftRepository:
-    return ShiftRepository()
+def _get_session():
+    with get_session() as session:
+        yield session
 
 
 @router.get("/")
-def list_shifts(repo: ShiftRepository = Depends(get_shift_repo)):
-    service = ShiftService(repo)
+def list_shifts(session: Session = Depends(_get_session())):
+    service = ShiftService(ShiftRepository(session))
     return service.list_shifts()
 
 
 @router.get("/{shift_id}")
-def get_shift(shift_id: UUID, repo: ShiftRepository = Depends(get_shift_repo)):
-    service = ShiftService(repo)
+def get_shift(
+    shift_id: UUID,
+    session: Session = Depends(_get_session),
+):
+    service = ShiftService(ShiftRepository(session))
     return service.get_shift(shift_id)
 
 
