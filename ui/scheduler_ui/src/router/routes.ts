@@ -13,11 +13,11 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/shift',
+    path: '/shifts',
     component: () => import('layouts/ShiftLayout.vue'),
     children: [
       {
-        path: 'list',
+        path: '',
         component: () => import('pages/ShiftListPage.vue'),
       },
       {
@@ -27,11 +27,11 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/skill',
+    path: '/skills',
     component: () => import('layouts/SkillLayout.vue'),
     children: [
       {
-        path: 'list',
+        path: '',
         component: () => import('pages/SkillListPage.vue'),
       },
       {
@@ -41,11 +41,11 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path: '/worker',
+    path: '/workers',
     component: () => import('layouts/WorkerLayout.vue'),
     children: [
       {
-        path: 'list',
+        path: '',
         component: () => import('pages/WorkerListPage.vue'),
       },
       {
