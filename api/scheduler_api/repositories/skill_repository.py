@@ -27,7 +27,7 @@ class SkillRepository:
             existing_skill = session.get(Skill, skill.id)
             if existing_skill is None:
                 return None
-            skill_data = skill.dict(exclude_unset=True)
+            skill_data = skill.model_dump(exclude_unset=True)
             for key, value in skill_data.items():
                 setattr(existing_skill, key, value)
             session.add(existing_skill)

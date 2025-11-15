@@ -27,7 +27,7 @@ class ShiftRepository:
             existing_shift = session.get(Shift, shift.id)
             if existing_shift is None:
                 return None
-            shift_data = shift.dict(exclude_unset=True)
+            shift_data = shift.model_dump(exclude_unset=True)
             for key, value in shift_data.items():
                 setattr(existing_shift, key, value)
             session.add(existing_shift)
