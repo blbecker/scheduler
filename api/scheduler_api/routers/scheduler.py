@@ -14,9 +14,9 @@ def create_schedule(input_dto: GenerateScheduleInput):
     return {"task_id": task_id}
 
 
-@router.get("/{task_id}")
+@router.get("/{task_id}", response_model=GenerateScheduleResult)
 def get_schedule_result(task_id: str):
     result = SchedulerService.get_schedule_result(task_id)
     if result:
         return result
-    return {"task_id": task_id, "status": "pending"}
+    return GenerateScheduleResult(status="pending", seconds_waited=0)
