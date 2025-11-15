@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter
 from scheduler_api.services.scheduler_service import SchedulerService
 from scheduler_api.models.schedule_dtos import (
@@ -15,8 +17,8 @@ def create_schedule(input_dto: GenerateScheduleInput):
 
 
 @router.get("/{task_id}", response_model=GenerateScheduleResult)
-def get_schedule_result(task_id: str):
-    result = SchedulerService.get_schedule_result(task_id)
+def get_schedule_result(task_id: UUID):
+    result = SchedulerService.get_schedule_result(str(task_id))
     if result:
         return result
     return GenerateScheduleResult(status="pending", seconds_waited=0)
