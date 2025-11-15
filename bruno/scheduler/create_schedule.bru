@@ -1,0 +1,22 @@
+meta {
+  name: create_schedule
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/v1/schedules/generate
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "total_seconds_to_wait": 5
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

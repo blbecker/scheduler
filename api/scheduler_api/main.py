@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from .db import init_db
-from .routers import shifts, skills, workers
+from .routers import shifts, skills, workers, scheduler
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Scheduler API")
@@ -27,4 +27,5 @@ def on_startup():
 v1router.include_router(skills.router)
 v1router.include_router(shifts.router)
 v1router.include_router(workers.router)
+v1router.include_router(scheduler.router)
 app.include_router(v1router, prefix="/v1")

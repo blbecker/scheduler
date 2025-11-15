@@ -1,5 +1,9 @@
 FROM python:3.12-slim
 
+# Create a non-root user with UID/GID 1000
+RUN groupadd -g 1000 appuser && \
+    useradd --uid 1000 --gid 1000 --create-home --shell /bin/bash appuser
+
 # set workdir
 WORKDIR /app
 
@@ -14,6 +18,9 @@ RUN pip install -r requirements.txt
 COPY . .
 
 ENV PYTHONUNBUFFERED=1
+
+# Switch to the non-root user
+USER appuser
 
 # expose dev port
 EXPOSE 8000
