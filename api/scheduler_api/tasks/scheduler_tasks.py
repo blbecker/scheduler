@@ -7,7 +7,7 @@ from scheduler_api.models.schedule_dtos import (
 
 
 @shared_task
-def generate_schedule_task(input_dict):
+def generate_schedule_task(input_dict: dict) -> dict:
     """
     input_dict is a dict representation of GenerateScheduleInput
     """
