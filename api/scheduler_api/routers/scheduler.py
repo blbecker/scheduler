@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Response, status
 from scheduler_api.services.scheduler_service import SchedulerService
 from scheduler_api.models.schedule_dtos import (
@@ -14,9 +15,11 @@ def create_schedule(input_dto: GenerateScheduleInput):
     return {"task_id": task_id}
 
 
-@router.get("/{task_id}", response_model=GenerateScheduleResult, status_code=status.HTTP_200_OK)
-def get_schedule_result(task_id: str, response: Response):
-    result, task_status = SchedulerService.get_schedule_result(task_id)
+@router.get(
+    "/{task_id}", response_model=GenerateScheduleResult, status_code=status.HTTP_200_OK
+)
+def get_schedule_result(task_id: UUID, response: Response):
+    result, task_status = SchedulerService.get_schedule_result(str(task_id))
 
     if task_status == "pending":
         response.status_code = status.HTTP_202_ACCEPTED
