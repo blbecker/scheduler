@@ -1,65 +1,65 @@
-import type { RouteRecordRaw } from 'vue-router';
+import MainLayout from 'layouts/MainLayout.vue';
+import ShiftLayout from 'layouts/ShiftLayout.vue';
+import SkillLayout from 'layouts/SkillLayout.vue';
+import WorkerLayout from 'layouts/WorkerLayout.vue';
 
-const routes: RouteRecordRaw[] = [
+import ShiftListPage from 'pages/shifts/ShiftListPage.vue';
+import SkillListPage from 'pages/skills/SkillListPage.vue';
+import WorkerListPage from 'pages/workers/WorkerListPage.vue';
+
+const routes = [
   {
     path: '/',
-    // component: () => import('layouts/MainLayout.vue'),
-    component: () => import('layouts/MainLayout.vue'),
+    component: MainLayout,
     children: [
+      // Redirect root to /shifts
+      { path: '', redirect: '/shifts' },
+
+      // Shifts section
       {
-        path: '',
-        component: () => import('pages/IndexPage.vue'),
+        path: 'shifts',
+        component: ShiftLayout,
+        children: [
+          {
+            path: '',
+            name: 'ShiftList',
+            component: ShiftListPage,
+          },
+          // Add additional shift-specific pages here
+          // { path: ':id', name: 'ShiftDetail', component: ShiftDetailPage }
+        ],
+      },
+
+      // Skills section
+      {
+        path: 'skills',
+        component: SkillLayout,
+        children: [
+          {
+            path: '',
+            name: 'SkillList',
+            component: SkillListPage,
+          },
+        ],
+      },
+
+      // Workers section
+      {
+        path: 'workers',
+        component: WorkerLayout,
+        children: [
+          {
+            path: '',
+            name: 'WorkerList',
+            component: WorkerListPage,
+          },
+        ],
       },
     ],
   },
-  {
-    path: '/shifts',
-    component: () => import('layouts/ShiftLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/ShiftListPage.vue'),
-      },
-      {
-        path: ':id',
-        component: () => import('pages/ShiftDetailPage.vue'),
-      },
-    ],
-  },
-  {
-    path: '/skills',
-    component: () => import('layouts/SkillLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/SkillListPage.vue'),
-      },
-      {
-        path: ':id',
-        component: () => import('pages/SkillDetailPage.vue'),
-      },
-    ],
-  },
-  {
-    path: '/workers',
-    component: () => import('layouts/WorkerLayout.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('pages/WorkerListPage.vue'),
-      },
-      {
-        path: ':id',
-        component: () => import('pages/WorkerDetailPage.vue'),
-      },
-    ],
-  },
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
-  },
+
+  // Catch-all route redirects back to root
+  { path: '/:catchAll(.*)*', redirect: '/' },
 ];
 
 export default routes;

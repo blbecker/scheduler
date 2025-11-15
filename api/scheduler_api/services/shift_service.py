@@ -14,6 +14,10 @@ class ShiftService:
     def get_shift(self, shift_id: int) -> Optional[Shift]:
         return self.repo.get_by_id(shift_id)
 
-    def create_shift(self, name: str, birthdate, email: str = None) -> Shift:
-        shift = Shift(name=name, birthdate=birthdate, email=email)
+    # start_time: datetime
+    # end_time: datetime
+    # location: Optional[str] = None
+    # notes: Optional[str] = None
+
+    def create_shift(self, shift: Shift) -> Shift:
         return self.repo.add(shift)

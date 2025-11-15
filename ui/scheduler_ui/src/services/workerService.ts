@@ -1,21 +1,24 @@
-import { getWorkers as clientGetWorkers, createWorker as clientCreateWorker, updateWorker as clientUpdateWorker, deleteWorker as clientDeleteWorker } from '../clients/workerClient';
-import type { Worker } from '../models/worker';
+import { WorkersClient } from 'src/clients/workers/workers';
+import type { Worker } from 'src/models/worker';
 
-export async function getWorkers(): Promise<Worker[]> {
-  const response = await clientGetWorkers();
-  return response.data;
-}
+export const WorkersService = {
+  async getWorkers(): Promise<Worker[]> {
+    return await WorkersClient.list();
+  },
 
-export async function createWorker(payload: Omit<Worker, 'id'>): Promise<Worker> {
-  const response = await clientCreateWorker(payload);
-  return response.data;
-}
+  async getWorker(id: string): Promise<Worker> {
+    return await WorkersClient.get(id);
+  },
 
-export async function updateWorker(workerId: number, payload: Partial<Worker>): Promise<Worker> {
-  const response = await clientUpdateWorker(workerId, payload);
-  return response.data;
-}
+  // async createWorker(payload: Omit<Worker, 'id'>): Promise<Worker> {
+  //   return await WorkersClient.create(payload);
+  // }
 
-export async function deleteWorker(workerId: number): Promise<void> {
-  await clientDeleteWorker(workerId);
-}
+  // async updateWorker(id: string, payload: Partial<Worker>): Promise<Worker> {
+  //   return await WorkersClient.update(id, payload as Worker);
+  // }
+
+  async deleteWorker(id: string): Promise<void> {
+    return await WorkersClient.delete(id);
+  },
+};

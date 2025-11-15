@@ -1,21 +1,25 @@
-import { getSkills as clientGetSkills, createSkill as clientCreateSkill, updateSkill as clientUpdateSkill, deleteSkill as clientDeleteSkill } from '../clients/skillClient';
-import type { Skill } from '../models/skill';
+import { SkillsClient } from 'src/clients/skills/skills';
 
-export async function getSkills(): Promise<Skill[]> {
-  const response = await clientGetSkills();
-  return response.data;
-}
+import type { Skill } from 'src/models/skill';
 
-export async function createSkill(payload: Omit<Skill, 'id'>): Promise<Skill> {
-  const response = await clientCreateSkill(payload);
-  return response.data;
-}
+export const SkillsService = {
+  async getSkills(): Promise<Skill[]> {
+    return await SkillsClient.list();
+  },
 
-export async function updateSkill(skillId: number, payload: Partial<Skill>): Promise<Skill> {
-  const response = await clientUpdateSkill(skillId, payload);
-  return response.data;
-}
+  async getSkill(id: string): Promise<Skill> {
+    return await SkillsClient.get(id);
+  },
 
-export async function deleteSkill(skillId: number): Promise<void> {
-  await clientDeleteSkill(skillId);
-}
+  // async createSkill(payload: Omit<Skill, 'id'>): Promise<Skill> {
+  //   return await SkillsClient.create(payload);
+  // }
+
+  // async updateSkill(id: string, payload: Partial<Skill>): Promise<Skill> {
+  //   return await SkillsClient.update(id, payload as Skill);
+  // }
+
+  async deleteSkill(id: string): Promise<void> {
+    return await SkillsClient.delete(id);
+  },
+};

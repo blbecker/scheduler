@@ -1,17 +1,26 @@
-import { getShifts as clientGetShifts, createShift as clientCreateShift, updateShift as clientUpdateShift } from '../clients/shiftClient';
-import type { Shift } from '../models/shift';
+// services/shifts.ts
+import { ShiftsClient } from 'src/clients/shifts/shifts';
+import type { Shift } from 'src/models/shift';
 
-export async function getShifts(): Promise<Shift[]> {
-  const response = await clientGetShifts();
-  return response.data;
-}
+export const ShiftsService = {
+  async getShifts(): Promise<Shift[]> {
+    console.log('Fetching shifts from ShiftsClient');
+    return await ShiftsClient.list();
+  },
 
-export async function createShift(payload: Omit<Shift, 'id'>): Promise<Shift> {
-  const response = await clientCreateShift(payload);
-  return response.data;
-}
+  async getShift(id: string): Promise<Shift> {
+    return await ShiftsClient.get(id);
+  },
 
-export async function updateShift(shiftId: number, payload: Partial<Shift>): Promise<Shift> {
-  const response = await clientUpdateShift(shiftId, payload);
-  return response.data;
-}
+  // async createShift(payload: Omit<Shift, 'id'>): Promise<Shift> {
+  //   return await ShiftsClient.create(payload);
+  // }
+
+  // async updateShift(id: string, payload: Partial<Shift>): Promise<Shift> {
+  //   return await ShiftsClient.update(id, payload as Shift);
+  // }
+
+  async deleteShift(id: string): Promise<void> {
+    return await ShiftsClient.delete(id);
+  },
+};

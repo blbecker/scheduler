@@ -25,8 +25,6 @@
               <q-item>
                 <q-item-section>
                   <q-item-label caption>Status</q-item-label>
-                  <q-item-label>{{ shift.reversed_id }}</q-item-label>
-                  <q-item-label>{{ shift.flerp }}</q-item-label>
                 </q-item-section>
               </q-item>
             </div>
@@ -42,7 +40,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 
-import type { Shift } from 'src/components/models';
+import type { Shift } from 'src/models/shift';
 
 const route = useRoute();
 
