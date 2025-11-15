@@ -1,31 +1,29 @@
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Skill
-from scheduler_api.db import get_session
+from sqlmodel import Session
 
 
 class SkillRepository:
-    def _get_session(self):
-        return get_session()
+    def __init__(self, session: Session):
+        self.session = session
 
     def get_all(self) -> List[Skill]:
-        with self._get_session() as session:
-            stmt = select(Skill)
-            return session.exec(stmt).all()
+        with self.session as session:
+            return session.query(Skill).all()
 
     def get_by_id(self, skill_id: int) -> Optional[Skill]:
-        with self._get_session() as session:
+        with self.session as session:
             return session.get(Skill, skill_id)
 
     def add(self, skill: Skill) -> Skill:
-        with self._get_session() as session:
+        with self.session as session:
             session.add(skill)
             session.commit()
             session.refresh(skill)
             return skill
 
     def update(self, skill: Skill) -> Optional[Skill]:
-        with self._get_session() as session:
+        with self.session as session:
             existing_skill = session.get(Skill, skill.id)
             if existing_skill is None:
                 return None
@@ -38,7 +36,7 @@ class SkillRepository:
             return existing_skill
 
     def delete(self, skill_id: int) -> bool:
-        with self._get_session() as session:
+        with self.session as session:
             skill = session.get(Skill, skill_id)
             if skill is None:
                 return False

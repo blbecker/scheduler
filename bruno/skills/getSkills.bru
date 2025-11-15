@@ -1,0 +1,15 @@
+meta {
+  name: getSkills
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8000/v1/skills
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

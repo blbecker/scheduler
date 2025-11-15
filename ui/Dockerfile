@@ -13,6 +13,6 @@ WORKDIR /app
 # COPY --chown=node ./scheduler_ui/package.json ./scheduler_ui/pnpm-lock.yaml ./
 COPY --chown=node ./scheduler_ui ./
 
-# RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --config.confirmModulesPurge=false
 
 CMD ["pnpm", "quasar", "dev"]

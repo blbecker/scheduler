@@ -1,0 +1,26 @@
+meta {
+  name: postShift
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/v1/shifts
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "{{$randomUUID}}",
+    "start_time": "{{$randomDatePast}}",
+    "end_time": "{{$randomDateFuture}}",
+    "location": "{{$randomCity}}",
+    "notes": "{{$randomBsAdjective}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,32 +1,30 @@
 # scheduler_api/repositories/worker_repository.py
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Worker
-from scheduler_api.db import get_session
+from sqlmodel import Session
 
 
 class WorkerRepository:
-    def _get_session(self):
-        return get_session()
+    def __init__(self, session: Session):
+        self.session = session
 
     def get_all(self) -> List[Worker]:
-        with self._get_session() as session:
-            stmt = select(Worker)
-            return session.exec(stmt).all()
+        with self.session as session:
+            return session.query(Worker).all()
 
     def get_by_id(self, worker_id: int) -> Optional[Worker]:
-        with self._get_session() as session:
+        with self.session as session:
             return session.get(Worker, worker_id)
 
     def add(self, worker: Worker) -> Worker:
-        with self._get_session() as session:
+        with self.session as session:
             session.add(worker)
             session.commit()
             session.refresh(worker)
             return worker
 
     def update(self, worker: Worker) -> Optional[Worker]:
-        with self._get_session() as session:
+        with self.session as session:
             existing_worker = session.get(Worker, worker.id)
             if existing_worker is None:
                 return None
@@ -39,7 +37,7 @@ class WorkerRepository:
             return existing_worker
 
     def delete(self, worker_id: int) -> bool:
-        with self._get_session() as session:
+        with self.session as session:
             worker = session.get(Worker, worker_id)
             if worker is None:
                 return False

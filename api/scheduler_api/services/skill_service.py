@@ -14,6 +14,5 @@ class SkillService:
     def get_skill(self, skill_id: int) -> Optional[Skill]:
         return self.repo.get_by_id(skill_id)
 
-    def create_skill(self, name: str, birthdate, email: str = None) -> Skill:
-        skill = Skill(name=name, birthdate=birthdate, email=email)
+    def create_skill(self, skill: Skill) -> Skill:
         return self.repo.add(skill)

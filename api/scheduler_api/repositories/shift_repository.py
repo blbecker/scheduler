@@ -1,31 +1,29 @@
 from typing import List, Optional
-from sqlmodel import select
 from scheduler_api.models import Shift
-from scheduler_api.db import get_session
+from sqlmodel import Session
 
 
 class ShiftRepository:
-    def _get_session(self):
-        return get_session()
+    def __init__(self, session: Session):
+        self.session = session
 
     def get_all(self) -> List[Shift]:
-        with self._get_session() as session:
-            stmt = select(Shift)
-            return session.exec(stmt).all()
+        with self.session as session:
+            return session.query(Shift).all()
 
     def get_by_id(self, shift_id: int) -> Optional[Shift]:
-        with self._get_session() as session:
+        with self.session as session:
             return session.get(Shift, shift_id)
 
     def add(self, shift: Shift) -> Shift:
-        with self._get_session() as session:
+        with self.session as session:
             session.add(shift)
             session.commit()
             session.refresh(shift)
             return shift
 
     def update(self, shift: Shift) -> Optional[Shift]:
-        with self._get_session() as session:
+        with self.session as session:
             existing_shift = session.get(Shift, shift.id)
             if existing_shift is None:
                 return None
@@ -38,7 +36,7 @@ class ShiftRepository:
             return existing_shift
 
     def delete(self, shift_id: int) -> bool:
-        with self._get_session() as session:
+        with self.session as session:
             shift = session.get(Shift, shift_id)
             if shift is None:
                 return False

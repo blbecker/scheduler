@@ -1,0 +1,26 @@
+meta {
+  name: postWorker
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8000/v1/workers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "id": "{{$randomUUID}}",
+    "name": "{{$randomFullName}}",
+    "birthdate": "{{$randomDatePast}}",
+    "email": "{{$randomEmail}}",
+    "phone": "{{$randomPhoneNumber}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
