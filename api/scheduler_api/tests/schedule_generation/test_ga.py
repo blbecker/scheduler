@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 
 from scheduler_api.genetic.ga import run_genetic_algorithm, GAConfig
 from scheduler_api.genetic.scoring import ScoreResult

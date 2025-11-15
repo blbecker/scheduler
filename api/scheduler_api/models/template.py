@@ -1,5 +1,5 @@
 from datetime import time, date
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
 from .associations import ScheduleTemplateShiftLink

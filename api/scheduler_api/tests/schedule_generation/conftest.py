@@ -1,6 +1,6 @@
 import pytest
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from scheduler_api.models.template import ScheduleTemplate
 from scheduler_api.models.template import ShiftTemplate

@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import List
+
+# from typing import List
 import random
 
-from .population import Population, Individual
+from .population import Population
 
 
 def select_survivors(

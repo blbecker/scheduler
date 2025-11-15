@@ -10,7 +10,7 @@ from .selection import select_survivors
 from .mutation import mutate_population
 from .scoring import ScoreResult
 
-from scheduler_api.schemas import ScheduleTemplateDTO
+# from scheduler_api.schemas import ScheduleTemplateDTO
 from scheduler_api.models import ScheduleTemplate
 
 
