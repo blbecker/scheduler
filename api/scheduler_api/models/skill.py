@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 # --- core model ---
 class Skill(SQLModel, table=True):
-    id: Optional[UUID] = Field(default=uuid4(), primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
     name: str
 
     # Relations

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 # --- core model ---
 class Shift(SQLModel, table=True):
-    id: Optional[UUID] = Field(default=uuid4(), primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
     start_time: datetime
     end_time: datetime
     location: Optional[str] = None
