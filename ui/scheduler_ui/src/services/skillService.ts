@@ -1,23 +1,23 @@
 import { SkillsClient } from 'src/clients/skills/skills';
 
-import type { Skill } from 'src/models/skill';
+import type { SkillRead, SkillUpdate, SkillCreate } from 'src/models/skill';
 
 export const SkillsService = {
-  async getSkills(): Promise<Skill[]> {
+  async getSkills(): Promise<SkillRead[]> {
     return await SkillsClient.list();
   },
 
-  async getSkill(id: string): Promise<Skill> {
+  async getSkill(id: string): Promise<SkillRead> {
     return await SkillsClient.get(id);
   },
 
-  // async createSkill(payload: Omit<Skill, 'id'>): Promise<Skill> {
-  //   return await SkillsClient.create(payload);
-  // }
+  async createSkill(payload: SkillCreate): Promise<SkillRead> {
+    return await SkillsClient.create(payload);
+  },
 
-  // async updateSkill(id: string, payload: Partial<Skill>): Promise<Skill> {
-  //   return await SkillsClient.update(id, payload as Skill);
-  // }
+  async updateSkill(id: string, payload: SkillUpdate): Promise<SkillRead> {
+    return await SkillsClient.update(id, payload);
+  },
 
   async deleteSkill(id: string): Promise<void> {
     return await SkillsClient.delete(id);
