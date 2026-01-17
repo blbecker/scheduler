@@ -45,7 +45,7 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/0
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69
     ports:
       - "5672:5672" # AMQP
       - "15672:15672" # Management UI
@@ -54,12 +54,12 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:ee64a64eaab618d88051c3ade8f6352d11531fcf79d9a4818b9b183d8c1d18ba
     ports:
       - "6379:6379"
 
   db:
-    image: postgres:15-alpine
+    image: postgres:15-alpine@sha256:b3968e348b48f1198cc6de6611d055dbad91cd561b7990c406c3fc28d7095b21
     environment:
       POSTGRES_DB: scheduler_db
       POSTGRES_USER: scheduler_user
