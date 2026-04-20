@@ -2,6 +2,7 @@ from datetime import date
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
+from decimal import Decimal
 from .associations import WorkerSkillLink, ShiftWorkerLink
 
 if TYPE_CHECKING:
@@ -11,9 +12,10 @@ if TYPE_CHECKING:
 
 # --- core model ---
 class Worker(SQLModel, table=True):
-    id: Optional[UUID] = Field(default=uuid4(), primary_key=True)
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
     name: str
     birthdate: date
+    # hourly_rate: Decimal
     email: Optional[str] = None
     phone: Optional[str] = None
 

@@ -40,7 +40,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from 'src/boot/axios';
 
-import type { Skill } from 'src/models/skill';
+import type { SkillRead } from 'src/models/skill';
 
 const route = useRoute();
 
@@ -52,7 +52,7 @@ const skillId = computed(() => {
   return id || ''; // Fallback to empty string if undefined
 });
 
-const skill = ref<Skill | null>(null);
+const skill = ref<SkillRead | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 

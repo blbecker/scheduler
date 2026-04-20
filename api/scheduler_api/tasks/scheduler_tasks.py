@@ -1,20 +1,13 @@
-import time
 from celery import shared_task
-from scheduler_api.models.schedule_dtos import (
-    GenerateScheduleInput,
-    GenerateScheduleResult,
-)
+from ..genetic.ga import run_ga
+from ..schemas.dtos import ScheduleTemplateDTO, WorkerDTO
+from ..scoring.base import SkillMatchScorer
 
 
 @shared_task
-def generate_schedule_task(input_dict: dict) -> dict:
-    """
-    input_dict is a dict representation of GenerateScheduleInput
-    """
-    input_data = GenerateScheduleInput(**input_dict)
-    total = input_data.total_seconds_to_wait
-    for i in range(1, total + 1):
-        time.sleep(1)
-        print(f"Worker: generating schedule ({i}/{total})")
-
-    return GenerateScheduleResult(status="success", seconds_waited=total).dict()
+def generate_schedule(template_data: dict, workers_data: list[dict]) -> dict:
+    template = ScheduleTemplateDTO(**template_data)
+    workers = [WorkerDTO(**w) for w in workers_data]
+    scorer = SkillMatchScorer()
+    best_schedule = run_ga(template, workers, scorer)
+    return best_schedule.dict()

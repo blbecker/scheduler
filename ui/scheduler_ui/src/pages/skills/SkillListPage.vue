@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import type { Skill } from 'src/models/skill';
+import type { SkillRead } from 'src/models/skill';
 import { SkillsService } from 'src/services/skillService';
 import SkillTable from 'components/skills/SkillTable.vue';
 
-const skills = ref<Skill[]>([]);
+const skills = ref<SkillRead[]>([]);
 const loading = ref(false);
 
 onMounted(async () => {
@@ -16,11 +16,11 @@ onMounted(async () => {
   }
 });
 
-function editSkill(row: Skill) {
+function editSkill(row: SkillRead) {
   console.log('Edit skill:', row);
 }
 
-function deleteSkill(row: Skill) {
+function deleteSkill(row: SkillRead) {
   console.log('Delete skill:', row);
 }
 </script>
