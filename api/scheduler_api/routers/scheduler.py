@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Response, status
 from scheduler_api.services.scheduler_service import SchedulerService
-from scheduler_api.models.schedule_dtos import (
+from scheduler_api.schemas.schedule import (
     GenerateScheduleInput,
     GenerateScheduleResult,
 )
