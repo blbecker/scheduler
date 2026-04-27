@@ -30,7 +30,11 @@ def test_worker_service_get_all(mock_worker_repo):
     # Setup
     worker_model = Worker(id=UUID(int=1), name="John Doe", birthdate=date(1990, 1, 1))
     expected_response = WorkerResponse(
-        id=UUID(int=1), name="John Doe", birthdate=date(1990, 1, 1), email=None, phone=None
+        id=UUID(int=1),
+        name="John Doe",
+        birthdate=date(1990, 1, 1),
+        email=None,
+        phone=None,
     )
     mock_worker_repo.get_all.return_value = [worker_model]
     service = WorkerService(mock_worker_repo)
@@ -51,7 +55,11 @@ def test_worker_service_get_by_id(mock_worker_repo):
     worker_id = UUID(int=1)
     worker_model = Worker(id=worker_id, name="John Doe", birthdate=date(1990, 1, 1))
     expected_response = WorkerResponse(
-        id=worker_id, name="John Doe", birthdate=date(1990, 1, 1), email=None, phone=None
+        id=worker_id,
+        name="John Doe",
+        birthdate=date(1990, 1, 1),
+        email=None,
+        phone=None,
     )
     mock_worker_repo.get_by_id.return_value = worker_model
     service = WorkerService(mock_worker_repo)
@@ -86,18 +94,18 @@ def test_skill_service_get_all(mock_skill_repo):
 def test_shift_service_get_all(mock_shift_repo):
     # Setup
     shift_model = Shift(
-        id=UUID(int=1), 
+        id=UUID(int=1),
         start_time=datetime(2024, 1, 1, 9, 0, 0),
         end_time=datetime(2024, 1, 1, 17, 0, 0),
         location="Office",
-        notes="Test shift"
+        notes="Test shift",
     )
     expected_response = ShiftResponse(
         id=UUID(int=1),
         start_time=datetime(2024, 1, 1, 9, 0, 0),
         end_time=datetime(2024, 1, 1, 17, 0, 0),
         location="Office",
-        notes="Test shift"
+        notes="Test shift",
     )
     mock_shift_repo.get_all.return_value = [shift_model]
     service = ShiftService(mock_shift_repo)
