@@ -2,7 +2,8 @@ from logging.config import fileConfig
 import os
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from scheduler_api.models import *
+from scheduler_api.db.base import Base
+from scheduler_api.db import models
 from alembic import context
 from sqlmodel import SQLModel
 
