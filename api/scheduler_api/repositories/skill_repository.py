@@ -1,4 +1,3 @@
-from typing import List, Optional
 from scheduler_api.db.models import Skill
 from sqlmodel import Session
 
