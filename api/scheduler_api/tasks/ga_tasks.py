@@ -5,7 +5,6 @@ from celery import shared_task, chain
 from scheduler_api.schemas.ga_dtos import (
     ScheduleLayoutDTO,
     PopulationDTO,
-    ScheduleDTO,
 )
 from scheduler_api.mappers.ga_mapper import (
     schedule_layout_from_dto,

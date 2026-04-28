@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field, Relationship, Column, JSON
+from sqlmodel import SQLModel, Field, Column, JSON
 from uuid import UUID, uuid4
-import json
 
 
 class ScheduleLayout(SQLModel, table=True):

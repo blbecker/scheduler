@@ -1,12 +1,8 @@
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from datetime import datetime, timedelta
 from uuid import uuid4
-import sys
-import os
 
-# Add the parent directory to sys.path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../.."))
 
 from scheduler_api.schemas.ga_dtos import (
     ScheduleLayoutDTO,

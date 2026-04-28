@@ -1,8 +1,7 @@
 """Test Celery tasks for schedule generation."""
 
 import pytest
-from unittest.mock import patch, MagicMock, call
-from celery import chain
+from unittest.mock import patch, MagicMock
 from pydantic import ValidationError
 from uuid import uuid4
 from datetime import datetime
@@ -310,7 +309,7 @@ class TestCeleryTasks:
                                             assert isinstance(
                                                 result, dict
                                             ), f"{task_func.__name__} should return dict"
-                                        except Exception as e:
+                                        except Exception:
                                             # Some tasks might fail due to missing mocks,
                                             # but we're only checking the interface
                                             pass

@@ -4,7 +4,7 @@ import pytest
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from scheduler_api.schemas.ga_dtos import ShiftAssignmentDTO, ScheduleDTO, PopulationDTO
+from scheduler_api.schemas.ga_dtos import ShiftAssignmentDTO
 from scheduler_api.domain.schedule import Schedule
 from scheduler_api.domain.population import Population
 

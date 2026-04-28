@@ -6,7 +6,6 @@ from scheduler_api.repositories.schedule_layout_repository import (
 from scheduler_api.mappers.schedule_layout_mapper import (
     to_response,
     from_create,
-    apply_update,
 )
 from scheduler_api.schemas.schedule_layout import (
     ScheduleLayoutCreate,
@@ -15,10 +14,8 @@ from scheduler_api.schemas.schedule_layout import (
     ScheduleLayoutGenerateResponse,
 )
 from scheduler_api.tasks.ga_tasks import generate_schedule_from_layout
-from scheduler_api.schemas.ga_dtos import ScheduleLayoutDTO
 from scheduler_api.mappers.ga_mapper import schedule_layout_to_dto
 from scheduler_api.domain.schedule_layout import ScheduleLayout as DomainScheduleLayout
-from datetime import datetime
 
 
 class ScheduleLayoutService:

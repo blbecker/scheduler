@@ -15,7 +15,6 @@ from scheduler_api.schemas.schedule_layout import (
 )
 from scheduler_api.db.models import (
     ScheduleLayout,
-    ScheduleLayoutUpdate as DBScheduleLayoutUpdate,
 )
 
 

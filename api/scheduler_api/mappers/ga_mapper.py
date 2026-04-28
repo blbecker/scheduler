@@ -7,7 +7,6 @@ from scheduler_api.schemas.ga_dtos import (
     PopulationDTO,
     ScheduleLayoutDTO,
 )
-from uuid import UUID
 
 
 def schedule_to_dto(schedule: Schedule) -> ScheduleDTO:

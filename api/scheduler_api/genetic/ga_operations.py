@@ -1,9 +1,7 @@
 import random
-from typing import List
 from scheduler_api.domain.schedule import Schedule
 from scheduler_api.domain.population import Population
 from scheduler_api.domain.schedule_layout import ScheduleLayout
-from uuid import uuid4
 
 
 def generate_initial_population(layout: ScheduleLayout, size: int = 100) -> Population:
