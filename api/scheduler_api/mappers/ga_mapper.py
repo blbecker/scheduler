@@ -20,7 +20,7 @@ def schedule_to_dto(schedule: Schedule) -> ScheduleDTO:
         )
         for assignment in schedule.assignments
     ]
-    
+
     return ScheduleDTO(
         id=schedule.id,
         name=schedule.name,
@@ -40,7 +40,7 @@ def schedule_from_dto(dto: ScheduleDTO) -> Schedule:
         )
         for assignment in dto.assignments
     ]
-    
+
     return Schedule(
         id=dto.id,
         name=dto.name,
@@ -52,7 +52,7 @@ def schedule_from_dto(dto: ScheduleDTO) -> Schedule:
 
 def population_to_dto(population: Population) -> PopulationDTO:
     schedule_dtos = [schedule_to_dto(schedule) for schedule in population.schedules]
-    
+
     return PopulationDTO(
         id=population.id,
         generation=population.generation,
@@ -64,7 +64,7 @@ def population_to_dto(population: Population) -> PopulationDTO:
 
 def population_from_dto(dto: PopulationDTO) -> Population:
     schedules = [schedule_from_dto(schedule_dto) for schedule_dto in dto.schedules]
-    
+
     return Population(
         id=dto.id,
         generation=dto.generation,

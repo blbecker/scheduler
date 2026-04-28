@@ -1,6 +1,8 @@
 from typing import List, Optional
 from uuid import UUID
-from scheduler_api.repositories.schedule_layout_repository import ScheduleLayoutRepository
+from scheduler_api.repositories.schedule_layout_repository import (
+    ScheduleLayoutRepository,
+)
 from scheduler_api.mappers.schedule_layout_mapper import (
     to_response,
     from_create,
@@ -36,9 +38,13 @@ class ScheduleLayoutService:
         saved = self.repo.create(model)
         return to_response(saved)
 
-    def update_layout(self, layout_id: UUID, dto: ScheduleLayoutUpdate) -> Optional[ScheduleLayoutResponse]:
-        from scheduler_api.db.models import ScheduleLayoutUpdate as DBScheduleLayoutUpdate
-        
+    def update_layout(
+        self, layout_id: UUID, dto: ScheduleLayoutUpdate
+    ) -> Optional[ScheduleLayoutResponse]:
+        from scheduler_api.db.models import (
+            ScheduleLayoutUpdate as DBScheduleLayoutUpdate,
+        )
+
         existing = self.repo.get_by_id(layout_id)
         if not existing:
             return None
@@ -46,7 +52,7 @@ class ScheduleLayoutService:
         # Convert Pydantic update DTO to SQLModel update model
         update_data = dto.model_dump(exclude_unset=True)
         db_update = DBScheduleLayoutUpdate(**update_data)
-        
+
         saved = self.repo.update(layout_id, db_update)
         return to_response(saved) if saved else None
 
@@ -57,7 +63,7 @@ class ScheduleLayoutService:
         layout = self.repo.get_by_id(layout_id)
         if not layout:
             raise ValueError(f"Schedule layout with ID {layout_id} not found")
-        
+
         # Convert database model to domain model
         domain_layout = DomainScheduleLayout(
             id=layout.id,
@@ -69,16 +75,16 @@ class ScheduleLayoutService:
             constraints=layout.constraints,
             created_at=layout.created_at,
         )
-        
+
         # Convert domain model to DTO
         layout_dto = schedule_layout_to_dto(domain_layout)
-        
+
         # Trigger the Celery task
         task_result = generate_schedule_from_layout.delay(layout_dto.model_dump())
-        
+
         return ScheduleLayoutGenerateResponse(
             layout_id=layout_id,
             task_id=task_result.id,
             status="queued",
-            message=f"Schedule generation task queued with ID: {task_result.id}"
+            message=f"Schedule generation task queued with ID: {task_result.id}",
         )

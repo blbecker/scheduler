@@ -6,7 +6,7 @@ import sys
 import os
 
 # Add the parent directory to sys.path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../.."))
 
 from scheduler_api.schemas.ga_dtos import (
     ScheduleLayoutDTO,
@@ -22,14 +22,14 @@ from scheduler_api.domain.schedule_layout import ScheduleLayout
 @pytest.fixture
 def mock_time_sleep():
     """Mock time.sleep to speed up tests."""
-    with patch('time.sleep') as mock_sleep:
+    with patch("time.sleep") as mock_sleep:
         yield mock_sleep
 
 
 @pytest.fixture
 def mock_random_uniform():
     """Mock random.uniform for deterministic tests."""
-    with patch('random.uniform') as mock_uniform:
+    with patch("random.uniform") as mock_uniform:
         mock_uniform.return_value = 0.5
         yield mock_uniform
 
@@ -37,7 +37,7 @@ def mock_random_uniform():
 @pytest.fixture
 def mock_random_random():
     """Mock random.random for deterministic tests."""
-    with patch('random.random') as mock_random:
+    with patch("random.random") as mock_random:
         mock_random.return_value = 0.5
         yield mock_random
 
@@ -149,26 +149,26 @@ def sample_population(sample_schedule, sample_schedule_layout):
 def celery_app():
     """Create a test Celery app."""
     from celery import Celery
-    
+
     # Use the test configuration
-    app = Celery('test_scheduler_api')
+    app = Celery("test_scheduler_api")
     app.conf.update(
         task_always_eager=True,  # Run tasks synchronously for testing
         task_eager_propagates=True,  # Propagate exceptions
-        broker_url='memory://',  # In-memory broker for testing
-        result_backend='cache+memory://',  # In-memory result backend
+        broker_url="memory://",  # In-memory broker for testing
+        result_backend="cache+memory://",  # In-memory result backend
     )
-    
+
     # Autodiscover tasks
     app.autodiscover_tasks(packages=["scheduler_api"])
-    
+
     return app
 
 
 @pytest.fixture
 def mock_celery_chain():
     """Mock celery.chain for testing orchestration."""
-    with patch('scheduler_api.tasks.ga_tasks.chain') as mock_chain:
+    with patch("scheduler_api.tasks.ga_tasks.chain") as mock_chain:
         mock_chain_instance = Mock()
         mock_chain.return_value = mock_chain_instance
         mock_chain_instance.return_value = Mock(get=lambda: {"test": "result"})
