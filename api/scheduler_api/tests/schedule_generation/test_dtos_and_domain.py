@@ -3,6 +3,10 @@ import pytest
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+from scheduler_api.schemas.ga_dtos import ShiftAssignmentDTO, ScheduleDTO, PopulationDTO
+from scheduler_api.domain.schedule import Schedule
+from scheduler_api.domain.population import Population
+
 
 class TestGADTOs:
     """Test GA DTO validation and serialization."""
@@ -18,6 +22,7 @@ class TestGADTOs:
     
     def test_schedule_layout_dto_serialization(self, sample_schedule_layout_dto):
         """Test ScheduleLayoutDTO serialization to dict."""
+        # Test regular model_dump (returns Python objects)
         dto_dict = sample_schedule_layout_dto.model_dump()
         
         assert "id" in dto_dict
@@ -29,10 +34,19 @@ class TestGADTOs:
         assert "constraints" in dto_dict
         assert "created_at" in dto_dict
         
-        # Ensure datetime fields are ISO format strings
-        assert isinstance(dto_dict["date_range_start"], str)
-        assert isinstance(dto_dict["date_range_end"], str)
-        assert isinstance(dto_dict["created_at"], str)
+        # datetime fields should be datetime objects in regular model_dump
+        from datetime import datetime
+        assert isinstance(dto_dict["date_range_start"], datetime)
+        assert isinstance(dto_dict["date_range_end"], datetime)
+        assert isinstance(dto_dict["created_at"], datetime)
+        
+        # Test JSON serialization mode
+        json_dict = sample_schedule_layout_dto.model_dump(mode='json')
+        
+        # Ensure datetime fields are ISO format strings in JSON mode
+        assert isinstance(json_dict["date_range_start"], str)
+        assert isinstance(json_dict["date_range_end"], str)
+        assert isinstance(json_dict["created_at"], str)
     
     def test_schedule_dto_creation(self, sample_schedule_dto):
         """Test ScheduleDTO creation and validation."""

@@ -10,6 +10,7 @@ from scheduler_api.schemas.schedule_layout import (
     ScheduleLayoutUpdate,
     ScheduleLayoutResponse,
 )
+from scheduler_api.db.models import ScheduleLayout, ScheduleLayoutUpdate as DBScheduleLayoutUpdate
 
 
 class TestScheduleLayoutRepository:
@@ -49,7 +50,7 @@ class TestScheduleLayoutRepository:
         result = repository.get_by_id(layout_id)
         
         # Verify
-        mock_session.get.assert_called_once_with(repository.__class__.__annotations__['ScheduleLayout'], layout_id)
+        mock_session.get.assert_called_once_with(ScheduleLayout, layout_id)
         assert result == mock_layout
     
     def test_get_by_id_not_found(self, repository, mock_session):
@@ -97,7 +98,7 @@ class TestScheduleLayoutRepository:
         result = repository.update(layout_id, update_data)
         
         # Verify
-        mock_session.get.assert_called_once_with(repository.__class__.__annotations__['ScheduleLayout'], layout_id)
+        mock_session.get.assert_called_once_with(ScheduleLayout, layout_id)
         update_data.model_dump.assert_called_once_with(exclude_unset=True)
         assert mock_layout.name == "Updated Name"
         assert mock_layout.description == "Updated Description"
@@ -130,7 +131,7 @@ class TestScheduleLayoutRepository:
         result = repository.delete(layout_id)
         
         # Verify
-        mock_session.get.assert_called_once_with(repository.__class__.__annotations__['ScheduleLayout'], layout_id)
+        mock_session.get.assert_called_once_with(ScheduleLayout, layout_id)
         mock_session.delete.assert_called_once_with(mock_layout)
         mock_session.commit.assert_called_once()
         assert result is True
@@ -278,7 +279,7 @@ class TestScheduleLayoutService:
         layout_id = uuid4()
         
         # Mock the db model import
-        with patch('scheduler_api.services.schedule_layout_service.ScheduleLayoutUpdate') as mock_db_update:
+        with patch('scheduler_api.db.models.ScheduleLayoutUpdate') as mock_db_update:
             mock_db_update_instance = MagicMock()
             mock_db_update.return_value = mock_db_update_instance
             

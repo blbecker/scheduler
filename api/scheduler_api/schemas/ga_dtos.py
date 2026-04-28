@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime, time
 from uuid import UUID
@@ -9,6 +9,12 @@ class ShiftAssignmentDTO(BaseModel):
     shift_id: UUID
     start_time: datetime
     end_time: datetime
+    
+    @validator('end_time')
+    def validate_end_time_after_start_time(cls, v, values):
+        if 'start_time' in values and v < values['start_time']:
+            raise ValueError('end_time must be after start_time')
+        return v
 
 
 class ScheduleDTO(BaseModel):

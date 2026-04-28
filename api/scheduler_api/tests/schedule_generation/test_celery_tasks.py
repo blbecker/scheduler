@@ -2,6 +2,9 @@
 import pytest
 from unittest.mock import patch, MagicMock, call
 from celery import chain
+from pydantic import ValidationError
+from uuid import uuid4
+from datetime import datetime
 from scheduler_api.tasks.ga_tasks import (
     population_generate,
     score_population_task,
@@ -117,7 +120,7 @@ class TestCeleryTasks:
                         # Verify calls
                         mock_from_dto.assert_called_once()
                         mock_mutate.assert_called_once_with(mock_population, mutation_rate=0.1)
-                        mock_breed.assert_called_once_with(mock_bred_population, crossover_rate=0.8)
+                        mock_breed.assert_called_once_with(mock_mutated_population, crossover_rate=0.8)
                         mock_to_dto.assert_called_once_with(mock_bred_population)
                         mock_time_sleep.assert_called_once()
                         
@@ -272,20 +275,32 @@ class TestCeleryTasks:
                                         except Exception as e:
                                             # Some tasks might fail due to missing mocks,
                                             # but we're only checking the interface
-                            pass
+                                            pass
     
     def test_task_error_handling(self, sample_schedule_layout_dto):
         """Test task error handling (simulated by mock failures)."""
-        # Test population_generate with invalid input
+        # Test population_generate with invalid input (Pydantic validation error)
+        with pytest.raises(ValidationError):
+            population_generate({"invalid": "data"})
+        
+        # Test population_generate with valid input but schedule_layout_from_dto error
         with patch('scheduler_api.tasks.ga_tasks.schedule_layout_from_dto', side_effect=ValueError("Invalid DTO")):
             with pytest.raises(ValueError, match="Invalid DTO"):
-                population_generate({"invalid": "data"})
+                # Use sample DTO that passes Pydantic validation
+                population_generate(sample_schedule_layout_dto.model_dump())
         
         # Test select_best with empty population
         with patch('scheduler_api.tasks.ga_tasks.population_from_dto', return_value=MagicMock(schedules=[])):
             with patch('scheduler_api.tasks.ga_tasks.select_best_schedule', side_effect=ValueError("No schedules")):
                 with pytest.raises(ValueError, match="No schedules"):
-                    select_best({"id": "test", "schedules": []})
+                    # Pass valid DTO data that passes Pydantic validation
+                    select_best({
+                        "id": str(uuid4()),
+                        "generation": 1,
+                        "schedules": [],
+                        "layout_id": str(uuid4()),
+                        "created_at": datetime.utcnow().isoformat()
+                    })
 
 
 class TestTaskIntegration:
@@ -305,15 +320,28 @@ class TestTaskIntegration:
         # Verify task order in chain
         task_names = []
         for task_sig in chain_args:
+            # Handle different possible signature types
             if hasattr(task_sig, 'task'):
-                task_names.append(task_sig.task.__name__)
+                # Celery Signature object
+                try:
+                    task_names.append(task_sig.task.__name__)
+                except AttributeError:
+                    # task might be a string or other object without __name__
+                    task_names.append(str(task_sig.task))
+            elif isinstance(task_sig, str):
+                # String representation of task
+                task_names.append(task_sig)
+            else:
+                # Try to get task name from other attributes
+                task_name = str(task_sig)
+                task_names.append(task_name)
         
         expected_order = [
-            'population_generate',
-            'score_population_task',
-            'mutate_and_breed',
-            'cull_population_task',
-            'select_best',
+            'scheduler_api.tasks.ga_tasks.population_generate',
+            'scheduler_api.tasks.ga_tasks.score_population_task',
+            'scheduler_api.tasks.ga_tasks.mutate_and_breed',
+            'scheduler_api.tasks.ga_tasks.cull_population_task',
+            'scheduler_api.tasks.ga_tasks.select_best',
         ]
         
         assert task_names == expected_order, f"Tasks should be chained in order: {expected_order}"

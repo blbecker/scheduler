@@ -48,7 +48,7 @@ def breed_population(population: Population, crossover_rate: float = 0.8) -> Pop
         parent2 = sorted_schedules[i + 1]
         
         if random.random() < crossover_rate:
-            child_fitness = (parent1.fitness or 0.0 + parent2.fitness or 0.0) / 2.0
+            child_fitness = ((parent1.fitness or 0.0) + (parent2.fitness or 0.0)) / 2.0
             child = Schedule(
                 name=f"Child_{i//2}",
                 fitness=child_fitness,
