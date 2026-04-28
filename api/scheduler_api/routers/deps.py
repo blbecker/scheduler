@@ -4,9 +4,11 @@ from scheduler_api.db.session import get_session
 from scheduler_api.repositories.shift_repository import ShiftRepository
 from scheduler_api.repositories.skill_repository import SkillRepository
 from scheduler_api.repositories.worker_repository import WorkerRepository
+from scheduler_api.repositories.schedule_layout_repository import ScheduleLayoutRepository
 from scheduler_api.services.shift_service import ShiftService
 from scheduler_api.services.skill_service import SkillService
 from scheduler_api.services.worker_service import WorkerService
+from scheduler_api.services.schedule_layout_service import ScheduleLayoutService
 
 
 # -----------------------------
@@ -71,3 +73,19 @@ def get_worker_service(
     Worker service (application/business boundary).
     """
     return WorkerService(repo)
+
+
+def get_schedule_layout_repository(session=Depends(get_db_session)) -> ScheduleLayoutRepository:
+    """
+    Schedule layout repository bound to request-scoped DB session.
+    """
+    return ScheduleLayoutRepository(session)
+
+
+def get_schedule_layout_service(
+    repo: ScheduleLayoutRepository = Depends(get_schedule_layout_repository),
+) -> ScheduleLayoutService:
+    """
+    Schedule layout service (application/business boundary).
+    """
+    return ScheduleLayoutService(repo)
