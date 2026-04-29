@@ -37,8 +37,8 @@ importers:
         specifier: 2.3.0
         version: 2.3.0(@types/node@20.19.11)(eslint@9.34.0)(quasar@2.18.2)(rollup@4.48.0)(sass@1.90.0)(terser@5.43.1)(typescript@5.5.4)(vue-router@4.5.1(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))(yaml@2.8.1)
       '@quasar/quasar-app-extension-testing-unit-vitest':
-        specifier: 1.2.3
-        version: 1.2.3(@vitest/ui@3.2.4)(@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))
+        specifier: 1.2.4
+        version: 1.2.4(@vitest/ui@3.2.4)(@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))
       '@types/node':
         specifier: 20.19.11
         version: 20.19.11
@@ -537,8 +537,8 @@ packages:
   '@quasar/extras@1.17.0':
     resolution: {integrity: sha512-KqAHdSJfIDauiR1nJ8rqHWT0diqD0QradZKoVIZJAilHAvgwyPIY7MbyR2z4RIMkUIMUSqBZcbshMpEw+9A30w==}
 
-  '@quasar/quasar-app-extension-testing-unit-vitest@1.2.3':
-    resolution: {integrity: sha512-kxjlKwdiIIS7OMq06L6tXtHgxedqcYN0D5GzFTfJB3wtdifV1lQirLkFJrAfs+PwOXJn3Qxz51QgY8cGdXDrTA==}
+  '@quasar/quasar-app-extension-testing-unit-vitest@1.2.4':
+    resolution: {integrity: sha512-u7WK0q0UWu2UxGx1hJphi8MujLHXK6+j/idyrmBSHixu6sBh2/As6uN2DV7Eau+Tlff352rxzxHdCudKA54RCg==}
     engines: {node: ^30 || ^28 || ^26 || ^24 || ^22 || ^20 || ^18, npm: '>= 9.5', yarn: '>= 1.22.19'}
     peerDependencies:
       '@vitest/ui': ^1.1.0 || ^2.0.0 || ^3.0.0
@@ -3387,7 +3387,7 @@ snapshots:
 
   '@quasar/extras@1.17.0': {}
 
-  '@quasar/quasar-app-extension-testing-unit-vitest@1.2.3(@vitest/ui@3.2.4)(@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))':
+  '@quasar/quasar-app-extension-testing-unit-vitest@1.2.4(@vitest/ui@3.2.4)(@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))':
     dependencies:
       '@vue/test-utils': 2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))
       happy-dom: 15.11.7

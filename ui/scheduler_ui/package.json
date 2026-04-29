@@ -29,7 +29,7 @@
   "devDependencies": {
     "@eslint/js": "9.34.0",
     "@quasar/app-vite": "2.3.0",
-    "@quasar/quasar-app-extension-testing-unit-vitest": "1.2.3",
+    "@quasar/quasar-app-extension-testing-unit-vitest": "1.2.4",
     "@types/node": "20.19.11",
     "@vitest/ui": "3.2.4",
     "@vue/eslint-config-prettier": "10.2.0",
