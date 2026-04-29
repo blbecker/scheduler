@@ -1,0 +1,36 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+.coveragerc
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Docker
+Dockerfile
+Dockerfile.dev
+docker-compose*.yml
+
+# Development
+.git
+.gitignore
+README.md
+tests/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
