@@ -1,6 +1,6 @@
 import time
 from celery import shared_task
-from scheduler_api.schema.schedule import (
+from scheduler_api.schemas.schedule import (
     GenerateScheduleInput,
     GenerateScheduleResult,
 )
