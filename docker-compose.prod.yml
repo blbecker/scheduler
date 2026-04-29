@@ -1,0 +1,101 @@
+services:
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9000",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      - api
+    networks:
+      - scheduler-network
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PG_USER=scheduler_user
+      - PG_PASS=scheduler_pass
+      - PG_HOST=db
+      - PG_PORT=5432
+      - PG_DB=scheduler_db
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    networks:
+      - scheduler-network
+
+  worker:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    command: celery -A scheduler_api worker --loglevel=info
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PG_USER=scheduler_user
+      - PG_PASS=scheduler_pass
+      - PG_HOST=db
+      - PG_PORT=5432
+      - PG_DB=scheduler_db
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+    networks:
+      - scheduler-network
+
+  rabbitmq:
+    image: rabbitmq:3-management@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - scheduler-network
+
+  redis:
+    image: redis:7-alpine@sha256:7aec734b2bb298a1d769fd8729f13b8514a41bf90fcdd1f38ec52267fbaa8ee6
+    networks:
+      - scheduler-network
+
+  db:
+    image: postgres:15-alpine@sha256:09e4f20b14ddb3dfe3a0c825b206032aaf8f28300ba2070c0b60fc1c10c6abc7
+    environment:
+      POSTGRES_DB: scheduler_db
+      POSTGRES_USER: scheduler_user
+      POSTGRES_PASSWORD: scheduler_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - scheduler-network
+
+volumes:
+  pgdata:
+
+networks:
+  scheduler-network:
+    driver: bridge
