@@ -38,7 +38,7 @@ importers:
         version: 2.3.0(@types/node@20.19.11)(eslint@9.34.0)(quasar@2.18.2)(rollup@4.48.0)(sass@1.90.0)(terser@5.43.1)(typescript@5.5.4)(vue-router@4.5.1(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))(yaml@2.8.1)
       '@quasar/quasar-app-extension-testing-unit-vitest':
         specifier: 1.2.3
-        version: 1.2.3(@vitest/ui@3.2.4)(@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))
+        version: 1.2.3(@vitest/ui@3.2.4)(@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))
       '@types/node':
         specifier: 20.19.11
         version: 20.19.11
@@ -52,8 +52,8 @@ importers:
         specifier: 14.6.0
         version: 14.6.0(eslint-plugin-vue@9.33.0(eslint@9.34.0))(eslint@9.34.0)(typescript@5.5.4)
       '@vue/test-utils':
-        specifier: 2.4.8
-        version: 2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))
+        specifier: 2.4.10
+        version: 2.4.10(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))
       autoprefixer:
         specifier: 10.4.21
         version: 10.4.21(postcss@8.5.6)
@@ -935,8 +935,8 @@ packages:
   '@vue/shared@3.5.26':
     resolution: {integrity: sha512-7Z6/y3uFI5PRoKeorTOSXKcDj0MSasfNNltcslbFrPpcw6aXRUALq4IfJlaTRspiWIUOEZbrpM+iQGmCOiWe4A==}
 
-  '@vue/test-utils@2.4.8':
-    resolution: {integrity: sha512-cjAKFbSXFhtZ9Cj+ug60b21lW/BN737e+Syu2LPACIW6R0zVtj65Fnfe649KjfHor3Etx3ZavDFFBrZ+p21YNw==}
+  '@vue/test-utils@2.4.10':
+    resolution: {integrity: sha512-SmoZ5EA1kYiAFs9NkYdiFFQF+cSnUwnvlYEbY+DogWQZUiqOm/Y29eSbc5T6yi75SgSF9863SBeXniIEoPajCA==}
     peerDependencies:
       '@vue/compiler-dom': 3.x
       '@vue/server-renderer': 3.x
@@ -3387,9 +3387,9 @@ snapshots:
 
   '@quasar/extras@1.17.0': {}
 
-  '@quasar/quasar-app-extension-testing-unit-vitest@1.2.3(@vitest/ui@3.2.4)(@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))':
+  '@quasar/quasar-app-extension-testing-unit-vitest@1.2.3(@vitest/ui@3.2.4)(@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4)))(quasar@2.18.2)(typescript@5.5.4)(vite@6.3.5(@types/node@20.19.11)(sass-embedded@1.90.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))(vitest@3.2.4)(vue@3.5.26(typescript@5.5.4))':
     dependencies:
-      '@vue/test-utils': 2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))
+      '@vue/test-utils': 2.4.10(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))
       happy-dom: 15.11.7
       lodash-es: 4.17.21
       quasar: 2.18.2
@@ -3837,7 +3837,7 @@ snapshots:
 
   '@vue/shared@3.5.26': {}
 
-  '@vue/test-utils@2.4.8(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))':
+  '@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.26)(@vue/server-renderer@3.5.26(vue@3.5.26(typescript@5.5.4)))(vue@3.5.26(typescript@5.5.4))':
     dependencies:
       '@vue/compiler-dom': 3.5.26
       js-beautify: 1.15.4
