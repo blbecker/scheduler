@@ -8,21 +8,24 @@ from scheduler_api.schemas.worker import (
     WorkerResponse,
 )
 
-from .deps import get_worker_service
+from .deps import get_unit_of_work_provider
+from scheduler_api.uow.unit_of_work import UnitOfWork
 
 router = APIRouter(prefix="/workers", tags=["workers"])
 
 
 @router.get("/", response_model=list[WorkerResponse])
-def list_workers(service: WorkerService = Depends(get_worker_service)):
+def list_workers(uow: UnitOfWork = Depends(get_unit_of_work_provider())):
+    service = WorkerService(uow)
     return service.list_workers()
 
 
 @router.get("/{worker_id}", response_model=WorkerResponse)
 def get_worker(
     worker_id: UUID,
-    service: WorkerService = Depends(get_worker_service),
+    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
+    service = WorkerService(uow)
     worker = service.get_worker(worker_id)
     if worker is None:
         raise HTTPException(status_code=404, detail="Worker not found")
@@ -32,8 +35,9 @@ def get_worker(
 @router.post("/", response_model=WorkerResponse, status_code=201)
 def create_worker(
     worker: WorkerCreate,
-    service: WorkerService = Depends(get_worker_service),
+    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
+    service = WorkerService(uow)
     return service.create_worker(worker)
 
 
@@ -41,8 +45,9 @@ def create_worker(
 def update_worker(
     worker_id: UUID,
     worker: WorkerUpdate,
-    service: WorkerService = Depends(get_worker_service),
+    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
+    service = WorkerService(uow)
     updated = service.update_worker(worker_id, worker)
     if updated is None:
         raise HTTPException(status_code=404, detail="Worker not found")
@@ -52,9 +57,7 @@ def update_worker(
 @router.delete("/{worker_id}", status_code=204)
 def delete_worker(
     worker_id: UUID,
-    service: WorkerService = Depends(get_worker_service),
+    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
-    ok = service.delete_worker(worker_id)
-    if not ok:
-        raise HTTPException(status_code=404, detail="Worker not found")
-    return None
+    service = WorkerService(uow)
+    service.delete_worker(worker_id)

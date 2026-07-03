@@ -7,6 +7,9 @@ def to_response(model: Skill) -> SkillResponse:
     return SkillResponse(
         id=model.id,
         name=model.name,
+        description=model.description,
+        created_at=model.created_at,
+        updated_at=model.updated_at,
     )
 
 

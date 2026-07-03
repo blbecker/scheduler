@@ -1,19 +1,19 @@
-# scheduler_api/schemas/worker.py
+# scheduler_api/schemas/schedule_template.py
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
-class WorkerCreate(BaseModel):
+class ScheduleTemplateCreate(BaseModel):
     name: str
 
 
-class WorkerUpdate(BaseModel):
+class ScheduleTemplateUpdate(BaseModel):
     name: Optional[str] = None
 
 
-class WorkerResponse(BaseModel):
+class ScheduleTemplateResponse(BaseModel):
     id: UUID
     name: str
     created_at: datetime

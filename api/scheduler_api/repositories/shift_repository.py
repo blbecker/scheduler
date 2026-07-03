@@ -1,27 +1,24 @@
+from typing import List, Optional
+from uuid import UUID
+from sqlmodel import Session, select
 from scheduler_api.db.models.schedules.shift import Shift
-from sqlmodel import Session
 
 
 class ShiftRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def get_all(self) -> list[Shift]:
-        return self.session.query(Shift).all()
+    def get_all(self) -> List[Shift]:
+        statement = select(Shift)
+        result = self.session.exec(statement)
+        return result.all()
 
-    def get_by_id(self, shift_id: int) -> Shift | None:
+    def get_by_id(self, shift_id: UUID) -> Optional[Shift]:
         return self.session.get(Shift, shift_id)
 
     def add(self, shift: Shift) -> Shift:
         self.session.add(shift)
-        self.session.commit()
-        self.session.refresh(shift)
         return shift
 
-    def delete(self, shift_id: int) -> bool:
-        obj = self.session.get(Shift, shift_id)
-        if not obj:
-            return False
-        self.session.delete(obj)
-        self.session.commit()
-        return True
+    def delete(self, shift: Shift) -> None:
+        self.session.delete(shift)

@@ -7,9 +7,8 @@ def to_response(model: Worker) -> WorkerResponse:
     return WorkerResponse(
         id=model.id,
         name=model.name,
-        birthdate=model.birthdate,
-        email=model.email,
-        phone=model.phone,
+        created_at=model.created_at,
+        updated_at=model.updated_at,
     )
 
 

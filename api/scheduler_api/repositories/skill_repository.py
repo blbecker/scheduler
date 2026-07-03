@@ -1,5 +1,7 @@
+from typing import Optional
+from uuid import UUID
+from sqlmodel import Session, select
 from scheduler_api.db.models.core.skill import Skill
-from sqlmodel import Session
 
 
 class SkillRepository:
@@ -7,21 +9,16 @@ class SkillRepository:
         self.session = session
 
     def get_all(self) -> list[Skill]:
-        return self.session.query(Skill).all()
+        statement = select(Skill)
+        result = self.session.exec(statement)
+        return list(result.all())
 
-    def get_by_id(self, skill_id: int) -> Skill | None:
+    def get_by_id(self, skill_id: UUID) -> Optional[Skill]:
         return self.session.get(Skill, skill_id)
 
     def add(self, skill: Skill) -> Skill:
         self.session.add(skill)
-        self.session.commit()
-        self.session.refresh(skill)
         return skill
 
-    def delete(self, skill_id: int) -> bool:
-        obj = self.session.get(Skill, skill_id)
-        if not obj:
-            return False
-        self.session.delete(obj)
-        self.session.commit()
-        return True
+    def delete(self, skill: Skill) -> None:
+        self.session.delete(skill)
