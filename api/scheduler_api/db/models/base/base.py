@@ -6,9 +6,6 @@ from datetime import datetime
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
-Base = declarative_base()
-metadata = Base.metadata
-
 
 class BaseModel(SQLModel):
     id: uuid.UUID = Field(

@@ -1,23 +1,17 @@
-from typing import Optional, TYPE_CHECKING
-from sqlmodel import SQLModel, Field, Relationship
-from uuid import UUID, uuid4
+from sqlalchemy import Column, String
+from sqlmodel import Field, Relationship
 
-from scheduler_api.db.models.associations import WorkerSkillLink, ShiftSkillLink
 from scheduler_api.db.models.base import BaseModel
-
-if TYPE_CHECKING:
-    from .worker import Worker
-    from .shift import Shift
+from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLink
 
 
-# --- core model ---
 class Skill(BaseModel, table=True):
-    name: str
+    __tablename__ = "skills"
 
-    # Relations
-    workers: list["Worker"] = Relationship(
-        back_populates="skills", link_model=WorkerSkillLink
-    )
+    name: str = Field(sa_column=Column(String, unique=True, index=True, nullable=False))
+    description: str | None = None
+
     shifts: list["Shift"] = Relationship(
-        back_populates="skills", link_model=ShiftSkillLink
+        back_populates="skills",
+        link_model=ShiftSkillLink,
     )

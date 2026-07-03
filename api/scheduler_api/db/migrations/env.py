@@ -2,8 +2,10 @@ from logging.config import fileConfig
 import os
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from scheduler_api.db.base import Base
-from scheduler_api.db import models
+
+from scheduler_api.db.models import registry
+
+# from scheduler_api.db.models.runs import schedule_generation_run
 from alembic import context
 from sqlmodel import SQLModel
 

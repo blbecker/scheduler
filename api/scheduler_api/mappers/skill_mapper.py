@@ -1,5 +1,5 @@
 # scheduler_api/mappers/skill_mapper.py
-from scheduler_api.db.models.core import Skill
+from scheduler_api.db.models.core.skill import Skill
 from scheduler_api.schemas.skill import SkillCreate, SkillResponse, SkillUpdate
 
 

@@ -1,4 +1,4 @@
-from scheduler_api.db.models.schedules import Shift
+from scheduler_api.db.models.schedules.shift import Shift
 from sqlmodel import Session
 
 
