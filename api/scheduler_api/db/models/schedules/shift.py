@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
-from .associations import ShiftWorkerLink, ShiftSkillLink
+from scheduler_api.db.models.associations import ShiftWorkerLink, ShiftSkillLink
+from scheduler_api.db.models.base import BaseModel
 
 if TYPE_CHECKING:
     from .skill import Skill
@@ -10,8 +11,7 @@ if TYPE_CHECKING:
 
 
 # --- core model ---
-class Shift(SQLModel, table=True):
-    id: Optional[UUID] = Field(default=uuid4(), primary_key=True)
+class Shift(BaseModel, table=True):
     start_time: datetime
     end_time: datetime
     location: Optional[str] = None

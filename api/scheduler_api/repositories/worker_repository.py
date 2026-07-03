@@ -1,4 +1,4 @@
-from scheduler_api.db.models import Worker
+from scheduler_api.db.models.core import Worker
 from sqlmodel import Session
 
 

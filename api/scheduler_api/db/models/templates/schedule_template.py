@@ -2,9 +2,10 @@ from datetime import datetime
 from typing import Optional, List, Dict, Any
 from sqlmodel import SQLModel, Field, Column, JSON
 from uuid import UUID, uuid4
+from scheduler_api.db.models.base import BaseModel
 
 
-class ScheduleLayout(SQLModel, table=True):
+class ScheduleLayout(BaseModel, table=True):
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
     name: str = Field(index=True)
     description: Optional[str] = None

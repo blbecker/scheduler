@@ -1,5 +1,5 @@
 # scheduler_api/mappers/shift_mapper.py
-from scheduler_api.db.models import Shift
+from scheduler_api.db.models.schedules import Shift
 from scheduler_api.schemas.shift import ShiftCreate, ShiftResponse, ShiftUpdate
 
 

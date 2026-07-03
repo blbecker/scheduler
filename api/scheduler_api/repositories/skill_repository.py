@@ -1,4 +1,4 @@
-from scheduler_api.db.models import Skill
+from scheduler_api.db.models.core import Skill
 from sqlmodel import Session
 
 

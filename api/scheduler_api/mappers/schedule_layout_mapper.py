@@ -1,4 +1,4 @@
-from scheduler_api.db.models import ScheduleLayout
+from scheduler_api.db.models.templates import ScheduleLayout
 from scheduler_api.schemas.schedule_layout import (
     ScheduleLayoutCreate,
     ScheduleLayoutUpdate,

@@ -1,5 +1,5 @@
 # scheduler_api/mappers/worker_mapper.py
-from scheduler_api.db.models import Worker
+from scheduler_api.db.models.core import Worker
 from scheduler_api.schemas.worker import WorkerCreate, WorkerResponse, WorkerUpdate
 
 

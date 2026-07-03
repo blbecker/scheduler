@@ -2,7 +2,8 @@ from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
 
-from .associations import WorkerSkillLink, ShiftSkillLink
+from scheduler_api.db.models.associations import WorkerSkillLink, ShiftSkillLink
+from scheduler_api.db.models.base import BaseModel
 
 if TYPE_CHECKING:
     from .worker import Worker
@@ -10,8 +11,7 @@ if TYPE_CHECKING:
 
 
 # --- core model ---
-class Skill(SQLModel, table=True):
-    id: Optional[UUID] = Field(default=uuid4(), primary_key=True)
+class Skill(BaseModel, table=True):
     name: str
 
     # Relations

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 from sqlmodel import Session
-from scheduler_api.db.models import ScheduleLayout, ScheduleLayoutUpdate
+from scheduler_api.db.models.templates import ScheduleLayout, ScheduleLayoutUpdate
 
 
 class ScheduleLayoutRepository:

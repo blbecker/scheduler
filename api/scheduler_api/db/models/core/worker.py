@@ -2,7 +2,12 @@ from datetime import date
 from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 from uuid import UUID, uuid4
-from .associations import WorkerSkillLink, ShiftWorkerLink
+from scheduler_api.db.models.associations import (
+    WorkerSkillLink,
+    ShiftSkillLink,
+    ShiftWorkerLink,
+)
+from scheduler_api.db.models.base import BaseModel
 
 if TYPE_CHECKING:
     from .skill import Skill
@@ -10,8 +15,7 @@ if TYPE_CHECKING:
 
 
 # --- core model ---
-class Worker(SQLModel, table=True):
-    id: Optional[UUID] = Field(default=uuid4(), primary_key=True)
+class Worker(BaseModel, table=True):
     name: str
     birthdate: date
     email: Optional[str] = None
