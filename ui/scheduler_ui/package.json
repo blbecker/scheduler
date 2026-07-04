@@ -1,53 +1,48 @@
 {
   "name": "scheduler-ui",
   "version": "0.0.1",
-  "description": "A scheduling tool",
-  "productName": "SchedulerUI",
+  "private": true,
+  "description": "A Quasar Project",
+  "keywords": [
+    "quasar",
+    "quasar-app",
+    "quasar-app-vite",
+    "quasar-cli",
+    "vite",
+    "vue",
+    "vuejs"
+  ],
   "author": "Benjamin Becker <18665277+blbecker@users.noreply.github.com>",
   "type": "module",
-  "private": true,
   "scripts": {
-    "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
-    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
+    "lint": "oxfmt && oxlint --fix",
+    "lint:check": "oxfmt --check && oxlint",
     "dev": "quasar dev",
     "build": "quasar build",
-    "postinstall": "quasar prepare",
-    "test:unit:ui": "vitest --ui",
-    "test:unit": "vitest",
-    "test:unit:ci": "vitest run"
+    "typecheck": "vue-tsc --noEmit",
+    "postinstall": "quasar prepare --silent"
   },
   "dependencies": {
-    "@quasar/extras": "^1.16.4",
-    "@tanstack/vue-query": "^5.87.4",
-    "axios": "^1.2.1",
-    "msw": "^2.11.2",
-    "quasar": "^2.16.0",
-    "vue": "^3.4.18",
-    "vue-router": "^4.0.12"
+    "@quasar/extras": "^2.0.0",
+    "@tanstack/vue-query": "^5.101.2",
+    "pinia": "^3.0.1",
+    "quasar": "^2.21.0",
+    "vue": "^3.5.22",
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@eslint/js": "^9.14.0",
-    "@quasar/app-vite": "^2.1.0",
-    "@quasar/quasar-app-extension-testing-unit-vitest": "^1.2.3",
-    "@types/node": "^20.5.9",
-    "@vitest/ui": "^3.1.2",
-    "@vue/eslint-config-prettier": "^10.1.0",
-    "@vue/eslint-config-typescript": "^14.4.0",
-    "@vue/test-utils": "^2.4.6",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9.14.0",
-    "eslint-plugin-vue": "^9.30.0",
-    "globals": "^15.12.0",
-    "prettier": "^3.3.3",
-    "typescript": "~5.5.3",
-    "vite-plugin-checker": "^0.9.0",
-    "vitest": "^3.1.2",
-    "vue-tsc": "^2.0.29"
+    "@quasar/app-vite": "^3.0.0-rc.6",
+    "@types/node": "^22.19.11",
+    "autoprefixer": "^10.4.27",
+    "orval": "^8.20.0",
+    "oxfmt": "^0.x",
+    "oxlint": "^1.x",
+    "oxlint-tsgolint": "^0.x",
+    "typescript": "^6.0.0",
+    "vue-tsc": "^3.3.3"
   },
   "engines": {
-    "node": "^28 || ^26 || ^24 || ^22 || ^20 || ^18",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
-  }
+    "node": ">= 26 || ^24 || ^22.12"
+  },
+  "productName": "Scheduler UI"
 }
