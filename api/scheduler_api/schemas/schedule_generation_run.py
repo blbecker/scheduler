@@ -6,7 +6,7 @@ from typing import Optional, Dict, Any
 from scheduler_api.db.models.enums import ScheduleGenerationStatus
 
 
-class ScheduleGenerationRunCreate(BaseModel):
+class ScheduleGenerationRun(BaseModel):
     schedule_template_id: UUID
     parameters: Dict[str, Any]
 

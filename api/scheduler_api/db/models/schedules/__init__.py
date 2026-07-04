@@ -1,2 +1,2 @@
-from .shift import Shift
-from .schedule import Schedule
+from .shift import ShiftModel
+from .schedule import ScheduleModel

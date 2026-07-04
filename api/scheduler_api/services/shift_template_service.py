@@ -10,7 +10,7 @@ from scheduler_api.mappers.shift_template_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.shift_template import (
-    ShiftTemplateCreate,
+    ShiftTemplate,
     ShiftTemplateResponse,
     ShiftTemplateUpdate,
 )
@@ -36,7 +36,7 @@ class ShiftTemplateService:
             )
         return to_response(model)
 
-    def create_shift_template(self, dto: ShiftTemplateCreate) -> ShiftTemplateResponse:
+    def create_shift_template(self, dto: ShiftTemplate) -> ShiftTemplateResponse:
         repo = ShiftTemplateRepository(self.uow.session)
         model = from_create(dto)
         saved_model = repo.add(model)

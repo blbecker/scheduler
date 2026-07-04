@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship
 from scheduler_api.db.models.base import BaseModel
 
 
-class Schedule(BaseModel, table=True):
+class ScheduleModel(BaseModel, table=True):
     __tablename__ = "schedules"
 
     schedule_template_id: uuid.UUID = Field(
@@ -20,4 +20,4 @@ class Schedule(BaseModel, table=True):
 
     name: str = Field(sa_column=Column(String, nullable=False))
 
-    shifts: list["Shift"] = Relationship(back_populates="schedule")
+    shifts: list["ShiftModel"] = Relationship(back_populates="schedule")

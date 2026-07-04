@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 
-class ScheduleCreate(BaseModel):
+class Schedule(BaseModel):
     schedule_template_id: UUID
     name: str
 

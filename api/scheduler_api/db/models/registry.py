@@ -8,50 +8,54 @@ in SQLModel.metadata.
 # ─────────────────────────────
 # CORE
 # ─────────────────────────────
-from scheduler_api.db.models.core.skill import Skill
-from scheduler_api.db.models.core.worker import Worker
+from scheduler_api.db.models.core.skill import SkillModel
+from scheduler_api.db.models.core.worker import WorkerModel
 
 # ─────────────────────────────
 # ASSOCIATIONS (must load before relationships resolve)
 # ─────────────────────────────
-from scheduler_api.db.models.associations.worker_skill_link import WorkerSkillLink
-from scheduler_api.db.models.associations.shift_worker_link import ShiftWorkerLink
-from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLink
-from scheduler_api.db.models.associations.shift_template_skill import ShiftTemplateSkill
+from scheduler_api.db.models.associations.worker_skill_link import WorkerSkillLinkModel
+from scheduler_api.db.models.associations.shift_worker_link import ShiftWorkerLinkModel
+from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLinkModel
+from scheduler_api.db.models.associations.shift_template_skill import (
+    ShiftTemplateSkillModel,
+)
 
 # ─────────────────────────────
 # TEMPLATES
 # ─────────────────────────────
-from scheduler_api.db.models.templates.schedule_template import ScheduleTemplate
-from scheduler_api.db.models.templates.shift_template import ShiftTemplate
+from scheduler_api.db.models.templates.schedule_template import ScheduleTemplateModel
+from scheduler_api.db.models.templates.shift_template import ShiftTemplateModel
 
 # ─────────────────────────────
 # SCHEDULES (OUTPUT)
 # ─────────────────────────────
-from scheduler_api.db.models.schedules.schedule import Schedule
-from scheduler_api.db.models.schedules.shift import Shift
+from scheduler_api.db.models.schedules.schedule import ScheduleModel
+from scheduler_api.db.models.schedules.shift import ShiftModel
 
 # ─────────────────────────────
 # RUNS / ORCHESTRATION
 # ─────────────────────────────
-from scheduler_api.db.models.runs.schedule_generation_run import ScheduleGenerationRun
+from scheduler_api.db.models.runs.schedule_generation_run import (
+    ScheduleGenerationRunModel,
+)
 
 # Optional convenience export (not required for Alembic)
 __all__ = [
     # core
-    "Skill",
-    "Worker",
+    "SkillModel",
+    "WorkerModel",
     # associations
-    "WorkerSkill",
-    "ShiftWorkerLink",
-    "ShiftSkillLink",
-    "ShiftTemplateSkill",
+    "WorkerSkillLinkModel",
+    "ShiftWorkerLinkModel",
+    "ShiftSkillLinkModel",
+    "ShiftTemplateSkillModel",
     # templates
-    "ScheduleTemplate",
-    "ShiftTemplate",
-    # schedules
-    "Schedule",
-    "Shift",
-    # runs
-    "ScheduleGenerationRun",
+    "ScheduleTemplateModel",
+    "ShiftTemplateModel",
+    # schedules (output)
+    "ScheduleModel",
+    "ShiftModel",
+    # runs / orchestration
+    "ScheduleGenerationRunModel",
 ]

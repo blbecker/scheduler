@@ -3,7 +3,7 @@ from uuid import UUID
 
 from scheduler_api.services.skill_service import SkillService
 from scheduler_api.schemas.skill import (
-    SkillCreate,
+    Skill,
     SkillUpdate,
     SkillResponse,
 )
@@ -34,7 +34,7 @@ def get_skill(
 
 @router.post("/", response_model=SkillResponse, status_code=201)
 def create_skill(
-    skill: SkillCreate,
+    skill: Skill,
     uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
     service = SkillService(uow)

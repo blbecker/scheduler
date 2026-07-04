@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from uuid import UUID
 
 
-class ScheduleLayoutCreate(BaseModel):
+class ScheduleLayout(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     date_range_start: datetime

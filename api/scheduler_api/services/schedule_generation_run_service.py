@@ -12,7 +12,7 @@ from scheduler_api.mappers.schedule_generation_run_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.schedule_generation_run import (
-    ScheduleGenerationRunCreate,
+    ScheduleGenerationRun,
     ScheduleGenerationRunResponse,
     ScheduleGenerationRunUpdate,
 )
@@ -39,7 +39,7 @@ class ScheduleGenerationRunService:
         return to_response(model)
 
     def create_schedule_generation_run(
-        self, dto: ScheduleGenerationRunCreate
+        self, dto: ScheduleGenerationRun
     ) -> ScheduleGenerationRunResponse:
         repo = ScheduleGenerationRunRepository(self.uow.session)
         model = from_create(dto)

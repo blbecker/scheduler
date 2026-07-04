@@ -5,7 +5,7 @@ from datetime import datetime, time
 from typing import Optional
 
 
-class ShiftTemplateCreate(BaseModel):
+class ShiftTemplate(BaseModel):
     schedule_template_id: UUID
     name: str
     start_time: time

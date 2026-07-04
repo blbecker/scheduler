@@ -8,7 +8,7 @@ from scheduler_api.mappers.shift_mapper import (
     from_create,
     apply_update,
 )
-from scheduler_api.schemas.shift import ShiftCreate, ShiftUpdate, ShiftResponse
+from scheduler_api.schemas.shift import Shift, ShiftUpdate, ShiftResponse
 from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
@@ -25,7 +25,7 @@ class ShiftService:
         shift = repo.get_by_id(shift_id)
         return to_response(shift) if shift else None
 
-    def create_shift(self, dto: ShiftCreate) -> ShiftResponse:
+    def create_shift(self, dto: Shift) -> ShiftResponse:
         repo = ShiftRepository(self.uow.session)
         model = from_create(dto)
         saved = repo.add(model)

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from scheduler_api.services.shift_service import ShiftService
 from scheduler_api.schemas.shift import (
-    ShiftCreate,
+    Shift,
     ShiftUpdate,
     ShiftResponse,
 )
@@ -34,7 +34,7 @@ def get_shift(
 
 @router.post("/", response_model=ShiftResponse, status_code=201)
 def create_shift(
-    shift: ShiftCreate,
+    shift: Shift,
     uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
     service = ShiftService(uow)

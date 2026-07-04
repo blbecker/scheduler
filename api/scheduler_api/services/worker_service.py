@@ -9,7 +9,7 @@ from scheduler_api.mappers.worker_mapper import (
     from_create,
     apply_update,
 )
-from scheduler_api.schemas.worker import WorkerCreate, WorkerUpdate, WorkerResponse
+from scheduler_api.schemas.worker import Worker, WorkerUpdate, WorkerResponse
 from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
@@ -27,7 +27,7 @@ class WorkerService:
         worker = repo.get_by_id(worker_id)
         return to_response(worker) if worker else None
 
-    def create_worker(self, dto: WorkerCreate) -> WorkerResponse:
+    def create_worker(self, dto: Worker) -> WorkerResponse:
         repo = WorkerRepository(self.uow.session)
         model = from_create(dto)
         saved = repo.add(model)

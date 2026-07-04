@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 
-class ShiftCreate(BaseModel):
+class Shift(BaseModel):
     schedule_id: UUID
     shift_template_id: UUID
     name: str

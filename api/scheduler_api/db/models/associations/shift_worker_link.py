@@ -4,7 +4,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class ShiftWorkerLink(SQLModel, table=True):
+class ShiftWorkerLinkModel(SQLModel, table=True):
     __tablename__ = "shift_worker_links"
 
     shift_id: uuid.UUID = Field(

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from scheduler_api.services.shift_template_service import ShiftTemplateService
 from scheduler_api.schemas.shift_template import (
-    ShiftTemplateCreate,
+    ShiftTemplate,
     ShiftTemplateUpdate,
     ShiftTemplateResponse,
 )
@@ -39,7 +39,7 @@ def get_shift_template(
 
 @router.post("/", response_model=ShiftTemplateResponse, status_code=201)
 def create_shift_template(
-    shift_template: ShiftTemplateCreate,
+    shift_template: ShiftTemplate,
     uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
     service = ShiftTemplateService(uow)

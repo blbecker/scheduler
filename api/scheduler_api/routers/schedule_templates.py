@@ -4,7 +4,7 @@ from uuid import UUID
 
 from scheduler_api.services.schedule_template_service import ScheduleTemplateService
 from scheduler_api.schemas.schedule_template import (
-    ScheduleTemplateCreate,
+    ScheduleTemplate,
     ScheduleTemplateUpdate,
     ScheduleTemplateResponse,
 )
@@ -39,7 +39,7 @@ def get_schedule_template(
 
 @router.post("/", response_model=ScheduleTemplateResponse, status_code=201)
 def create_schedule_template(
-    schedule_template: ScheduleTemplateCreate,
+    schedule_template: ScheduleTemplate,
     uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
     service = ScheduleTemplateService(uow)

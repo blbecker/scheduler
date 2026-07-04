@@ -3,7 +3,7 @@ from uuid import UUID
 
 from scheduler_api.services.worker_service import WorkerService
 from scheduler_api.schemas.worker import (
-    WorkerCreate,
+    Worker,
     WorkerUpdate,
     WorkerResponse,
 )
@@ -34,7 +34,7 @@ def get_worker(
 
 @router.post("/", response_model=WorkerResponse, status_code=201)
 def create_worker(
-    worker: WorkerCreate,
+    worker: Worker,
     uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
     service = WorkerService(uow)

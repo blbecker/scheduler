@@ -4,7 +4,7 @@ from uuid import UUID
 
 from scheduler_api.services.schedule_service import ScheduleService
 from scheduler_api.schemas.schedule_crud import (
-    ScheduleCreate,
+    Schedule,
     ScheduleUpdate,
     ScheduleResponse,
 )
@@ -37,7 +37,7 @@ def get_schedule(
 
 @router.post("/", response_model=ScheduleResponse, status_code=201)
 def create_schedule(
-    schedule: ScheduleCreate,
+    schedule: Schedule,
     uow: UnitOfWork = Depends(get_unit_of_work_provider()),
 ):
     service = ScheduleService(uow)

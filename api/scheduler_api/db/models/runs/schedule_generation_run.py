@@ -9,7 +9,7 @@ from scheduler_api.db.models.base import BaseModel
 from scheduler_api.db.models.enums import ScheduleGenerationStatus
 
 
-class ScheduleGenerationRun(BaseModel, table=True):
+class ScheduleGenerationRunModel(BaseModel, table=True):
     __tablename__ = "schedule_generation_runs"
 
     schedule_template_id: uuid.UUID = Field(

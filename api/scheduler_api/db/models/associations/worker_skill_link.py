@@ -4,7 +4,7 @@ from sqlalchemy import Column, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 
 
-class WorkerSkillLink(SQLModel, table=True):
+class WorkerSkillLinkModel(SQLModel, table=True):
     __tablename__ = "worker_skill_links"
 
     worker_id: uuid.UUID = Field(

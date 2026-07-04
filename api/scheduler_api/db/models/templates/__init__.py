@@ -1,2 +1,2 @@
-from .schedule_template import ScheduleTemplate
-from .shift_template import ShiftTemplate
+from .schedule_template import ScheduleTemplateModel
+from .shift_template import ShiftTemplateModel

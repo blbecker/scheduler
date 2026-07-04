@@ -7,7 +7,7 @@ from sqlmodel import Field, Relationship
 from scheduler_api.db.models.base import BaseModel
 
 
-class ShiftTemplate(BaseModel, table=True):
+class ShiftTemplateModel(BaseModel, table=True):
     __tablename__ = "shift_templates"
 
     schedule_template_id: uuid.UUID = Field(
@@ -23,6 +23,6 @@ class ShiftTemplate(BaseModel, table=True):
     start_time: time = Field(sa_column=Column(Time, nullable=False))
     end_time: time = Field(sa_column=Column(Time, nullable=False))
 
-    schedule_template: "ScheduleTemplate" = Relationship(
+    schedule_template: "ScheduleTemplateModel" = Relationship(
         back_populates="shift_templates"
     )

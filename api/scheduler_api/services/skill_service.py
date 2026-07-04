@@ -9,7 +9,7 @@ from scheduler_api.mappers.skill_mapper import (
     from_create,
     apply_update,
 )
-from scheduler_api.schemas.skill import SkillCreate, SkillUpdate, SkillResponse
+from scheduler_api.schemas.skill import Skill, SkillUpdate, SkillResponse
 from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
@@ -27,7 +27,7 @@ class SkillService:
         skill = repo.get_by_id(skill_id)
         return to_response(skill) if skill else None
 
-    def create_skill(self, dto: SkillCreate) -> SkillResponse:
+    def create_skill(self, dto: Skill) -> SkillResponse:
         repo = SkillRepository(self.uow.session)
         model = from_create(dto)
         saved = repo.add(model)

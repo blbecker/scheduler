@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional, List
 
 
-class ScheduleTemplateCreate(BaseModel):
+class ScheduleTemplate(BaseModel):
     name: str
 
 

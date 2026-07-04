@@ -12,7 +12,7 @@ from scheduler_api.mappers.schedule_template_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.schedule_template import (
-    ScheduleTemplateCreate,
+    ScheduleTemplate,
     ScheduleTemplateResponse,
     ScheduleTemplateUpdate,
 )
@@ -39,7 +39,7 @@ class ScheduleTemplateService:
         return to_response(model)
 
     def create_schedule_template(
-        self, dto: ScheduleTemplateCreate
+        self, dto: ScheduleTemplate
     ) -> ScheduleTemplateResponse:
         repo = ScheduleTemplateRepository(self.uow.session)
         model = from_create(dto)

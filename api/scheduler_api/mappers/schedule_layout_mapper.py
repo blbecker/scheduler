@@ -1,12 +1,12 @@
 from scheduler_api.db.models.templates import ScheduleLayout
 from scheduler_api.schemas.schedule_layout import (
-    ScheduleLayoutCreate,
+    ScheduleLayout,
     ScheduleLayoutUpdate,
     ScheduleLayoutResponse,
 )
 
 
-def to_response(model: ScheduleLayout) -> ScheduleLayoutResponse:
+def to_response(model: ScheduleLayoutModel) -> ScheduleLayoutResponse:
     return ScheduleLayoutResponse(
         id=model.id,
         name=model.name,
@@ -21,7 +21,7 @@ def to_response(model: ScheduleLayout) -> ScheduleLayoutResponse:
     )
 
 
-def from_create(dto: ScheduleLayoutCreate) -> ScheduleLayout:
+def from_create(dto: ScheduleLayout) -> ScheduleLayoutModel:
     return ScheduleLayout(
         name=dto.name,
         description=dto.description,
@@ -33,7 +33,9 @@ def from_create(dto: ScheduleLayoutCreate) -> ScheduleLayout:
     )
 
 
-def apply_update(model: ScheduleLayout, dto: ScheduleLayoutUpdate) -> ScheduleLayout:
+def apply_update(
+    model: ScheduleLayoutModel, dto: ScheduleLayoutUpdate
+) -> ScheduleLayout:
     data = dto.model_dump(exclude_unset=True)
     for key, value in data.items():
         setattr(model, key, value)

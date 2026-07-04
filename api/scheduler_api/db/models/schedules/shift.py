@@ -5,11 +5,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field, Relationship
 
 from scheduler_api.db.models.base import BaseModel
-from scheduler_api.db.models.associations.shift_worker_link import ShiftWorkerLink
-from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLink
+from scheduler_api.db.models.associations.shift_worker_link import ShiftWorkerLinkModel
+from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLinkModel
 
 
-class Shift(BaseModel, table=True):
+class ShiftModel(BaseModel, table=True):
     __tablename__ = "shifts"
 
     schedule_id: uuid.UUID = Field(
@@ -35,14 +35,14 @@ class Shift(BaseModel, table=True):
     start_time: datetime
     end_time: datetime
 
-    schedule: "Schedule" = Relationship(back_populates="shifts")
+    schedule: "ScheduleModel" = Relationship(back_populates="shifts")
 
-    workers: list["Worker"] = Relationship(
+    workers: list["WorkerModel"] = Relationship(
         back_populates="shifts",
-        link_model=ShiftWorkerLink,
+        link_model=ShiftWorkerLinkModel,
     )
 
-    skills: list["Skill"] = Relationship(
+    skills: list["SkillModel"] = Relationship(
         back_populates="shifts",
-        link_model=ShiftSkillLink,
+        link_model=ShiftSkillLinkModel,
     )

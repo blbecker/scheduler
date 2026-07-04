@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List
 from uuid import UUID, uuid4
-from .schedule import Schedule
+from .schedule import ScheduleModel
 
 
 @dataclass

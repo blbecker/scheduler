@@ -10,7 +10,7 @@ from scheduler_api.mappers.schedule_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.schedule_crud import (
-    ScheduleCreate,
+    Schedule,
     ScheduleResponse,
     ScheduleUpdate,
 )
@@ -36,7 +36,7 @@ class ScheduleService:
             )
         return to_response(model)
 
-    def create_schedule(self, dto: ScheduleCreate) -> ScheduleResponse:
+    def create_schedule(self, dto: Schedule) -> ScheduleResponse:
         repo = ScheduleRepository(self.uow.session)
         model = from_create(dto)
         saved_model = repo.add(model)
