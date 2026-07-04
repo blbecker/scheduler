@@ -59,7 +59,7 @@ jobs:
 
       - name: Run API tests
         working-directory: ./api
-        run: pytest
+        run: pytest --cov --cov-fail-under 90
 
   lint-ui:
     name: Lint UI
@@ -215,7 +215,7 @@ jobs:
           name: Release ${{ github.run_number }}
           body: |
             ${{ steps.changelog.outputs.changelog }}
-            
+
             ### Docker Images
             - API: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}:${{ github.run_number }}`
             - UI: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME_UI }}:${{ github.run_number }}`

@@ -5,23 +5,28 @@ from typing import Optional
 from uuid import UUID
 
 
-class ShiftCreate(BaseModel):
+class Shift(BaseModel):
+    schedule_id: UUID
+    shift_template_id: UUID
+    name: str
     start_time: datetime
     end_time: datetime
-    location: Optional[str] = None
-    notes: Optional[str] = None
 
 
 class ShiftUpdate(BaseModel):
+    schedule_id: Optional[UUID] = None
+    shift_template_id: Optional[UUID] = None
+    name: Optional[str] = None
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
-    location: Optional[str] = None
-    notes: Optional[str] = None
 
 
 class ShiftResponse(BaseModel):
     id: UUID
+    schedule_id: UUID
+    shift_template_id: UUID
+    name: str
     start_time: datetime
     end_time: datetime
-    location: Optional[str]
-    notes: Optional[str]
+    created_at: datetime
+    updated_at: datetime

@@ -1,3 +1,3 @@
-from . import scheduler_tasks
+from . import solve_tasks
 
-__all__ = ["scheduler_tasks"]
+__all__ = ["solve_tasks"]

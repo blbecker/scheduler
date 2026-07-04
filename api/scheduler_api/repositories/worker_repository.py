@@ -1,27 +1,24 @@
-from scheduler_api.db.models import Worker
-from sqlmodel import Session
+from typing import Optional
+from uuid import UUID
+from sqlmodel import Session, select
+from scheduler_api.db.models.core.worker import WorkerModel
 
 
 class WorkerRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def get_all(self) -> list[Worker]:
-        return self.session.query(Worker).all()
+    def get_all(self) -> list[WorkerModel]:
+        statement = select(WorkerModel)
+        result = self.session.exec(statement)
+        return list(result.all())
 
-    def get_by_id(self, worker_id: int) -> Worker | None:
-        return self.session.get(Worker, worker_id)
+    def get_by_id(self, worker_id: UUID) -> Optional[WorkerModel]:
+        return self.session.get(WorkerModel, worker_id)
 
-    def add(self, worker: Worker) -> Worker:
+    def add(self, worker: WorkerModel) -> WorkerModel:
         self.session.add(worker)
-        self.session.commit()
-        self.session.refresh(worker)
         return worker
 
-    def delete(self, worker_id: int) -> bool:
-        obj = self.session.get(Worker, worker_id)
-        if not obj:
-            return False
-        self.session.delete(obj)
-        self.session.commit()
-        return True
+    def delete(self, worker: WorkerModel) -> None:
+        self.session.delete(worker)
