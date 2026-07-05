@@ -1,41 +1,37 @@
 import type { NextRequest } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL ?? "http://api:9000";
+const BACKEND_URL = process.env.BACKEND_URL;
+
+function assertBackendUrl(): string {
+  if (!BACKEND_URL) {
+    throw new Error("BACKEND_URL is not defined");
+  }
+  return BACKEND_URL;
+}
 
 async function handler(
-  req: NextRequest,
-  context: { params: { path: string[] } },
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> },
 ) {
-  const path = context.params.path.join("/");
-  const url = `${BACKEND_URL}/api/${path}`;
+  const { path } = await context.params;
 
-  // Preserve query string
-  const search = req.nextUrl.search;
+  const backendUrl = assertBackendUrl();
 
-  const targetUrl = `${url}${search}`;
+  const url = new URL(`${backendUrl}/api/${path.join("/")}`);
 
-  // Clone headers (strip host-related ones)
-  const headers = new Headers(req.headers);
-  headers.delete("host");
+  // forward query string
+  url.search = request.nextUrl.search;
 
-  const method = req.method;
+  const isBodyAllowed = request.method !== "GET" && request.method !== "HEAD";
 
-  const hasBody = !["GET", "HEAD"].includes(method);
-
-  const body = hasBody ? await req.arrayBuffer() : undefined;
-
-  const res = await fetch(targetUrl, {
-    method,
-    headers,
-    body,
-    redirect: "manual",
+  const upstreamResponse = await fetch(url, {
+    method: request.method,
+    headers: request.headers,
+    body: isBodyAllowed ? await request.arrayBuffer() : undefined,
+    duplex: isBodyAllowed ? "half" : undefined,
   });
 
-  return new Response(res.body, {
-    status: res.status,
-    statusText: res.statusText,
-    headers: res.headers,
-  });
+  return upstreamResponse;
 }
 
 export const GET = handler;
