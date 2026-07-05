@@ -17,12 +17,12 @@ def to_response(model: ScheduleTemplateModel) -> ScheduleTemplateResponse:
 
 
 def from_create(dto: ScheduleTemplate) -> ScheduleTemplateModel:
-    return ScheduleTemplate(**dto.model_dump())
+    return ScheduleTemplateModel(**dto.model_dump())
 
 
 def apply_update(
-    model: ScheduleTemplate, dto: ScheduleTemplateUpdate
-) -> ScheduleTemplate:
+    model: ScheduleTemplateModel, dto: ScheduleTemplateUpdate
+) -> ScheduleTemplateModel:
     data = dto.model_dump(exclude_unset=True)
     for k, v in data.items():
         setattr(model, k, v)

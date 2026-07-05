@@ -16,20 +16,19 @@ from scheduler_api.schemas.schedule_template import (
     ScheduleTemplateResponse,
     ScheduleTemplateUpdate,
 )
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
 class ScheduleTemplateService:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+    def __init__(self, repo: ScheduleTemplateRepository):
+        self.repo = repo
 
     def list_schedule_templates(self) -> List[ScheduleTemplateResponse]:
-        repo = ScheduleTemplateRepository(self.uow.session)
+        repo = self.repo
         models = repo.get_all()
         return [to_response(model) for model in models]
 
     def get_schedule_template(self, id: UUID) -> ScheduleTemplateResponse:
-        repo = ScheduleTemplateRepository(self.uow.session)
+        repo = self.repo
         model = repo.get_by_id(id)
         if not model:
             raise HTTPException(
@@ -41,16 +40,15 @@ class ScheduleTemplateService:
     def create_schedule_template(
         self, dto: ScheduleTemplate
     ) -> ScheduleTemplateResponse:
-        repo = ScheduleTemplateRepository(self.uow.session)
+        repo = self.repo
         model = from_create(dto)
         saved_model = repo.add(model)
-        self.uow.flush()  # Generate IDs if needed
         return to_response(saved_model)
 
     def update_schedule_template(
         self, id: UUID, dto: ScheduleTemplateUpdate
     ) -> ScheduleTemplateResponse:
-        repo = ScheduleTemplateRepository(self.uow.session)
+        repo = self.repo
         model = repo.get_by_id(id)
         if not model:
             raise HTTPException(
@@ -59,11 +57,10 @@ class ScheduleTemplateService:
             )
         updated_model = apply_update(model, dto)
         repo.add(updated_model)
-        self.uow.flush()  # Ensure updates are persisted
         return to_response(updated_model)
 
     def delete_schedule_template(self, id: UUID) -> None:
-        repo = ScheduleTemplateRepository(self.uow.session)
+        repo = self.repo
         model = repo.get_by_id(id)
         if not model:
             raise HTTPException(

@@ -18,7 +18,9 @@ class ShiftRepository:
 
     def add(self, shift: ShiftModel) -> ShiftModel:
         self.session.add(shift)
+        self.session.commit()  # Commit transaction
         return shift
 
     def delete(self, shift: ShiftModel) -> None:
         self.session.delete(shift)
+        self.session.commit()  # Commit transaction

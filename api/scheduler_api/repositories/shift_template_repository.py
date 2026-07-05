@@ -20,7 +20,9 @@ class ShiftTemplateRepository:
 
     def add(self, model: ShiftTemplateModel) -> ShiftTemplateModel:
         self.session.add(model)
+        self.session.commit()  # Commit transaction
         return model
 
     def delete(self, model: ShiftTemplateModel) -> None:
         self.session.delete(model)
+        self.session.commit()  # Commit transaction

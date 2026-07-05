@@ -16,20 +16,19 @@ from scheduler_api.schemas.schedule_generation_run import (
     ScheduleGenerationRunResponse,
     ScheduleGenerationRunUpdate,
 )
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
 class ScheduleGenerationRunService:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+    def __init__(self, repo: ScheduleGenerationRunRepository):
+        self.repo = repo
 
     def list_schedule_generation_runs(self) -> List[ScheduleGenerationRunResponse]:
-        repo = ScheduleGenerationRunRepository(self.uow.session)
+        repo = self.repo
         models = repo.get_all()
         return [to_response(model) for model in models]
 
     def get_schedule_generation_run(self, id: UUID) -> ScheduleGenerationRunResponse:
-        repo = ScheduleGenerationRunRepository(self.uow.session)
+        repo = self.repo
         model = repo.get_by_id(id)
         if not model:
             raise HTTPException(
@@ -41,16 +40,15 @@ class ScheduleGenerationRunService:
     def create_schedule_generation_run(
         self, dto: ScheduleGenerationRun
     ) -> ScheduleGenerationRunResponse:
-        repo = ScheduleGenerationRunRepository(self.uow.session)
+        repo = self.repo
         model = from_create(dto)
         saved_model = repo.add(model)
-        self.uow.flush()  # Generate IDs if needed
         return to_response(saved_model)
 
     def update_schedule_generation_run(
         self, id: UUID, dto: ScheduleGenerationRunUpdate
     ) -> ScheduleGenerationRunResponse:
-        repo = ScheduleGenerationRunRepository(self.uow.session)
+        repo = self.repo
         model = repo.get_by_id(id)
         if not model:
             raise HTTPException(
@@ -59,11 +57,10 @@ class ScheduleGenerationRunService:
             )
         updated_model = apply_update(model, dto)
         repo.add(updated_model)
-        self.uow.flush()  # Ensure updates are persisted
         return to_response(updated_model)
 
     def delete_schedule_generation_run(self, id: UUID) -> None:
-        repo = ScheduleGenerationRunRepository(self.uow.session)
+        repo = self.repo
         model = repo.get_by_id(id)
         if not model:
             raise HTTPException(

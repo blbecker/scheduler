@@ -18,7 +18,9 @@ class WorkerRepository:
 
     def add(self, worker: WorkerModel) -> WorkerModel:
         self.session.add(worker)
+        self.session.commit()  # Commit transaction
         return worker
 
     def delete(self, worker: WorkerModel) -> None:
         self.session.delete(worker)
+        self.session.commit()  # Commit transaction

@@ -10,43 +10,40 @@ from scheduler_api.mappers.skill_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.skill import Skill, SkillUpdate, SkillResponse
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
 class SkillService:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+    def __init__(self, repo: SkillRepository):
+        self.repo = repo
 
     def list_skills(self) -> List[SkillResponse]:
-        repo = SkillRepository(self.uow.session)
+        repo = self.repo
         models = repo.get_all()
         return [to_response(s) for s in models]
 
     def get_skill(self, skill_id: UUID) -> Optional[SkillResponse]:
-        repo = SkillRepository(self.uow.session)
+        repo = self.repo
         skill = repo.get_by_id(skill_id)
         return to_response(skill) if skill else None
 
     def create_skill(self, dto: Skill) -> SkillResponse:
-        repo = SkillRepository(self.uow.session)
+        repo = self.repo
         model = from_create(dto)
         saved = repo.add(model)
-        self.uow.flush()  # Generate IDs if needed
         return to_response(saved)
 
     def update_skill(self, skill_id: UUID, dto: SkillUpdate) -> Optional[SkillResponse]:
-        repo = SkillRepository(self.uow.session)
+        repo = self.repo
         existing = repo.get_by_id(skill_id)
         if not existing:
             return None
 
         updated = apply_update(existing, dto)
         saved = repo.add(updated)
-        self.uow.flush()  # Ensure updates are persisted
         return to_response(saved)
 
     def delete_skill(self, skill_id: UUID) -> None:
-        repo = SkillRepository(self.uow.session)
+        repo = self.repo
         skill = repo.get_by_id(skill_id)
         if not skill:
             raise HTTPException(

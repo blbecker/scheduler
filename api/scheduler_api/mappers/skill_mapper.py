@@ -14,10 +14,10 @@ def to_response(model: SkillModel) -> SkillResponse:
 
 
 def from_create(dto: Skill) -> SkillModel:
-    return Skill(**dto.model_dump())
+    return SkillModel(**dto.model_dump())
 
 
-def apply_update(model: SkillModel, dto: SkillUpdate) -> Skill:
+def apply_update(model: SkillModel, dto: SkillUpdate) -> SkillModel:
     data = dto.model_dump(exclude_unset=True)
     for k, v in data.items():
         setattr(model, k, v)

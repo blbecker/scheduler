@@ -25,16 +25,18 @@ def to_response(model: ScheduleGenerationRunModel) -> ScheduleGenerationRunRespo
 
 
 def from_create(dto: ScheduleGenerationRun) -> ScheduleGenerationRunModel:
-    return ScheduleGenerationRun(
+    return ScheduleGenerationRunModel(
         schedule_template_id=dto.schedule_template_id,
         parameters=dto.parameters,
         status=ScheduleGenerationStatus.pending,
+        started_at=None,
+        finished_at=None,
     )
 
 
 def apply_update(
-    model: ScheduleGenerationRun, dto: ScheduleGenerationRunUpdate
-) -> ScheduleGenerationRun:
+    model: ScheduleGenerationRunModel, dto: ScheduleGenerationRunUpdate
+) -> ScheduleGenerationRunModel:
     data = dto.model_dump(exclude_unset=True)
     for k, v in data.items():
         setattr(model, k, v)

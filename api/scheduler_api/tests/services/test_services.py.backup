@@ -17,14 +17,17 @@ from scheduler_api.schemas.shift import ShiftResponse
 
 
 @pytest.fixture
-def mock_uow():
-    uow = MagicMock(spec=UnitOfWork)
-    uow.session = MagicMock()
-    uow.flush = MagicMock()
-    return uow
+def mock_repo():
+    repo = MagicMock()
+    repo.get_all = MagicMock()
+    repo.get_by_id = MagicMock()
+    repo.add = MagicMock()
+    repo.delete = MagicMock()
+    repo.session = MagicMock()
+    return repo
 
 
-def test_worker_service_get_all(mock_uow):
+def test_worker_service_get_all(mock_repo):
     # Setup
     worker_model = WorkerModel(id=UUID(int=1), name="John Doe")
     expected_response = WorkerResponse(

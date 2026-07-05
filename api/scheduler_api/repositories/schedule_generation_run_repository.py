@@ -22,7 +22,9 @@ class ScheduleGenerationRunRepository:
 
     def add(self, model: ScheduleGenerationRunModel) -> ScheduleGenerationRunModel:
         self.session.add(model)
+        self.session.commit()  # Commit transaction
         return model
 
     def delete(self, model: ScheduleGenerationRunModel) -> None:
         self.session.delete(model)
+        self.session.commit()  # Commit transaction

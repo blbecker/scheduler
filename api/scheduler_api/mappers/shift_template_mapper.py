@@ -20,10 +20,10 @@ def to_response(model: ShiftTemplateModel) -> ShiftTemplateResponse:
 
 
 def from_create(dto: ShiftTemplate) -> ShiftTemplateModel:
-    return ShiftTemplate(**dto.model_dump())
+    return ShiftTemplateModel(**dto.model_dump())
 
 
-def apply_update(model: ShiftTemplateModel, dto: ShiftTemplateUpdate) -> ShiftTemplate:
+def apply_update(model: ShiftTemplateModel, dto: ShiftTemplateUpdate) -> ShiftTemplateModel:
     data = dto.model_dump(exclude_unset=True)
     for k, v in data.items():
         setattr(model, k, v)

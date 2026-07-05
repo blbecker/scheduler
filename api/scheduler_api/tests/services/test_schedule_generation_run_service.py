@@ -1,12 +1,11 @@
-"""Test ScheduleGenerationRunService with UnitOfWork pattern."""
+"""Test ScheduleGenerationRunService with repository pattern."""
 
 import pytest
 from unittest.mock import MagicMock, patch
 from uuid import UUID, uuid4
-from datetime import datetime
+from datetime import datetime, UTC
 from fastapi import HTTPException, status
 
-from scheduler_api.uow.unit_of_work import UnitOfWork
 from scheduler_api.services.schedule_generation_run_service import (
     ScheduleGenerationRunService,
 )
@@ -22,11 +21,13 @@ class TestScheduleGenerationRunService:
     """Test ScheduleGenerationRunService."""
 
     @pytest.fixture
-    def mock_uow(self):
-        uow = MagicMock(spec=UnitOfWork)
-        uow.session = MagicMock()
-        uow.flush = MagicMock()
-        return uow
+    def mock_repo(self):
+        repo = MagicMock()
+        repo.get_all = MagicMock()
+        repo.get_by_id = MagicMock()
+        repo.add = MagicMock()
+        repo.delete = MagicMock()
+        return repo
 
     @pytest.fixture
     def sample_run_model(self):
@@ -38,8 +39,8 @@ class TestScheduleGenerationRunService:
         run.started_at = None
         run.finished_at = None
         run.parameters = {}
-        run.created_at = datetime.utcnow()
-        run.updated_at = datetime.utcnow()
+        run.created_at = datetime.now(UTC)
+        run.updated_at = datetime.now(UTC)
         return run
 
     @pytest.fixture
@@ -57,21 +58,14 @@ class TestScheduleGenerationRunService:
         )
 
     def test_list_schedule_generation_runs(
-        self, mock_uow, sample_run_model, sample_run_response
+        self, mock_repo, sample_run_model, sample_run_response
     ):
         # Setup
-        mock_repo = MagicMock()
         mock_repo.get_all.return_value = [sample_run_model]
+        service = ScheduleGenerationRunService(mock_repo)
 
-        # Patch the repository constructor to return our mock
-        with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
-        ):
-            service = ScheduleGenerationRunService(mock_uow)
-
-            # Test
-            result = service.list_schedule_generation_runs()
+        # Test
+        result = service.list_schedule_generation_runs()
 
         # Verify
         mock_repo.get_all.assert_called_once()
@@ -80,161 +74,128 @@ class TestScheduleGenerationRunService:
         assert result[0].status == sample_run_response.status
 
     def test_get_schedule_generation_run(
-        self, mock_uow, sample_run_model, sample_run_response
+        self, mock_repo, sample_run_model, sample_run_response
     ):
         # Setup
         run_id = sample_run_model.id
-        mock_repo = MagicMock()
         mock_repo.get_by_id.return_value = sample_run_model
+        service = ScheduleGenerationRunService(mock_repo)
 
-        # Patch the repository constructor to return our mock
-        with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
-        ):
-            service = ScheduleGenerationRunService(mock_uow)
-
-            # Test
-            result = service.get_schedule_generation_run(run_id)
+        # Test
+        result = service.get_schedule_generation_run(run_id)
 
         # Verify
         mock_repo.get_by_id.assert_called_once_with(run_id)
         assert result.id == sample_run_response.id
         assert result.status == sample_run_response.status
 
-    def test_get_schedule_generation_run_not_found(self, mock_uow):
+    def test_get_schedule_generation_run_not_found(self, mock_repo):
         # Setup
         run_id = uuid4()
-        mock_repo = MagicMock()
         mock_repo.get_by_id.return_value = None
+        service = ScheduleGenerationRunService(mock_repo)
 
-        # Patch the repository constructor to return our mock
-        with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
-        ):
-            service = ScheduleGenerationRunService(mock_uow)
-
-            # Test & Verify
-            with pytest.raises(HTTPException) as exc_info:
-                service.get_schedule_generation_run(run_id)
+        # Test & Verify
+        with pytest.raises(HTTPException) as exc_info:
+            service.get_schedule_generation_run(run_id)
 
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         mock_repo.get_by_id.assert_called_once_with(run_id)
 
     def test_create_schedule_generation_run(
-        self, mock_uow, sample_run_model, sample_run_response
+        self, mock_repo, sample_run_model, sample_run_response
     ):
         # Setup
         create_dto = ScheduleGenerationRun(
             schedule_template_id=sample_run_model.schedule_template_id, parameters={}
         )
-        mock_repo = MagicMock()
         mock_repo.add.return_value = sample_run_model
-
-        # Patch the repository constructor to return our mock
+        
+        # Mock the mapper function
         with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
+            "scheduler_api.services.schedule_generation_run_service.from_create",
+            return_value=sample_run_model
+        ), patch(
+            "scheduler_api.services.schedule_generation_run_service.to_response",
+            return_value=sample_run_response
         ):
-            service = ScheduleGenerationRunService(mock_uow)
+            service = ScheduleGenerationRunService(mock_repo)
 
             # Test
             result = service.create_schedule_generation_run(create_dto)
 
         # Verify
-        mock_repo.add.assert_called_once()
-        mock_uow.flush.assert_called_once()
+        mock_repo.add.assert_called_once_with(sample_run_model)
         assert result.id == sample_run_response.id
         assert result.status == sample_run_response.status
 
     def test_update_schedule_generation_run(
-        self, mock_uow, sample_run_model, sample_run_response
+        self, mock_repo, sample_run_model, sample_run_response
     ):
         # Setup
         run_id = sample_run_model.id
         update_dto = ScheduleGenerationRunUpdate(
             status=ScheduleGenerationStatus.running
         )
-        mock_repo = MagicMock()
         mock_repo.get_by_id.return_value = sample_run_model
         mock_repo.add.return_value = sample_run_model
-
-        # Patch the repository constructor to return our mock
+        
+        # Mock the mapper function
         with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
+            "scheduler_api.services.schedule_generation_run_service.apply_update",
+            return_value=sample_run_model
+        ), patch(
+            "scheduler_api.services.schedule_generation_run_service.to_response",
+            return_value=sample_run_response
         ):
-            service = ScheduleGenerationRunService(mock_uow)
+            service = ScheduleGenerationRunService(mock_repo)
 
             # Test
             result = service.update_schedule_generation_run(run_id, update_dto)
 
         # Verify
         mock_repo.get_by_id.assert_called_once_with(run_id)
-        mock_repo.add.assert_called_once()
-        mock_uow.flush.assert_called_once()
+        mock_repo.add.assert_called_once_with(sample_run_model)
         assert result.id == sample_run_response.id
 
-    def test_update_schedule_generation_run_not_found(self, mock_uow):
+    def test_update_schedule_generation_run_not_found(self, mock_repo):
         # Setup
         run_id = uuid4()
         update_dto = ScheduleGenerationRunUpdate(
             status=ScheduleGenerationStatus.running
         )
-        mock_repo = MagicMock()
         mock_repo.get_by_id.return_value = None
+        service = ScheduleGenerationRunService(mock_repo)
 
-        # Patch the repository constructor to return our mock
-        with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
-        ):
-            service = ScheduleGenerationRunService(mock_uow)
-
-            # Test & Verify
-            with pytest.raises(HTTPException) as exc_info:
-                service.update_schedule_generation_run(run_id, update_dto)
+        # Test & Verify
+        with pytest.raises(HTTPException) as exc_info:
+            service.update_schedule_generation_run(run_id, update_dto)
 
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         mock_repo.get_by_id.assert_called_once_with(run_id)
 
-    def test_delete_schedule_generation_run(self, mock_uow, sample_run_model):
+    def test_delete_schedule_generation_run(self, mock_repo, sample_run_model):
         # Setup
         run_id = sample_run_model.id
-        mock_repo = MagicMock()
         mock_repo.get_by_id.return_value = sample_run_model
+        service = ScheduleGenerationRunService(mock_repo)
 
-        # Patch the repository constructor to return our mock
-        with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
-        ):
-            service = ScheduleGenerationRunService(mock_uow)
-
-            # Test
-            service.delete_schedule_generation_run(run_id)
+        # Test
+        service.delete_schedule_generation_run(run_id)
 
         # Verify
         mock_repo.get_by_id.assert_called_once_with(run_id)
         mock_repo.delete.assert_called_once_with(sample_run_model)
 
-    def test_delete_schedule_generation_run_not_found(self, mock_uow):
+    def test_delete_schedule_generation_run_not_found(self, mock_repo):
         # Setup
         run_id = uuid4()
-        mock_repo = MagicMock()
         mock_repo.get_by_id.return_value = None
+        service = ScheduleGenerationRunService(mock_repo)
 
-        # Patch the repository constructor to return our mock
-        with patch(
-            "scheduler_api.services.schedule_generation_run_service.ScheduleGenerationRunRepository",
-            return_value=mock_repo,
-        ):
-            service = ScheduleGenerationRunService(mock_uow)
-
-            # Test & Verify
-            with pytest.raises(HTTPException) as exc_info:
-                service.delete_schedule_generation_run(run_id)
+        # Test & Verify
+        with pytest.raises(HTTPException) as exc_info:
+            service.delete_schedule_generation_run(run_id)
 
         assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
         mock_repo.get_by_id.assert_called_once_with(run_id)

@@ -10,45 +10,42 @@ from scheduler_api.mappers.worker_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.worker import Worker, WorkerUpdate, WorkerResponse
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
 class WorkerService:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
+    def __init__(self, repo: WorkerRepository):
+        self.repo = repo
 
     def list_workers(self) -> List[WorkerResponse]:
-        repo = WorkerRepository(self.uow.session)
+        repo = self.repo
         models = repo.get_all()
         return [to_response(s) for s in models]
 
     def get_worker(self, worker_id: UUID) -> Optional[WorkerResponse]:
-        repo = WorkerRepository(self.uow.session)
+        repo = self.repo
         worker = repo.get_by_id(worker_id)
         return to_response(worker) if worker else None
 
     def create_worker(self, dto: Worker) -> WorkerResponse:
-        repo = WorkerRepository(self.uow.session)
+        repo = self.repo
         model = from_create(dto)
         saved = repo.add(model)
-        self.uow.flush()  # Generate IDs if needed
         return to_response(saved)
 
     def update_worker(
         self, worker_id: UUID, dto: WorkerUpdate
     ) -> Optional[WorkerResponse]:
-        repo = WorkerRepository(self.uow.session)
+        repo = self.repo
         existing = repo.get_by_id(worker_id)
         if not existing:
             return None
 
         updated = apply_update(existing, dto)
         saved = repo.add(updated)
-        self.uow.flush()  # Ensure updates are persisted
         return to_response(saved)
 
     def delete_worker(self, worker_id: UUID) -> None:
-        repo = WorkerRepository(self.uow.session)
+        repo = self.repo
         worker = repo.get_by_id(worker_id)
         if not worker:
             raise HTTPException(

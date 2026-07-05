@@ -20,7 +20,9 @@ class ScheduleRepository:
 
     def add(self, model: ScheduleModel) -> ScheduleModel:
         self.session.add(model)
+        self.session.commit()  # Commit transaction
         return model
 
     def delete(self, model: ScheduleModel) -> None:
         self.session.delete(model)
+        self.session.commit()  # Commit transaction

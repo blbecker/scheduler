@@ -18,7 +18,9 @@ class SkillRepository:
 
     def add(self, skill: SkillModel) -> SkillModel:
         self.session.add(skill)
+        self.session.commit()  # Commit transaction
         return skill
 
     def delete(self, skill: SkillModel) -> None:
         self.session.delete(skill)
+        self.session.commit()  # Commit transaction

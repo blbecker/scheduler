@@ -18,10 +18,10 @@ def to_response(model: ScheduleModel) -> ScheduleResponse:
 
 
 def from_create(dto: Schedule) -> ScheduleModel:
-    return Schedule(**dto.model_dump())
+    return ScheduleModel(**dto.model_dump())
 
 
-def apply_update(model: ScheduleModel, dto: ScheduleUpdate) -> Schedule:
+def apply_update(model: ScheduleModel, dto: ScheduleUpdate) -> ScheduleModel:
     data = dto.model_dump(exclude_unset=True)
     for k, v in data.items():
         setattr(model, k, v)

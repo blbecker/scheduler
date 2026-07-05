@@ -20,7 +20,9 @@ class ScheduleTemplateRepository:
 
     def add(self, model: ScheduleTemplateModel) -> ScheduleTemplateModel:
         self.session.add(model)
+        self.session.commit()  # Commit transaction
         return model
 
     def delete(self, model: ScheduleTemplateModel) -> None:
         self.session.delete(model)
+        self.session.commit()  # Commit transaction
