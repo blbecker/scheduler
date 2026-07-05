@@ -6,14 +6,13 @@ export default defineConfig({
     input: {
       target: "http://localhost:8000/api/v1/openapi.json",
     },
-    baseUrl: {
-      runtime: "process.env.API_BASE_URL",
-    },
     output: {
       mode: "tags-split",
-      client: "vue-query",
+      client: "react-query",
       target: "./src/api/generated",
       schemas: "./src/api/models",
+      baseUrl: "process.env.API_BASE_URL",
+      mock: true,
     },
   },
 });
