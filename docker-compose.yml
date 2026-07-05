@@ -2,7 +2,7 @@ services:
   ui:
     build: ./ui/
     ports:
-      - "9000:9000"
+      - "3000:3000"
     volumes:
       - ./ui/scheduler_ui:/app
       - node_modules:/app/node_modules

@@ -9,7 +9,7 @@ export default defineConfig({
     output: {
       mode: "tags-split",
       client: "react-query",
-      target: "./src/api/generated",
+      target: "./src/api/client",
       schemas: "./src/api/models",
       baseUrl: "process.env.API_BASE_URL",
       mock: true,

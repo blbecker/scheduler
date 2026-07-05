@@ -1,18 +1,34 @@
-FROM node:24.6 AS base 
+FROM node:24.6 AS base
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+
 RUN corepack enable
 
-FROM base AS build 
-
-USER 1000:1000
+# ------------------------
+# Dependencies
+# ------------------------
+FROM base AS deps
 
 WORKDIR /app
 
-# FIXME: Quasar wants to run from the project, but this means the code is in a docker layer.
-# COPY --chown=node ./scheduler_ui/package.json ./scheduler_ui/pnpm-lock.yaml ./
-COPY --chown=node ./scheduler_ui ./
+COPY scheduler_ui/package.json scheduler_ui/pnpm-*.yaml ./
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --config.confirmModulesPurge=false
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
-CMD ["pnpm", "quasar", "dev"]
+# ------------------------
+# Dev stage
+# ------------------------
+FROM base AS dev
+
+WORKDIR /app
+
+USER 1000:1000
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY scheduler_ui ./
+
+EXPOSE 3000
+
+CMD ["pnpm", "dev"]
