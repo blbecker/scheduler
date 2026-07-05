@@ -9,9 +9,14 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -61,7 +66,7 @@ export const getListWorkersUrl = () => {
 
 
 
-  return `process.env.API_BASE_URL/workers/`
+  return `/api/v1/workers/`
 }
 
 /**
@@ -91,12 +96,12 @@ export const listWorkers = async ( options?: RequestInit): Promise<listWorkersRe
 
 export const getListWorkersQueryKey = () => {
     return [
-    `process.env.API_BASE_URL/workers/`
+    `/api/v1/workers/`
     ] as const;
     }
 
 
-export const getListWorkersQueryOptions = <TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>, fetch?: RequestInit}
+export const getListWorkersQueryOptions = <TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
@@ -111,25 +116,49 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ListWorkersQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkers>>>
 export type ListWorkersQueryError = unknown
 
 
+export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listWorkers>>,
+          TError,
+          Awaited<ReturnType<typeof listWorkers>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listWorkers>>,
+          TError,
+          Awaited<ReturnType<typeof listWorkers>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Workers
  */
 
 export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>, fetch?: RequestInit}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getListWorkersQueryOptions(options)
 
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -163,7 +192,7 @@ export const getCreateWorkerUrl = () => {
 
 
 
-  return `process.env.API_BASE_URL/workers/`
+  return `/api/v1/workers/`
 }
 
 /**
@@ -227,13 +256,13 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useCreateWorker = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorker>>, TError,{data: Worker}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createWorker>>,
         TError,
         {data: Worker},
         TContext
       > => {
-      return useMutation(getCreateWorkerMutationOptions(options));
+      return useMutation(getCreateWorkerMutationOptions(options), queryClient);
     }
     export type getWorkerResponse200 = {
   data: WorkerResponse
@@ -259,7 +288,7 @@ export const getGetWorkerUrl = (workerId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/workers/${workerId}`
+  return `/api/v1/workers/${workerId}`
 }
 
 /**
@@ -289,12 +318,12 @@ export const getWorker = async (workerId: string, options?: RequestInit): Promis
 
 export const getGetWorkerQueryKey = (workerId: string,) => {
     return [
-    `process.env.API_BASE_URL/workers/${workerId}`
+    `/api/v1/workers/${workerId}`
     ] as const;
     }
 
 
-export const getGetWorkerQueryOptions = <TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(workerId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>, fetch?: RequestInit}
+export const getGetWorkerQueryOptions = <TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
@@ -309,25 +338,49 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: workerId !== null && workerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: workerId !== null && workerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetWorkerQueryResult = NonNullable<Awaited<ReturnType<typeof getWorker>>>
 export type GetWorkerQueryError = HTTPValidationError
 
 
+export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
+ workerId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorker>>,
+          TError,
+          Awaited<ReturnType<typeof getWorker>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
+ workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorker>>,
+          TError,
+          Awaited<ReturnType<typeof getWorker>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
+ workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Worker
  */
 
 export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
- workerId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>, fetch?: RequestInit}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkerQueryOptions(workerId,options)
 
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -361,7 +414,7 @@ export const getUpdateWorkerUrl = (workerId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/workers/${workerId}`
+  return `/api/v1/workers/${workerId}`
 }
 
 /**
@@ -426,13 +479,13 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useUpdateWorker = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorker>>, TError,{workerId: string;data: WorkerUpdate}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateWorker>>,
         TError,
         {workerId: string;data: WorkerUpdate},
         TContext
       > => {
-      return useMutation(getUpdateWorkerMutationOptions(options));
+      return useMutation(getUpdateWorkerMutationOptions(options), queryClient);
     }
     export type deleteWorkerResponse204 = {
   data: void
@@ -458,7 +511,7 @@ export const getDeleteWorkerUrl = (workerId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/workers/${workerId}`
+  return `/api/v1/workers/${workerId}`
 }
 
 /**
@@ -522,11 +575,11 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useDeleteWorker = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorker>>, TError,{workerId: string}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorker>>,
         TError,
         {workerId: string},
         TContext
       > => {
-      return useMutation(getDeleteWorkerMutationOptions(options));
+      return useMutation(getDeleteWorkerMutationOptions(options), queryClient);
     }

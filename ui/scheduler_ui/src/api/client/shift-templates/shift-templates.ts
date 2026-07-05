@@ -9,9 +9,14 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -61,7 +66,7 @@ export const getListShiftTemplatesUrl = () => {
 
 
 
-  return `process.env.API_BASE_URL/shift-templates/`
+  return `/api/v1/shift-templates/`
 }
 
 /**
@@ -91,12 +96,12 @@ export const listShiftTemplates = async ( options?: RequestInit): Promise<listSh
 
 export const getListShiftTemplatesQueryKey = () => {
     return [
-    `process.env.API_BASE_URL/shift-templates/`
+    `/api/v1/shift-templates/`
     ] as const;
     }
 
 
-export const getListShiftTemplatesQueryOptions = <TData = Awaited<ReturnType<typeof listShiftTemplates>>, TError = unknown>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>, fetch?: RequestInit}
+export const getListShiftTemplatesQueryOptions = <TData = Awaited<ReturnType<typeof listShiftTemplates>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
@@ -111,25 +116,49 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ListShiftTemplatesQueryResult = NonNullable<Awaited<ReturnType<typeof listShiftTemplates>>>
 export type ListShiftTemplatesQueryError = unknown
 
 
+export function useListShiftTemplates<TData = Awaited<ReturnType<typeof listShiftTemplates>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listShiftTemplates>>,
+          TError,
+          Awaited<ReturnType<typeof listShiftTemplates>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListShiftTemplates<TData = Awaited<ReturnType<typeof listShiftTemplates>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listShiftTemplates>>,
+          TError,
+          Awaited<ReturnType<typeof listShiftTemplates>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListShiftTemplates<TData = Awaited<ReturnType<typeof listShiftTemplates>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Shift Templates
  */
 
 export function useListShiftTemplates<TData = Awaited<ReturnType<typeof listShiftTemplates>>, TError = unknown>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>, fetch?: RequestInit}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShiftTemplates>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getListShiftTemplatesQueryOptions(options)
 
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -163,7 +192,7 @@ export const getCreateShiftTemplateUrl = () => {
 
 
 
-  return `process.env.API_BASE_URL/shift-templates/`
+  return `/api/v1/shift-templates/`
 }
 
 /**
@@ -227,13 +256,13 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useCreateShiftTemplate = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createShiftTemplate>>, TError,{data: ShiftTemplate}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createShiftTemplate>>,
         TError,
         {data: ShiftTemplate},
         TContext
       > => {
-      return useMutation(getCreateShiftTemplateMutationOptions(options));
+      return useMutation(getCreateShiftTemplateMutationOptions(options), queryClient);
     }
     export type getShiftTemplateResponse200 = {
   data: ShiftTemplateResponse
@@ -259,7 +288,7 @@ export const getGetShiftTemplateUrl = (shiftTemplateId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/shift-templates/${shiftTemplateId}`
+  return `/api/v1/shift-templates/${shiftTemplateId}`
 }
 
 /**
@@ -289,12 +318,12 @@ export const getShiftTemplate = async (shiftTemplateId: string, options?: Reques
 
 export const getGetShiftTemplateQueryKey = (shiftTemplateId: string,) => {
     return [
-    `process.env.API_BASE_URL/shift-templates/${shiftTemplateId}`
+    `/api/v1/shift-templates/${shiftTemplateId}`
     ] as const;
     }
 
 
-export const getGetShiftTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getShiftTemplate>>, TError = HTTPValidationError>(shiftTemplateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>, fetch?: RequestInit}
+export const getGetShiftTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getShiftTemplate>>, TError = HTTPValidationError>(shiftTemplateId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
@@ -309,25 +338,49 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: shiftTemplateId !== null && shiftTemplateId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: shiftTemplateId !== null && shiftTemplateId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetShiftTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof getShiftTemplate>>>
 export type GetShiftTemplateQueryError = HTTPValidationError
 
 
+export function useGetShiftTemplate<TData = Awaited<ReturnType<typeof getShiftTemplate>>, TError = HTTPValidationError>(
+ shiftTemplateId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getShiftTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getShiftTemplate>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetShiftTemplate<TData = Awaited<ReturnType<typeof getShiftTemplate>>, TError = HTTPValidationError>(
+ shiftTemplateId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getShiftTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getShiftTemplate>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetShiftTemplate<TData = Awaited<ReturnType<typeof getShiftTemplate>>, TError = HTTPValidationError>(
+ shiftTemplateId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Shift Template
  */
 
 export function useGetShiftTemplate<TData = Awaited<ReturnType<typeof getShiftTemplate>>, TError = HTTPValidationError>(
- shiftTemplateId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>, fetch?: RequestInit}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ shiftTemplateId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShiftTemplate>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetShiftTemplateQueryOptions(shiftTemplateId,options)
 
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -361,7 +414,7 @@ export const getUpdateShiftTemplateUrl = (shiftTemplateId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/shift-templates/${shiftTemplateId}`
+  return `/api/v1/shift-templates/${shiftTemplateId}`
 }
 
 /**
@@ -426,13 +479,13 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useUpdateShiftTemplate = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateShiftTemplate>>, TError,{shiftTemplateId: string;data: ShiftTemplateUpdate}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateShiftTemplate>>,
         TError,
         {shiftTemplateId: string;data: ShiftTemplateUpdate},
         TContext
       > => {
-      return useMutation(getUpdateShiftTemplateMutationOptions(options));
+      return useMutation(getUpdateShiftTemplateMutationOptions(options), queryClient);
     }
     export type deleteShiftTemplateResponse204 = {
   data: void
@@ -458,7 +511,7 @@ export const getDeleteShiftTemplateUrl = (shiftTemplateId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/shift-templates/${shiftTemplateId}`
+  return `/api/v1/shift-templates/${shiftTemplateId}`
 }
 
 /**
@@ -522,11 +575,11 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useDeleteShiftTemplate = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteShiftTemplate>>, TError,{shiftTemplateId: string}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteShiftTemplate>>,
         TError,
         {shiftTemplateId: string},
         TContext
       > => {
-      return useMutation(getDeleteShiftTemplateMutationOptions(options));
+      return useMutation(getDeleteShiftTemplateMutationOptions(options), queryClient);
     }

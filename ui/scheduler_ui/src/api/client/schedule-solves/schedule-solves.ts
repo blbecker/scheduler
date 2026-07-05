@@ -9,9 +9,14 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -69,7 +74,7 @@ export const getCreateScheduleSolveUrl = () => {
 
 
 
-  return `process.env.API_BASE_URL/solves/schedule`
+  return `/api/v1/solves/schedule`
 }
 
 /**
@@ -137,13 +142,13 @@ const {mutation: mutationOptions, fetch: fetchOptions} = options ?
  */
 export const useCreateScheduleSolve = <TError = HTTPValidationError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createScheduleSolve>>, TError,{data: ScheduleSolveRequest}, TContext>, fetch?: RequestInit}
- ): UseMutationResult<
+ , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createScheduleSolve>>,
         TError,
         {data: ScheduleSolveRequest},
         TContext
       > => {
-      return useMutation(getCreateScheduleSolveMutationOptions(options));
+      return useMutation(getCreateScheduleSolveMutationOptions(options), queryClient);
     }
     export type getScheduleSolveStatusResponse200 = {
   data: ScheduleSolveStatus
@@ -169,7 +174,7 @@ export const getGetScheduleSolveStatusUrl = (solveId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/solves/schedule/${solveId}`
+  return `/api/v1/solves/schedule/${solveId}`
 }
 
 /**
@@ -202,12 +207,12 @@ export const getScheduleSolveStatus = async (solveId: string, options?: RequestI
 
 export const getGetScheduleSolveStatusQueryKey = (solveId: string,) => {
     return [
-    `process.env.API_BASE_URL/solves/schedule/${solveId}`
+    `/api/v1/solves/schedule/${solveId}`
     ] as const;
     }
 
 
-export const getGetScheduleSolveStatusQueryOptions = <TData = Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError = HTTPValidationError>(solveId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>, fetch?: RequestInit}
+export const getGetScheduleSolveStatusQueryOptions = <TData = Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError = HTTPValidationError>(solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
@@ -222,25 +227,49 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: solveId !== null && solveId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: solveId !== null && solveId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetScheduleSolveStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getScheduleSolveStatus>>>
 export type GetScheduleSolveStatusQueryError = HTTPValidationError
 
 
+export function useGetScheduleSolveStatus<TData = Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError = HTTPValidationError>(
+ solveId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getScheduleSolveStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getScheduleSolveStatus>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetScheduleSolveStatus<TData = Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError = HTTPValidationError>(
+ solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getScheduleSolveStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getScheduleSolveStatus>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetScheduleSolveStatus<TData = Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError = HTTPValidationError>(
+ solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Schedule Solve Status
  */
 
 export function useGetScheduleSolveStatus<TData = Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError = HTTPValidationError>(
- solveId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>, fetch?: RequestInit}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveStatus>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetScheduleSolveStatusQueryOptions(solveId,options)
 
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -274,7 +303,7 @@ export const getGetScheduleSolveResultUrl = (solveId: string,) => {
 
 
 
-  return `process.env.API_BASE_URL/solves/schedule/${solveId}/result`
+  return `/api/v1/solves/schedule/${solveId}/result`
 }
 
 /**
@@ -307,12 +336,12 @@ export const getScheduleSolveResult = async (solveId: string, options?: RequestI
 
 export const getGetScheduleSolveResultQueryKey = (solveId: string,) => {
     return [
-    `process.env.API_BASE_URL/solves/schedule/${solveId}/result`
+    `/api/v1/solves/schedule/${solveId}/result`
     ] as const;
     }
 
 
-export const getGetScheduleSolveResultQueryOptions = <TData = Awaited<ReturnType<typeof getScheduleSolveResult>>, TError = HTTPValidationError>(solveId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>, fetch?: RequestInit}
+export const getGetScheduleSolveResultQueryOptions = <TData = Awaited<ReturnType<typeof getScheduleSolveResult>>, TError = HTTPValidationError>(solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>>, fetch?: RequestInit}
 ) => {
 
 const {query: queryOptions, fetch: fetchOptions} = options ?? {};
@@ -327,25 +356,49 @@ const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: solveId !== null && solveId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData> & { queryKey: QueryKey }
+   return  { queryKey, queryFn, enabled: solveId !== null && solveId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetScheduleSolveResultQueryResult = NonNullable<Awaited<ReturnType<typeof getScheduleSolveResult>>>
 export type GetScheduleSolveResultQueryError = HTTPValidationError
 
 
+export function useGetScheduleSolveResult<TData = Awaited<ReturnType<typeof getScheduleSolveResult>>, TError = HTTPValidationError>(
+ solveId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getScheduleSolveResult>>,
+          TError,
+          Awaited<ReturnType<typeof getScheduleSolveResult>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetScheduleSolveResult<TData = Awaited<ReturnType<typeof getScheduleSolveResult>>, TError = HTTPValidationError>(
+ solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getScheduleSolveResult>>,
+          TError,
+          Awaited<ReturnType<typeof getScheduleSolveResult>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetScheduleSolveResult<TData = Awaited<ReturnType<typeof getScheduleSolveResult>>, TError = HTTPValidationError>(
+ solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Schedule Solve Result
  */
 
 export function useGetScheduleSolveResult<TData = Awaited<ReturnType<typeof getScheduleSolveResult>>, TError = HTTPValidationError>(
- solveId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>, fetch?: RequestInit}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+ solveId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScheduleSolveResult>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetScheduleSolveResultQueryOptions(solveId,options)
 
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
