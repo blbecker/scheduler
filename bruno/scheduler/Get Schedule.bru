@@ -1,11 +1,11 @@
 meta {
-  name: get_schedules
+  name: Get Schedule
   type: http
   seq: 2
 }
 
 get {
-  url: http://localhost:8000/v1/schedules/:task_id
+  url: {{api_url}}/api/v1/schedules/:task_id
   body: none
   auth: inherit
 }
