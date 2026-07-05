@@ -1,8 +1,9 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi import Depends
+from sqlmodel import Session
 
-from scheduler_api.db.session import get_session
+from scheduler_api.db.session import engine
 from scheduler_api.repositories.shift_repository import ShiftRepository
 from scheduler_api.repositories.skill_repository import SkillRepository
 from scheduler_api.repositories.worker_repository import WorkerRepository
@@ -23,7 +24,6 @@ from scheduler_api.services.schedule_service import ScheduleService
 from scheduler_api.services.schedule_generation_run_service import (
     ScheduleGenerationRunService,
 )
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
 
 # -----------------------------
@@ -31,9 +31,13 @@ from scheduler_api.uow.unit_of_work import UnitOfWork
 # -----------------------------
 def get_db_session():
     """
-    Provides a SQLAlchemy session per request.
+    Provides a SQLModel session per request.
     """
-    return get_session()
+    session = Session(engine)
+    try:
+        yield session
+    finally:
+        session.close()
 
 
 # -----------------------------
@@ -162,36 +166,4 @@ def get_schedule_generation_run_service(
     return ScheduleGenerationRunService(repo)
 
 
-# -----------------------------
-# Unit of Work Dependencies
-# -----------------------------
-def get_unit_of_work(session=Depends(get_db_session)) -> UnitOfWork:
-    """
-    Provides a UnitOfWork instance for manual transaction management.
 
-    The caller is responsible for calling commit() or rollback().
-    For automatic transaction management, use get_unit_of_work_provider().
-    """
-    return UnitOfWork(session)
-
-
-def get_unit_of_work_provider():
-    """
-    Provides UnitOfWork via async context manager for automatic transaction management.
-
-    The context manager automatically commits on success or rolls back on exception.
-    Usage: uow: UnitOfWork = Depends(get_unit_of_work_provider())
-    """
-
-    @asynccontextmanager
-    async def _provider(
-        session=Depends(get_db_session),
-    ) -> AsyncGenerator[UnitOfWork, None]:
-        """
-        Context manager that yields a UnitOfWork for the request.
-        Transaction is committed on success, rolled back on exception.
-        """
-        with UnitOfWork(session) as uow:
-            yield uow
-
-    return _provider

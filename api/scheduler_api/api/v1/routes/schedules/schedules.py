@@ -1,23 +1,25 @@
 # scheduler_api/routers/schedules.py
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
+from sqlmodel import Session
 
 from scheduler_api.services.schedule_service import ScheduleService
+from scheduler_api.repositories.schedule_repository import ScheduleRepository
 from scheduler_api.schemas.schedule_crud import (
     Schedule,
     ScheduleUpdate,
     ScheduleResponse,
 )
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
-from ..deps import get_unit_of_work_provider
+from ..deps import get_db_session
 
 router = APIRouter(prefix="/schedules", tags=["schedules"])
 
 
 @router.get("/", response_model=list[ScheduleResponse], operation_id="list_schedules")
-def list_schedules(uow: UnitOfWork = Depends(get_unit_of_work_provider())):
-    service = ScheduleService(uow)
+def list_schedules(session: Session = Depends(get_db_session)):
+    repo = ScheduleRepository(session)
+    service = ScheduleService(repo)
     return service.list_schedules()
 
 
@@ -26,9 +28,10 @@ def list_schedules(uow: UnitOfWork = Depends(get_unit_of_work_provider())):
 )
 def get_schedule(
     schedule_id: UUID,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleService(uow)
+    repo = ScheduleRepository(session)
+    service = ScheduleService(repo)
     try:
         return service.get_schedule(schedule_id)
     except HTTPException:
@@ -45,9 +48,10 @@ def get_schedule(
 )
 def create_schedule(
     schedule: Schedule,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleService(uow)
+    repo = ScheduleRepository(session)
+    service = ScheduleService(repo)
     return service.create_schedule(schedule)
 
 
@@ -57,9 +61,10 @@ def create_schedule(
 def update_schedule(
     schedule_id: UUID,
     schedule: ScheduleUpdate,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleService(uow)
+    repo = ScheduleRepository(session)
+    service = ScheduleService(repo)
     try:
         return service.update_schedule(schedule_id, schedule)
     except HTTPException:
@@ -71,9 +76,10 @@ def update_schedule(
 @router.delete("/{schedule_id}", operation_id="delete_schedule", status_code=204)
 def delete_schedule(
     schedule_id: UUID,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleService(uow)
+    repo = ScheduleRepository(session)
+    service = ScheduleService(repo)
     try:
         service.delete_schedule(schedule_id)
     except HTTPException:

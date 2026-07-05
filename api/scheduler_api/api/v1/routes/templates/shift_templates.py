@@ -1,16 +1,17 @@
 # scheduler_api/routers/shift_templates.py
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
+from sqlmodel import Session
 
 from scheduler_api.services.shift_template_service import ShiftTemplateService
+from scheduler_api.repositories.shift_template_repository import ShiftTemplateRepository
 from scheduler_api.schemas.shift_template import (
     ShiftTemplate,
     ShiftTemplateUpdate,
     ShiftTemplateResponse,
 )
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
-from ..deps import get_unit_of_work_provider
+from ..deps import get_db_session
 
 router = APIRouter(prefix="/shift-templates", tags=["shift-templates"])
 
@@ -19,9 +20,10 @@ router = APIRouter(prefix="/shift-templates", tags=["shift-templates"])
     "/", response_model=list[ShiftTemplateResponse], operation_id="list_shift_templates"
 )
 def list_shift_templates(
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ShiftTemplateService(uow)
+    repo = ShiftTemplateRepository(session)
+    service = ShiftTemplateService(repo)
     return service.list_shift_templates()
 
 
@@ -32,9 +34,10 @@ def list_shift_templates(
 )
 def get_shift_template(
     shift_template_id: UUID,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ShiftTemplateService(uow)
+    repo = ShiftTemplateRepository(session)
+    service = ShiftTemplateService(repo)
     try:
         return service.get_shift_template(shift_template_id)
     except HTTPException:
@@ -51,9 +54,10 @@ def get_shift_template(
 )
 def create_shift_template(
     shift_template: ShiftTemplate,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ShiftTemplateService(uow)
+    repo = ShiftTemplateRepository(session)
+    service = ShiftTemplateService(repo)
     return service.create_shift_template(shift_template)
 
 
@@ -65,9 +69,10 @@ def create_shift_template(
 def update_shift_template(
     shift_template_id: UUID,
     shift_template: ShiftTemplateUpdate,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ShiftTemplateService(uow)
+    repo = ShiftTemplateRepository(session)
+    service = ShiftTemplateService(repo)
     try:
         return service.update_shift_template(shift_template_id, shift_template)
     except HTTPException:
@@ -81,9 +86,10 @@ def update_shift_template(
 )
 def delete_shift_template(
     shift_template_id: UUID,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ShiftTemplateService(uow)
+    repo = ShiftTemplateRepository(session)
+    service = ShiftTemplateService(repo)
     try:
         service.delete_shift_template(shift_template_id)
     except HTTPException:

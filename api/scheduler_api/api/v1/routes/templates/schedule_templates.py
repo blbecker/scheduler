@@ -1,16 +1,17 @@
 # scheduler_api/routers/schedule_templates.py
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
+from sqlmodel import Session
 
 from scheduler_api.services.schedule_template_service import ScheduleTemplateService
+from scheduler_api.repositories.schedule_template_repository import ScheduleTemplateRepository
 from scheduler_api.schemas.schedule_template import (
     ScheduleTemplate,
     ScheduleTemplateUpdate,
     ScheduleTemplateResponse,
 )
-from scheduler_api.uow.unit_of_work import UnitOfWork
 
-from ..deps import get_unit_of_work_provider
+from ..deps import get_db_session
 
 router = APIRouter(prefix="/schedule-templates", tags=["schedule-templates"])
 
@@ -21,9 +22,10 @@ router = APIRouter(prefix="/schedule-templates", tags=["schedule-templates"])
     operation_id="list_schedule_templates",
 )
 def list_schedule_templates(
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleTemplateService(uow)
+    repo = ScheduleTemplateRepository(session)
+    service = ScheduleTemplateService(repo)
     return service.list_schedule_templates()
 
 
@@ -34,9 +36,10 @@ def list_schedule_templates(
 )
 def get_schedule_template(
     schedule_template_id: UUID,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleTemplateService(uow)
+    repo = ScheduleTemplateRepository(session)
+    service = ScheduleTemplateService(repo)
     try:
         return service.get_schedule_template(schedule_template_id)
     except HTTPException:
@@ -53,9 +56,10 @@ def get_schedule_template(
 )
 def create_schedule_template(
     schedule_template: ScheduleTemplate,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleTemplateService(uow)
+    repo = ScheduleTemplateRepository(session)
+    service = ScheduleTemplateService(repo)
     return service.create_schedule_template(schedule_template)
 
 
@@ -67,9 +71,10 @@ def create_schedule_template(
 def update_schedule_template(
     schedule_template_id: UUID,
     schedule_template: ScheduleTemplateUpdate,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleTemplateService(uow)
+    repo = ScheduleTemplateRepository(session)
+    service = ScheduleTemplateService(repo)
     try:
         return service.update_schedule_template(schedule_template_id, schedule_template)
     except HTTPException:
@@ -83,9 +88,10 @@ def update_schedule_template(
 )
 def delete_schedule_template(
     schedule_template_id: UUID,
-    uow: UnitOfWork = Depends(get_unit_of_work_provider()),
+    session: Session = Depends(get_db_session),
 ):
-    service = ScheduleTemplateService(uow)
+    repo = ScheduleTemplateRepository(session)
+    service = ScheduleTemplateService(repo)
     try:
         service.delete_schedule_template(schedule_template_id)
     except HTTPException:
