@@ -1,31 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import {
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+  DarkMode as DarkModeIcon,
+  Dashboard as DashboardIcon,
+  LightMode as LightModeIcon,
+  People as PeopleIcon,
+  Build as BuildIcon,
+  CalendarToday as CalendarTodayIcon,
+  AvTimer as AvTimerIcon,
+  CalendarMonth as CalendarMonthIcon,
+  Work as WorkIcon,
+} from "@mui/icons-material";
 import {
   Box,
+  Divider,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  IconButton,
+  Tooltip,
   Typography,
   useTheme,
-  Divider,
-  Tooltip,
 } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
-  People as PeopleIcon,
-  Dashboard as DashboardIcon,
-  LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon,
-} from "@mui/icons-material";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { useTheme as useAppTheme } from "@/hooks/useTheme";
-import { useRouter, usePathname } from "next/navigation";
 
 const DRAWER_WIDTH = 240;
 const COLLAPSED_WIDTH = 64;
@@ -33,6 +37,11 @@ const COLLAPSED_WIDTH = 64;
 const navigationItems = [
   { label: "Dashboard", icon: <DashboardIcon />, path: "/" },
   { label: "Workers", icon: <PeopleIcon />, path: "/workers" },
+  { label: "Skills", icon: <BuildIcon />, path: "/skills" },
+  { label: "Schedule Templates", icon: <CalendarTodayIcon />, path: "/schedule-templates" },
+  { label: "Shift Templates", icon: <AvTimerIcon />, path: "/shift-templates" },
+  { label: "Schedules", icon: <CalendarMonthIcon />, path: "/schedules" },
+  { label: "Shifts", icon: <WorkIcon />, path: "/shifts" },
 ];
 
 export function SidePanel() {
@@ -86,9 +95,9 @@ export function SidePanel() {
           {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       </Box>
-      
+
       <Divider />
-      
+
       <List sx={{ flex: 1 }}>
         {navigationItems.map((item) => (
           <ListItem key={item.label} disablePadding sx={{ display: "block" }}>
@@ -115,8 +124,10 @@ export function SidePanel() {
                 {!collapsed && (
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{
-                      color: isActive(item.path) ? "primary.main" : "inherit",
+                    sx={{
+                      "& .MuiListItemText-primary": {
+                        color: isActive(item.path) ? "primary.main" : "inherit",
+                      },
                     }}
                   />
                 )}
@@ -125,9 +136,9 @@ export function SidePanel() {
           </ListItem>
         ))}
       </List>
-      
+
       <Divider />
-      
+
       <Box sx={{ p: 2 }}>
         <Tooltip title={collapsed ? "Toggle theme" : ""} placement="right">
           <IconButton
@@ -136,10 +147,11 @@ export function SidePanel() {
               width: "100%",
               justifyContent: collapsed ? "center" : "flex-start",
             }}
+            suppressHydrationWarning
           >
             {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
             {!collapsed && (
-              <Typography sx={{ ml: 2 }}>
+              <Typography sx={{ ml: 2 }} suppressHydrationWarning>
                 {mode === "dark" ? "Light Mode" : "Dark Mode"}
               </Typography>
             )}

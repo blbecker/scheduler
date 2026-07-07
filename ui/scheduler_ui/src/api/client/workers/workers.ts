@@ -4,10 +4,7 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,26 +17,25 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   HTTPValidationError,
-  Worker,
+  WorkerCreate,
   WorkerResponse,
-  WorkerUpdate
-} from '../../models';
+  WorkerUpdate,
+} from "../../models";
 
-
-
-
-
-const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+const withQueryKey = <T extends object, K>(
+  query: T,
+  queryKey: K,
+): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === "queryKey") continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -50,536 +46,690 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 export type listWorkersResponse200 = {
-  data: WorkerResponse[]
-  status: 200
-}
+  data: WorkerResponse[];
+  status: 200;
+};
 
-export type listWorkersResponseSuccess = (listWorkersResponse200) & {
+export type listWorkersResponseSuccess = listWorkersResponse200 & {
   headers: Headers;
 };
-;
 
-export type listWorkersResponse = (listWorkersResponseSuccess)
+export type listWorkersResponse = listWorkersResponseSuccess;
 
 export const getListWorkersUrl = () => {
-
-
-
-
-  return `/api/v1/workers/`
-}
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/`;
+};
 
 /**
  * @summary List Workers
  */
-export const listWorkers = async ( options?: RequestInit): Promise<listWorkersResponse> => {
-
-  const res = await fetch(getListWorkersUrl(),
-  {
+export const listWorkers = async (
+  options?: RequestInit,
+): Promise<listWorkersResponse> => {
+  const res = await fetch(getListWorkersUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listWorkersResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listWorkersResponse
-}
-
-
-
-
+  const data: listWorkersResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listWorkersResponse;
+};
 
 export const getListWorkersQueryKey = () => {
-    return [
-    `/api/v1/workers/`
-    ] as const;
-    }
+  return [`${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/`] as const;
+};
 
+export const getListWorkersQueryOptions = <
+  TData = Awaited<ReturnType<typeof listWorkers>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+}) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-export const getListWorkersQueryOptions = <TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>>, fetch?: RequestInit}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getListWorkersQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkers>>> = ({
+    signal,
+  }) => listWorkers({ signal, ...fetchOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getListWorkersQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listWorkers>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type ListWorkersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listWorkers>>
+>;
+export type ListWorkersQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWorkers>>> = ({ signal }) => listWorkers({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListWorkersQueryResult = NonNullable<Awaited<ReturnType<typeof listWorkers>>>
-export type ListWorkersQueryError = unknown
-
-
-export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>> & Pick<
+export function useListWorkers<
+  TData = Awaited<ReturnType<typeof listWorkers>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listWorkers>>,
           TError,
           Awaited<ReturnType<typeof listWorkers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListWorkers<
+  TData = Awaited<ReturnType<typeof listWorkers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listWorkers>>,
           TError,
           Awaited<ReturnType<typeof listWorkers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListWorkers<
+  TData = Awaited<ReturnType<typeof listWorkers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Workers
  */
 
-export function useListWorkers<TData = Awaited<ReturnType<typeof listWorkers>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useListWorkers<
+  TData = Awaited<ReturnType<typeof listWorkers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listWorkers>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListWorkersQueryOptions(options);
 
-  const queryOptions = getListWorkersQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
 export type createWorkerResponse201 = {
-  data: WorkerResponse
-  status: 201
-}
+  data: WorkerResponse;
+  status: 201;
+};
 
 export type createWorkerResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type createWorkerResponseSuccess = (createWorkerResponse201) & {
-  headers: Headers;
-};
-export type createWorkerResponseError = (createWorkerResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type createWorkerResponse = (createWorkerResponseSuccess | createWorkerResponseError)
+export type createWorkerResponseSuccess = createWorkerResponse201 & {
+  headers: Headers;
+};
+export type createWorkerResponseError = createWorkerResponse422 & {
+  headers: Headers;
+};
+
+export type createWorkerResponse =
+  | createWorkerResponseSuccess
+  | createWorkerResponseError;
 
 export const getCreateWorkerUrl = () => {
-
-
-
-
-  return `/api/v1/workers/`
-}
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/`;
+};
 
 /**
  * @summary Create Worker
  */
-export const createWorker = async (worker: Worker, options?: RequestInit): Promise<createWorkerResponse> => {
-
-  const res = await fetch(getCreateWorkerUrl(),
-  {
+export const createWorker = async (
+  workerCreate: WorkerCreate,
+  options?: RequestInit,
+): Promise<createWorkerResponse> => {
+  const res = await fetch(getCreateWorkerUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(worker)
-  }
-)
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(workerCreate),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createWorkerResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createWorkerResponse
-}
+  const data: createWorkerResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createWorkerResponse;
+};
 
+export const getCreateWorkerMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createWorker>>,
+    TError,
+    { data: WorkerCreate },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createWorker>>,
+  TError,
+  { data: WorkerCreate },
+  TContext
+> => {
+  const mutationKey = ["createWorker"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createWorker>>,
+    { data: WorkerCreate }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return createWorker(data, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getCreateWorkerMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorker>>, TError,{data: Worker}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof createWorker>>, TError,{data: Worker}, TContext> => {
+export type CreateWorkerMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createWorker>>
+>;
+export type CreateWorkerMutationBody = WorkerCreate;
+export type CreateWorkerMutationError = HTTPValidationError;
 
-const mutationKey = ['createWorker'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorker>>, {data: Worker}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createWorker(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateWorkerMutationResult = NonNullable<Awaited<ReturnType<typeof createWorker>>>
-    export type CreateWorkerMutationBody = Worker
-    export type CreateWorkerMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Create Worker
  */
-export const useCreateWorker = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorker>>, TError,{data: Worker}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createWorker>>,
-        TError,
-        {data: Worker},
-        TContext
-      > => {
-      return useMutation(getCreateWorkerMutationOptions(options), queryClient);
-    }
-    export type getWorkerResponse200 = {
-  data: WorkerResponse
-  status: 200
-}
+export const useCreateWorker = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createWorker>>,
+      TError,
+      { data: WorkerCreate },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createWorker>>,
+  TError,
+  { data: WorkerCreate },
+  TContext
+> => {
+  return useMutation(getCreateWorkerMutationOptions(options), queryClient);
+};
+export type getWorkerResponse200 = {
+  data: WorkerResponse;
+  status: 200;
+};
 
 export type getWorkerResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type getWorkerResponseSuccess = (getWorkerResponse200) & {
-  headers: Headers;
-};
-export type getWorkerResponseError = (getWorkerResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type getWorkerResponse = (getWorkerResponseSuccess | getWorkerResponseError)
+export type getWorkerResponseSuccess = getWorkerResponse200 & {
+  headers: Headers;
+};
+export type getWorkerResponseError = getWorkerResponse422 & {
+  headers: Headers;
+};
 
-export const getGetWorkerUrl = (workerId: string,) => {
+export type getWorkerResponse =
+  | getWorkerResponseSuccess
+  | getWorkerResponseError;
 
-
-
-
-  return `/api/v1/workers/${workerId}`
-}
+export const getGetWorkerUrl = (workerId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/${workerId}`;
+};
 
 /**
  * @summary Get Worker
  */
-export const getWorker = async (workerId: string, options?: RequestInit): Promise<getWorkerResponse> => {
-
-  const res = await fetch(getGetWorkerUrl(workerId),
-  {
+export const getWorker = async (
+  workerId: string,
+  options?: RequestInit,
+): Promise<getWorkerResponse> => {
+  const res = await fetch(getGetWorkerUrl(workerId), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getWorkerResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getWorkerResponse
-}
+  const data: getWorkerResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getWorkerResponse;
+};
 
+export const getGetWorkerQueryKey = (workerId: string) => {
+  return [
+    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/${workerId}`,
+  ] as const;
+};
 
-
-
-
-export const getGetWorkerQueryKey = (workerId: string,) => {
-    return [
-    `/api/v1/workers/${workerId}`
-    ] as const;
-    }
-
-
-export const getGetWorkerQueryOptions = <TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>>, fetch?: RequestInit}
+export const getGetWorkerQueryOptions = <
+  TData = Awaited<ReturnType<typeof getWorker>>,
+  TError = HTTPValidationError,
+>(
+  workerId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetWorkerQueryKey(workerId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetWorkerQueryKey(workerId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorker>>> = ({
+    signal,
+  }) => getWorker(workerId, { signal, ...fetchOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: workerId !== null && workerId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type GetWorkerQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getWorker>>
+>;
+export type GetWorkerQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorker>>> = ({ signal }) => getWorker(workerId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: workerId !== null && workerId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetWorkerQueryResult = NonNullable<Awaited<ReturnType<typeof getWorker>>>
-export type GetWorkerQueryError = HTTPValidationError
-
-
-export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
- workerId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>> & Pick<
+export function useGetWorker<
+  TData = Awaited<ReturnType<typeof getWorker>>,
+  TError = HTTPValidationError,
+>(
+  workerId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorker>>,
           TError,
           Awaited<ReturnType<typeof getWorker>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
- workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetWorker<
+  TData = Awaited<ReturnType<typeof getWorker>>,
+  TError = HTTPValidationError,
+>(
+  workerId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorker>>,
           TError,
           Awaited<ReturnType<typeof getWorker>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
- workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetWorker<
+  TData = Awaited<ReturnType<typeof getWorker>>,
+  TError = HTTPValidationError,
+>(
+  workerId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Worker
  */
 
-export function useGetWorker<TData = Awaited<ReturnType<typeof getWorker>>, TError = HTTPValidationError>(
- workerId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetWorker<
+  TData = Awaited<ReturnType<typeof getWorker>>,
+  TError = HTTPValidationError,
+>(
+  workerId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getWorker>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetWorkerQueryOptions(workerId, options);
 
-  const queryOptions = getGetWorkerQueryOptions(workerId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
 export type updateWorkerResponse200 = {
-  data: WorkerResponse
-  status: 200
-}
+  data: WorkerResponse;
+  status: 200;
+};
 
 export type updateWorkerResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type updateWorkerResponseSuccess = (updateWorkerResponse200) & {
-  headers: Headers;
-};
-export type updateWorkerResponseError = (updateWorkerResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type updateWorkerResponse = (updateWorkerResponseSuccess | updateWorkerResponseError)
+export type updateWorkerResponseSuccess = updateWorkerResponse200 & {
+  headers: Headers;
+};
+export type updateWorkerResponseError = updateWorkerResponse422 & {
+  headers: Headers;
+};
 
-export const getUpdateWorkerUrl = (workerId: string,) => {
+export type updateWorkerResponse =
+  | updateWorkerResponseSuccess
+  | updateWorkerResponseError;
 
-
-
-
-  return `/api/v1/workers/${workerId}`
-}
+export const getUpdateWorkerUrl = (workerId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/${workerId}`;
+};
 
 /**
  * @summary Update Worker
  */
-export const updateWorker = async (workerId: string,
-    workerUpdate: WorkerUpdate, options?: RequestInit): Promise<updateWorkerResponse> => {
-
-  const res = await fetch(getUpdateWorkerUrl(workerId),
-  {
+export const updateWorker = async (
+  workerId: string,
+  workerUpdate: WorkerUpdate,
+  options?: RequestInit,
+): Promise<updateWorkerResponse> => {
+  const res = await fetch(getUpdateWorkerUrl(workerId), {
     ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(workerUpdate)
-  }
-)
-
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(workerUpdate),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updateWorkerResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateWorkerResponse
-}
+  const data: updateWorkerResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateWorkerResponse;
+};
 
+export const getUpdateWorkerMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateWorker>>,
+    TError,
+    { workerId: string; data: WorkerUpdate },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateWorker>>,
+  TError,
+  { workerId: string; data: WorkerUpdate },
+  TContext
+> => {
+  const mutationKey = ["updateWorker"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateWorker>>,
+    { workerId: string; data: WorkerUpdate }
+  > = (props) => {
+    const { workerId, data } = props ?? {};
 
+    return updateWorker(workerId, data, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getUpdateWorkerMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorker>>, TError,{workerId: string;data: WorkerUpdate}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof updateWorker>>, TError,{workerId: string;data: WorkerUpdate}, TContext> => {
+export type UpdateWorkerMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateWorker>>
+>;
+export type UpdateWorkerMutationBody = WorkerUpdate;
+export type UpdateWorkerMutationError = HTTPValidationError;
 
-const mutationKey = ['updateWorker'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorker>>, {workerId: string;data: WorkerUpdate}> = (props) => {
-          const {workerId,data} = props ?? {};
-
-          return  updateWorker(workerId,data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateWorkerMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorker>>>
-    export type UpdateWorkerMutationBody = WorkerUpdate
-    export type UpdateWorkerMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Update Worker
  */
-export const useUpdateWorker = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorker>>, TError,{workerId: string;data: WorkerUpdate}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateWorker>>,
-        TError,
-        {workerId: string;data: WorkerUpdate},
-        TContext
-      > => {
-      return useMutation(getUpdateWorkerMutationOptions(options), queryClient);
-    }
-    export type deleteWorkerResponse204 = {
-  data: void
-  status: 204
-}
+export const useUpdateWorker = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateWorker>>,
+      TError,
+      { workerId: string; data: WorkerUpdate },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateWorker>>,
+  TError,
+  { workerId: string; data: WorkerUpdate },
+  TContext
+> => {
+  return useMutation(getUpdateWorkerMutationOptions(options), queryClient);
+};
+export type deleteWorkerResponse204 = {
+  data: void;
+  status: 204;
+};
 
 export type deleteWorkerResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type deleteWorkerResponseSuccess = (deleteWorkerResponse204) & {
-  headers: Headers;
-};
-export type deleteWorkerResponseError = (deleteWorkerResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type deleteWorkerResponse = (deleteWorkerResponseSuccess | deleteWorkerResponseError)
+export type deleteWorkerResponseSuccess = deleteWorkerResponse204 & {
+  headers: Headers;
+};
+export type deleteWorkerResponseError = deleteWorkerResponse422 & {
+  headers: Headers;
+};
 
-export const getDeleteWorkerUrl = (workerId: string,) => {
+export type deleteWorkerResponse =
+  | deleteWorkerResponseSuccess
+  | deleteWorkerResponseError;
 
-
-
-
-  return `/api/v1/workers/${workerId}`
-}
+export const getDeleteWorkerUrl = (workerId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/workers/${workerId}`;
+};
 
 /**
  * @summary Delete Worker
  */
-export const deleteWorker = async (workerId: string, options?: RequestInit): Promise<deleteWorkerResponse> => {
-
-  const res = await fetch(getDeleteWorkerUrl(workerId),
-  {
+export const deleteWorker = async (
+  workerId: string,
+  options?: RequestInit,
+): Promise<deleteWorkerResponse> => {
+  const res = await fetch(getDeleteWorkerUrl(workerId), {
     ...options,
-    method: 'DELETE'
-
-
-  }
-)
-
+    method: "DELETE",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteWorkerResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as deleteWorkerResponse
-}
+  const data: deleteWorkerResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteWorkerResponse;
+};
 
+export const getDeleteWorkerMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteWorker>>,
+    TError,
+    { workerId: string },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteWorker>>,
+  TError,
+  { workerId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteWorker"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteWorker>>,
+    { workerId: string }
+  > = (props) => {
+    const { workerId } = props ?? {};
 
+    return deleteWorker(workerId, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getDeleteWorkerMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorker>>, TError,{workerId: string}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteWorker>>, TError,{workerId: string}, TContext> => {
+export type DeleteWorkerMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteWorker>>
+>;
 
-const mutationKey = ['deleteWorker'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+export type DeleteWorkerMutationError = HTTPValidationError;
 
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorker>>, {workerId: string}> = (props) => {
-          const {workerId} = props ?? {};
-
-          return  deleteWorker(workerId,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteWorkerMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorker>>>
-
-    export type DeleteWorkerMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Delete Worker
  */
-export const useDeleteWorker = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorker>>, TError,{workerId: string}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteWorker>>,
-        TError,
-        {workerId: string},
-        TContext
-      > => {
-      return useMutation(getDeleteWorkerMutationOptions(options), queryClient);
-    }
+export const useDeleteWorker = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteWorker>>,
+      TError,
+      { workerId: string },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteWorker>>,
+  TError,
+  { workerId: string },
+  TContext
+> => {
+  return useMutation(getDeleteWorkerMutationOptions(options), queryClient);
+};

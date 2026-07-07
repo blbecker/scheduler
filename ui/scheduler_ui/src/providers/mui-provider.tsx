@@ -6,7 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 
 export function MuiProvider({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
-  
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

@@ -4,8 +4,8 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import type { ScheduleSolveResultBestGenome } from './scheduleSolveResultBestGenome';
-import type { ScheduleSolveResultMetrics } from './scheduleSolveResultMetrics';
+import type { ScheduleSolveResultBestGenome } from "./scheduleSolveResultBestGenome";
+import type { ScheduleSolveResultMetrics } from "./scheduleSolveResultMetrics";
 
 /**
  * Response for schedule solve result.

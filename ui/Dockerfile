@@ -3,6 +3,9 @@ FROM node:24.6 AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
+ARG NEXT_PUBLIC_V1_API_BASE_URL
+ENV NEXT_PUBLIC_V1_API_BASE_URL=$NEXT_PUBLIC_V1_API_BASE_URL
+
 RUN corepack enable
 
 # ------------------------

@@ -4,93 +4,175 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw";
+import type { RequestHandlerOptions } from "msw";
 
-import type {
-  ScheduleTemplateResponse
-} from '../../models';
+import type { ScheduleTemplateResponse } from "../../models";
 
+export const getListScheduleTemplatesResponseMock =
+  (): ScheduleTemplateResponse[] =>
+    Array.from(
+      { length: faker.number.int({ min: 1, max: 10 }) },
+      (_, i) => i + 1,
+    ).map(() => ({
+      id: faker.string.uuid(),
+      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+      created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+      updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+    }));
 
-export const getListScheduleTemplatesResponseMock = (): ScheduleTemplateResponse[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
+export const getCreateScheduleTemplateResponseMock = (
+  overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {},
+): ScheduleTemplateResponse => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+  ...overrideResponse,
+});
 
-export const getCreateScheduleTemplateResponseMock = (overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {}): ScheduleTemplateResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+export const getGetScheduleTemplateResponseMock = (
+  overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {},
+): ScheduleTemplateResponse => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+  ...overrideResponse,
+});
 
-export const getGetScheduleTemplateResponseMock = (overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {}): ScheduleTemplateResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+export const getUpdateScheduleTemplateResponseMock = (
+  overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {},
+): ScheduleTemplateResponse => ({
+  id: faker.string.uuid(),
+  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
+  ...overrideResponse,
+});
 
-export const getUpdateScheduleTemplateResponseMock = (overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {}): ScheduleTemplateResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+export const getListScheduleTemplatesMockHandler = (
+  overrideResponse?:
+    | ScheduleTemplateResponse[]
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<ScheduleTemplateResponse[]> | ScheduleTemplateResponse[]),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/schedule-templates/",
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getListScheduleTemplatesResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
+export const getCreateScheduleTemplateMockHandler = (
+  overrideResponse?:
+    | ScheduleTemplateResponse
+    | ((
+        info: Parameters<Parameters<typeof http.post>[1]>[0],
+      ) => Promise<ScheduleTemplateResponse> | ScheduleTemplateResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.post(
+    "*/schedule-templates/",
+    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getCreateScheduleTemplateResponseMock(),
+        { status: 201 },
+      );
+    },
+    options,
+  );
+};
 
-export const getListScheduleTemplatesMockHandler = (overrideResponse?: ScheduleTemplateResponse[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ScheduleTemplateResponse[]> | ScheduleTemplateResponse[]), options?: RequestHandlerOptions) => {
-  return http.get('*/schedule-templates/', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetScheduleTemplateMockHandler = (
+  overrideResponse?:
+    | ScheduleTemplateResponse
+    | ((
+        info: Parameters<Parameters<typeof http.get>[1]>[0],
+      ) => Promise<ScheduleTemplateResponse> | ScheduleTemplateResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.get(
+    "*/schedule-templates/:scheduleTemplateId",
+    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getGetScheduleTemplateResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
+export const getUpdateScheduleTemplateMockHandler = (
+  overrideResponse?:
+    | ScheduleTemplateResponse
+    | ((
+        info: Parameters<Parameters<typeof http.put>[1]>[0],
+      ) => Promise<ScheduleTemplateResponse> | ScheduleTemplateResponse),
+  options?: RequestHandlerOptions,
+) => {
+  return http.put(
+    "*/schedule-templates/:scheduleTemplateId",
+    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+      return HttpResponse.json(
+        overrideResponse !== undefined
+          ? typeof overrideResponse === "function"
+            ? await overrideResponse(info)
+            : overrideResponse
+          : getUpdateScheduleTemplateResponseMock(),
+        { status: 200 },
+      );
+    },
+    options,
+  );
+};
 
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getListScheduleTemplatesResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getDeleteScheduleTemplateMockHandler = (
+  overrideResponse?:
+    | void
+    | ((
+        info: Parameters<Parameters<typeof http.delete>[1]>[0],
+      ) => Promise<void> | void),
+  options?: RequestHandlerOptions,
+) => {
+  return http.delete(
+    "*/schedule-templates/:scheduleTemplateId",
+    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+      if (typeof overrideResponse === "function") {
+        await overrideResponse(info);
+      }
 
-export const getCreateScheduleTemplateMockHandler = (overrideResponse?: ScheduleTemplateResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ScheduleTemplateResponse> | ScheduleTemplateResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/schedule-templates/', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getCreateScheduleTemplateResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-export const getGetScheduleTemplateMockHandler = (overrideResponse?: ScheduleTemplateResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ScheduleTemplateResponse> | ScheduleTemplateResponse), options?: RequestHandlerOptions) => {
-  return http.get('*/schedule-templates/:scheduleTemplateId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetScheduleTemplateResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getUpdateScheduleTemplateMockHandler = (overrideResponse?: ScheduleTemplateResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<ScheduleTemplateResponse> | ScheduleTemplateResponse), options?: RequestHandlerOptions) => {
-  return http.put('*/schedule-templates/:scheduleTemplateId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getUpdateScheduleTemplateResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getDeleteScheduleTemplateMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.delete('*/schedule-templates/:scheduleTemplateId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-
-    return new HttpResponse(null,
-      { status: 204
-      })
-  }, options)
-}
+      return new HttpResponse(null, { status: 204 });
+    },
+    options,
+  );
+};
 export const getScheduleTemplatesMock = () => [
   getListScheduleTemplatesMockHandler(),
   getCreateScheduleTemplateMockHandler(),
   getGetScheduleTemplateMockHandler(),
   getUpdateScheduleTemplateMockHandler(),
-  getDeleteScheduleTemplateMockHandler()
-]
+  getDeleteScheduleTemplateMockHandler(),
+];

@@ -1,32 +1,31 @@
 "use client";
 
 import {
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Button,
-  Box,
-  Chip,
-  Divider,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
   ArrowBack as ArrowBackIcon,
-  Person as PersonIcon,
   CalendarToday as CalendarIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  Person as PersonIcon,
   Update as UpdateIcon,
 } from "@mui/icons-material";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useGetWorker } from "@/api/client/workers/workers";
+import { useCallback, useState } from "react";
+import { useDeleteWorker, useGetWorker } from "@/api/client/workers/workers";
 import { ConfirmationDialog } from "@/components/common/ConfirmationDialog";
-import { useState, useCallback } from "react";
-import { useDeleteWorker } from "@/api/client/workers/workers";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface WorkerDetailCardProps {
   workerId: string;
@@ -34,10 +33,14 @@ interface WorkerDetailCardProps {
   onDelete?: () => void;
 }
 
-export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCardProps) {
+export function WorkerDetailCard({
+  workerId,
+  onEdit,
+  onDelete,
+}: WorkerDetailCardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  
+
   // State
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -46,6 +49,7 @@ export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCar
   const deleteMutation = useDeleteWorker();
 
   const worker = data?.data;
+  const isWorkerResponse = worker && "name" in worker && "id" in worker;
 
   // Handle delete
   const handleDeleteClick = useCallback(() => {
@@ -79,7 +83,14 @@ export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCar
   // Loading state
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height={400}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 400,
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -95,12 +106,8 @@ export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCar
   }
 
   // Not found state
-  if (!worker) {
-    return (
-      <Alert severity="warning">
-        Worker not found
-      </Alert>
-    );
+  if (!worker || !isWorkerResponse) {
+    return <Alert severity="warning">Worker not found</Alert>;
   }
 
   return (
@@ -152,7 +159,11 @@ export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCar
               Skills (Coming Soon)
             </Typography>
             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-              <Chip label="No skills assigned" color="default" variant="outlined" />
+              <Chip
+                label="No skills assigned"
+                color="default"
+                variant="outlined"
+              />
             </Box>
           </Box>
 
@@ -161,7 +172,8 @@ export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCar
               Assigned Shifts (Coming Soon)
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Shift assignments will be displayed here when the scheduling feature is implemented.
+              Shift assignments will be displayed here when the scheduling
+              feature is implemented.
             </Typography>
           </Box>
         </CardContent>
@@ -173,7 +185,7 @@ export function WorkerDetailCard({ workerId, onEdit, onDelete }: WorkerDetailCar
           >
             Back to Workers
           </Button>
-          
+
           <Box sx={{ display: "flex", gap: 2 }}>
             <Button
               variant="outlined"

@@ -1,4 +1,6 @@
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata } from "next";
+import { MainLayout } from "@/components/layout/MainLayout";
 import EmotionRegistry from "@/lib/emotion-registry";
 import { MuiProvider } from "@/providers/mui-provider";
 import { QueryProvider } from "@/providers/query-provider";
@@ -17,7 +19,11 @@ export default function RootLayout({
       <body>
         <EmotionRegistry>
           <MuiProvider>
-            <QueryProvider>{children}</QueryProvider>
+            <QueryProvider>
+              <AppRouterCacheProvider>
+                <MainLayout>{children}</MainLayout>
+              </AppRouterCacheProvider>
+            </QueryProvider>
           </MuiProvider>
         </EmotionRegistry>
       </body>

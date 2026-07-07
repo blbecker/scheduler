@@ -1,7 +1,7 @@
 "use client";
 
-import { AppBar, Toolbar, IconButton, Typography, Box } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
+import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 
 interface TopBarProps {
   title?: string;
@@ -31,7 +31,7 @@ export function TopBar({ title = "Scheduler", onMenuClick }: TopBarProps) {
         >
           <MenuIcon />
         </IconButton>
-        
+
         <Box sx={{ flexGrow: 1 }}>
           <Typography variant="h6" noWrap component="div">
             {title}

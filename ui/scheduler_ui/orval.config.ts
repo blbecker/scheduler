@@ -11,7 +11,9 @@ export default defineConfig({
       client: "react-query",
       target: "./src/api/client",
       schemas: "./src/api/models",
-      baseUrl: "/api/v1",
+      baseUrl: {
+        runtime: "process.env.NEXT_PUBLIC_V1_API_BASE_URL",
+      },
       mock: true,
     },
   },

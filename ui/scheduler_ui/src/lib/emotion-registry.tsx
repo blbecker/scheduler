@@ -24,6 +24,7 @@ export default function EmotionRegistry({
     return (
       <style
         data-emotion={`${cache.key}`}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe - injecting Emotion CSS styles
         dangerouslySetInnerHTML={{ __html: styles }}
       />
     );

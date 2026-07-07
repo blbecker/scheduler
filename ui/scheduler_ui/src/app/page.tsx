@@ -1,66 +1,83 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import { Add as AddIcon, People as PeopleIcon } from "@mui/icons-material";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+
+export default function HomePage() {
+  const router = useRouter();
+
+  const handleNavigateToWorkers = () => {
+    router.push("/workers");
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Box sx={{ p: 3, maxWidth: 1200, margin: "0 auto" }}>
+      <Typography variant="h4" gutterBottom>
+        Welcome to Scheduler
+      </Typography>
+
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Manage your workforce, schedules, and optimize assignments with our
+        scheduling system.
+      </Typography>
+
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, mt: 2 }}>
+        <Box sx={{ flex: "1 1 300px", minWidth: 300 }}>
+          <Card>
+            <CardContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h6">Workers</Typography>
+                <PeopleIcon color="primary" />
+              </Box>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Manage your workforce. Add, edit, or remove workers from the
+                system.
+              </Typography>
+
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button
+                  variant="contained"
+                  startIcon={<PeopleIcon />}
+                  onClick={handleNavigateToWorkers}
+                >
+                  View Workers
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  onClick={() => router.push("/workers/new")}
+                >
+                  Add Worker
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+
+        <Box sx={{ flex: "1 1 300px", minWidth: 300 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Quick Stats
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                More features coming soon: Skills management, schedule
+                templates, and optimization tools.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
+    </Box>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
 import {
+  Button,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  Button,
+  DialogTitle,
 } from "@mui/material";
 
 interface ConfirmationDialogProps {

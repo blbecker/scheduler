@@ -4,10 +4,7 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,26 +17,25 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   HTTPValidationError,
-  Shift,
+  ShiftCreate,
   ShiftResponse,
-  ShiftUpdate
-} from '../../models';
+  ShiftUpdate,
+} from "../../models";
 
-
-
-
-
-const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+const withQueryKey = <T extends object, K>(
+  query: T,
+  queryKey: K,
+): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === "queryKey") continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -50,536 +46,682 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 export type listShiftsResponse200 = {
-  data: ShiftResponse[]
-  status: 200
-}
+  data: ShiftResponse[];
+  status: 200;
+};
 
-export type listShiftsResponseSuccess = (listShiftsResponse200) & {
+export type listShiftsResponseSuccess = listShiftsResponse200 & {
   headers: Headers;
 };
-;
 
-export type listShiftsResponse = (listShiftsResponseSuccess)
+export type listShiftsResponse = listShiftsResponseSuccess;
 
 export const getListShiftsUrl = () => {
-
-
-
-
-  return `/api/v1/shifts/`
-}
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/`;
+};
 
 /**
  * @summary List Shifts
  */
-export const listShifts = async ( options?: RequestInit): Promise<listShiftsResponse> => {
-
-  const res = await fetch(getListShiftsUrl(),
-  {
+export const listShifts = async (
+  options?: RequestInit,
+): Promise<listShiftsResponse> => {
+  const res = await fetch(getListShiftsUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listShiftsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listShiftsResponse
-}
-
-
-
-
+  const data: listShiftsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listShiftsResponse;
+};
 
 export const getListShiftsQueryKey = () => {
-    return [
-    `/api/v1/shifts/`
-    ] as const;
-    }
+  return [`${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/`] as const;
+};
 
+export const getListShiftsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listShifts>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+}) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-export const getListShiftsQueryOptions = <TData = Awaited<ReturnType<typeof listShifts>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>>, fetch?: RequestInit}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getListShiftsQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listShifts>>> = ({
+    signal,
+  }) => listShifts({ signal, ...fetchOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getListShiftsQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listShifts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type ListShiftsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listShifts>>
+>;
+export type ListShiftsQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listShifts>>> = ({ signal }) => listShifts({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListShiftsQueryResult = NonNullable<Awaited<ReturnType<typeof listShifts>>>
-export type ListShiftsQueryError = unknown
-
-
-export function useListShifts<TData = Awaited<ReturnType<typeof listShifts>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>> & Pick<
+export function useListShifts<
+  TData = Awaited<ReturnType<typeof listShifts>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listShifts>>,
           TError,
           Awaited<ReturnType<typeof listShifts>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListShifts<TData = Awaited<ReturnType<typeof listShifts>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListShifts<
+  TData = Awaited<ReturnType<typeof listShifts>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listShifts>>,
           TError,
           Awaited<ReturnType<typeof listShifts>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListShifts<TData = Awaited<ReturnType<typeof listShifts>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListShifts<
+  TData = Awaited<ReturnType<typeof listShifts>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Shifts
  */
 
-export function useListShifts<TData = Awaited<ReturnType<typeof listShifts>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useListShifts<
+  TData = Awaited<ReturnType<typeof listShifts>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listShifts>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListShiftsQueryOptions(options);
 
-  const queryOptions = getListShiftsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
 export type createShiftResponse201 = {
-  data: ShiftResponse
-  status: 201
-}
+  data: ShiftResponse;
+  status: 201;
+};
 
 export type createShiftResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type createShiftResponseSuccess = (createShiftResponse201) & {
-  headers: Headers;
-};
-export type createShiftResponseError = (createShiftResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type createShiftResponse = (createShiftResponseSuccess | createShiftResponseError)
+export type createShiftResponseSuccess = createShiftResponse201 & {
+  headers: Headers;
+};
+export type createShiftResponseError = createShiftResponse422 & {
+  headers: Headers;
+};
+
+export type createShiftResponse =
+  | createShiftResponseSuccess
+  | createShiftResponseError;
 
 export const getCreateShiftUrl = () => {
-
-
-
-
-  return `/api/v1/shifts/`
-}
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/`;
+};
 
 /**
  * @summary Create Shift
  */
-export const createShift = async (shift: Shift, options?: RequestInit): Promise<createShiftResponse> => {
-
-  const res = await fetch(getCreateShiftUrl(),
-  {
+export const createShift = async (
+  shiftCreate: ShiftCreate,
+  options?: RequestInit,
+): Promise<createShiftResponse> => {
+  const res = await fetch(getCreateShiftUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(shift)
-  }
-)
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(shiftCreate),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createShiftResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createShiftResponse
-}
+  const data: createShiftResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createShiftResponse;
+};
 
+export const getCreateShiftMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createShift>>,
+    TError,
+    { data: ShiftCreate },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createShift>>,
+  TError,
+  { data: ShiftCreate },
+  TContext
+> => {
+  const mutationKey = ["createShift"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createShift>>,
+    { data: ShiftCreate }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return createShift(data, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getCreateShiftMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createShift>>, TError,{data: Shift}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof createShift>>, TError,{data: Shift}, TContext> => {
+export type CreateShiftMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createShift>>
+>;
+export type CreateShiftMutationBody = ShiftCreate;
+export type CreateShiftMutationError = HTTPValidationError;
 
-const mutationKey = ['createShift'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createShift>>, {data: Shift}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createShift(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateShiftMutationResult = NonNullable<Awaited<ReturnType<typeof createShift>>>
-    export type CreateShiftMutationBody = Shift
-    export type CreateShiftMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Create Shift
  */
-export const useCreateShift = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createShift>>, TError,{data: Shift}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createShift>>,
-        TError,
-        {data: Shift},
-        TContext
-      > => {
-      return useMutation(getCreateShiftMutationOptions(options), queryClient);
-    }
-    export type getShiftResponse200 = {
-  data: ShiftResponse
-  status: 200
-}
+export const useCreateShift = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createShift>>,
+      TError,
+      { data: ShiftCreate },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createShift>>,
+  TError,
+  { data: ShiftCreate },
+  TContext
+> => {
+  return useMutation(getCreateShiftMutationOptions(options), queryClient);
+};
+export type getShiftResponse200 = {
+  data: ShiftResponse;
+  status: 200;
+};
 
 export type getShiftResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type getShiftResponseSuccess = (getShiftResponse200) & {
-  headers: Headers;
-};
-export type getShiftResponseError = (getShiftResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type getShiftResponse = (getShiftResponseSuccess | getShiftResponseError)
+export type getShiftResponseSuccess = getShiftResponse200 & {
+  headers: Headers;
+};
+export type getShiftResponseError = getShiftResponse422 & {
+  headers: Headers;
+};
 
-export const getGetShiftUrl = (shiftId: string,) => {
+export type getShiftResponse = getShiftResponseSuccess | getShiftResponseError;
 
-
-
-
-  return `/api/v1/shifts/${shiftId}`
-}
+export const getGetShiftUrl = (shiftId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/${shiftId}`;
+};
 
 /**
  * @summary Get Shift
  */
-export const getShift = async (shiftId: string, options?: RequestInit): Promise<getShiftResponse> => {
-
-  const res = await fetch(getGetShiftUrl(shiftId),
-  {
+export const getShift = async (
+  shiftId: string,
+  options?: RequestInit,
+): Promise<getShiftResponse> => {
+  const res = await fetch(getGetShiftUrl(shiftId), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getShiftResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getShiftResponse
-}
+  const data: getShiftResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getShiftResponse;
+};
 
+export const getGetShiftQueryKey = (shiftId: string) => {
+  return [
+    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/${shiftId}`,
+  ] as const;
+};
 
-
-
-
-export const getGetShiftQueryKey = (shiftId: string,) => {
-    return [
-    `/api/v1/shifts/${shiftId}`
-    ] as const;
-    }
-
-
-export const getGetShiftQueryOptions = <TData = Awaited<ReturnType<typeof getShift>>, TError = HTTPValidationError>(shiftId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>>, fetch?: RequestInit}
+export const getGetShiftQueryOptions = <
+  TData = Awaited<ReturnType<typeof getShift>>,
+  TError = HTTPValidationError,
+>(
+  shiftId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetShiftQueryKey(shiftId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetShiftQueryKey(shiftId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getShift>>> = ({
+    signal,
+  }) => getShift(shiftId, { signal, ...fetchOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: shiftId !== null && shiftId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type GetShiftQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getShift>>
+>;
+export type GetShiftQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getShift>>> = ({ signal }) => getShift(shiftId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: shiftId !== null && shiftId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetShiftQueryResult = NonNullable<Awaited<ReturnType<typeof getShift>>>
-export type GetShiftQueryError = HTTPValidationError
-
-
-export function useGetShift<TData = Awaited<ReturnType<typeof getShift>>, TError = HTTPValidationError>(
- shiftId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>> & Pick<
+export function useGetShift<
+  TData = Awaited<ReturnType<typeof getShift>>,
+  TError = HTTPValidationError,
+>(
+  shiftId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getShift>>,
           TError,
           Awaited<ReturnType<typeof getShift>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetShift<TData = Awaited<ReturnType<typeof getShift>>, TError = HTTPValidationError>(
- shiftId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetShift<
+  TData = Awaited<ReturnType<typeof getShift>>,
+  TError = HTTPValidationError,
+>(
+  shiftId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getShift>>,
           TError,
           Awaited<ReturnType<typeof getShift>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetShift<TData = Awaited<ReturnType<typeof getShift>>, TError = HTTPValidationError>(
- shiftId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetShift<
+  TData = Awaited<ReturnType<typeof getShift>>,
+  TError = HTTPValidationError,
+>(
+  shiftId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Shift
  */
 
-export function useGetShift<TData = Awaited<ReturnType<typeof getShift>>, TError = HTTPValidationError>(
- shiftId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetShift<
+  TData = Awaited<ReturnType<typeof getShift>>,
+  TError = HTTPValidationError,
+>(
+  shiftId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getShift>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetShiftQueryOptions(shiftId, options);
 
-  const queryOptions = getGetShiftQueryOptions(shiftId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
 export type updateShiftResponse200 = {
-  data: ShiftResponse
-  status: 200
-}
+  data: ShiftResponse;
+  status: 200;
+};
 
 export type updateShiftResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type updateShiftResponseSuccess = (updateShiftResponse200) & {
-  headers: Headers;
-};
-export type updateShiftResponseError = (updateShiftResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type updateShiftResponse = (updateShiftResponseSuccess | updateShiftResponseError)
+export type updateShiftResponseSuccess = updateShiftResponse200 & {
+  headers: Headers;
+};
+export type updateShiftResponseError = updateShiftResponse422 & {
+  headers: Headers;
+};
 
-export const getUpdateShiftUrl = (shiftId: string,) => {
+export type updateShiftResponse =
+  | updateShiftResponseSuccess
+  | updateShiftResponseError;
 
-
-
-
-  return `/api/v1/shifts/${shiftId}`
-}
+export const getUpdateShiftUrl = (shiftId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/${shiftId}`;
+};
 
 /**
  * @summary Update Shift
  */
-export const updateShift = async (shiftId: string,
-    shiftUpdate: ShiftUpdate, options?: RequestInit): Promise<updateShiftResponse> => {
-
-  const res = await fetch(getUpdateShiftUrl(shiftId),
-  {
+export const updateShift = async (
+  shiftId: string,
+  shiftUpdate: ShiftUpdate,
+  options?: RequestInit,
+): Promise<updateShiftResponse> => {
+  const res = await fetch(getUpdateShiftUrl(shiftId), {
     ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(shiftUpdate)
-  }
-)
-
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(shiftUpdate),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updateShiftResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateShiftResponse
-}
+  const data: updateShiftResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateShiftResponse;
+};
 
+export const getUpdateShiftMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateShift>>,
+    TError,
+    { shiftId: string; data: ShiftUpdate },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateShift>>,
+  TError,
+  { shiftId: string; data: ShiftUpdate },
+  TContext
+> => {
+  const mutationKey = ["updateShift"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateShift>>,
+    { shiftId: string; data: ShiftUpdate }
+  > = (props) => {
+    const { shiftId, data } = props ?? {};
 
+    return updateShift(shiftId, data, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getUpdateShiftMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateShift>>, TError,{shiftId: string;data: ShiftUpdate}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof updateShift>>, TError,{shiftId: string;data: ShiftUpdate}, TContext> => {
+export type UpdateShiftMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateShift>>
+>;
+export type UpdateShiftMutationBody = ShiftUpdate;
+export type UpdateShiftMutationError = HTTPValidationError;
 
-const mutationKey = ['updateShift'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateShift>>, {shiftId: string;data: ShiftUpdate}> = (props) => {
-          const {shiftId,data} = props ?? {};
-
-          return  updateShift(shiftId,data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateShiftMutationResult = NonNullable<Awaited<ReturnType<typeof updateShift>>>
-    export type UpdateShiftMutationBody = ShiftUpdate
-    export type UpdateShiftMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Update Shift
  */
-export const useUpdateShift = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateShift>>, TError,{shiftId: string;data: ShiftUpdate}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateShift>>,
-        TError,
-        {shiftId: string;data: ShiftUpdate},
-        TContext
-      > => {
-      return useMutation(getUpdateShiftMutationOptions(options), queryClient);
-    }
-    export type deleteShiftResponse204 = {
-  data: void
-  status: 204
-}
+export const useUpdateShift = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateShift>>,
+      TError,
+      { shiftId: string; data: ShiftUpdate },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateShift>>,
+  TError,
+  { shiftId: string; data: ShiftUpdate },
+  TContext
+> => {
+  return useMutation(getUpdateShiftMutationOptions(options), queryClient);
+};
+export type deleteShiftResponse204 = {
+  data: void;
+  status: 204;
+};
 
 export type deleteShiftResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type deleteShiftResponseSuccess = (deleteShiftResponse204) & {
-  headers: Headers;
-};
-export type deleteShiftResponseError = (deleteShiftResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type deleteShiftResponse = (deleteShiftResponseSuccess | deleteShiftResponseError)
+export type deleteShiftResponseSuccess = deleteShiftResponse204 & {
+  headers: Headers;
+};
+export type deleteShiftResponseError = deleteShiftResponse422 & {
+  headers: Headers;
+};
 
-export const getDeleteShiftUrl = (shiftId: string,) => {
+export type deleteShiftResponse =
+  | deleteShiftResponseSuccess
+  | deleteShiftResponseError;
 
-
-
-
-  return `/api/v1/shifts/${shiftId}`
-}
+export const getDeleteShiftUrl = (shiftId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/shifts/${shiftId}`;
+};
 
 /**
  * @summary Delete Shift
  */
-export const deleteShift = async (shiftId: string, options?: RequestInit): Promise<deleteShiftResponse> => {
-
-  const res = await fetch(getDeleteShiftUrl(shiftId),
-  {
+export const deleteShift = async (
+  shiftId: string,
+  options?: RequestInit,
+): Promise<deleteShiftResponse> => {
+  const res = await fetch(getDeleteShiftUrl(shiftId), {
     ...options,
-    method: 'DELETE'
-
-
-  }
-)
-
+    method: "DELETE",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteShiftResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as deleteShiftResponse
-}
+  const data: deleteShiftResponse["data"] = body ? JSON.parse(body) : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteShiftResponse;
+};
 
+export const getDeleteShiftMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteShift>>,
+    TError,
+    { shiftId: string },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteShift>>,
+  TError,
+  { shiftId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteShift"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteShift>>,
+    { shiftId: string }
+  > = (props) => {
+    const { shiftId } = props ?? {};
 
+    return deleteShift(shiftId, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getDeleteShiftMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteShift>>, TError,{shiftId: string}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteShift>>, TError,{shiftId: string}, TContext> => {
+export type DeleteShiftMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteShift>>
+>;
 
-const mutationKey = ['deleteShift'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+export type DeleteShiftMutationError = HTTPValidationError;
 
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteShift>>, {shiftId: string}> = (props) => {
-          const {shiftId} = props ?? {};
-
-          return  deleteShift(shiftId,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteShiftMutationResult = NonNullable<Awaited<ReturnType<typeof deleteShift>>>
-
-    export type DeleteShiftMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Delete Shift
  */
-export const useDeleteShift = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteShift>>, TError,{shiftId: string}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteShift>>,
-        TError,
-        {shiftId: string},
-        TContext
-      > => {
-      return useMutation(getDeleteShiftMutationOptions(options), queryClient);
-    }
+export const useDeleteShift = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteShift>>,
+      TError,
+      { shiftId: string },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteShift>>,
+  TError,
+  { shiftId: string },
+  TContext
+> => {
+  return useMutation(getDeleteShiftMutationOptions(options), queryClient);
+};

@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@mui/material";
 import { Download as DownloadIcon } from "@mui/icons-material";
+import { Button } from "@mui/material";
 
 interface ExportButtonProps<T> {
   data: T[];
@@ -32,12 +32,16 @@ export function ExportButton<T>({
           .map((cell) => {
             // Escape quotes and wrap in quotes if contains comma, quote, or newline
             const escaped = cell.toString().replace(/"/g, '""');
-            if (escaped.includes(",") || escaped.includes('"') || escaped.includes("\n")) {
+            if (
+              escaped.includes(",") ||
+              escaped.includes('"') ||
+              escaped.includes("\n")
+            ) {
               return `"${escaped}"`;
             }
             return escaped;
           })
-          .join(",")
+          .join(","),
       ),
     ].join("\n");
 
@@ -46,7 +50,10 @@ export function ExportButton<T>({
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `${filename}-${new Date().toISOString().split("T")[0]}.csv`);
+    link.setAttribute(
+      "download",
+      `${filename}-${new Date().toISOString().split("T")[0]}.csv`,
+    );
     link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();

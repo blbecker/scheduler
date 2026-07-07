@@ -4,10 +4,7 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -20,26 +17,25 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   HTTPValidationError,
-  Skill,
+  SkillCreate,
   SkillResponse,
-  SkillUpdate
-} from '../../models';
+  SkillUpdate,
+} from "../../models";
 
-
-
-
-
-const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+const withQueryKey = <T extends object, K>(
+  query: T,
+  queryKey: K,
+): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
+    if (key === "queryKey") continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -50,536 +46,682 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 export type listSkillsResponse200 = {
-  data: SkillResponse[]
-  status: 200
-}
+  data: SkillResponse[];
+  status: 200;
+};
 
-export type listSkillsResponseSuccess = (listSkillsResponse200) & {
+export type listSkillsResponseSuccess = listSkillsResponse200 & {
   headers: Headers;
 };
-;
 
-export type listSkillsResponse = (listSkillsResponseSuccess)
+export type listSkillsResponse = listSkillsResponseSuccess;
 
 export const getListSkillsUrl = () => {
-
-
-
-
-  return `/api/v1/skills/`
-}
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/`;
+};
 
 /**
  * @summary List Skills
  */
-export const listSkills = async ( options?: RequestInit): Promise<listSkillsResponse> => {
-
-  const res = await fetch(getListSkillsUrl(),
-  {
+export const listSkills = async (
+  options?: RequestInit,
+): Promise<listSkillsResponse> => {
+  const res = await fetch(getListSkillsUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listSkillsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as listSkillsResponse
-}
-
-
-
-
+  const data: listSkillsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listSkillsResponse;
+};
 
 export const getListSkillsQueryKey = () => {
-    return [
-    `/api/v1/skills/`
-    ] as const;
-    }
+  return [`${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/`] as const;
+};
 
+export const getListSkillsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSkills>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+}) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-export const getListSkillsQueryOptions = <TData = Awaited<ReturnType<typeof listSkills>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>>, fetch?: RequestInit}
-) => {
+  const queryKey = queryOptions?.queryKey ?? getListSkillsQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listSkills>>> = ({
+    signal,
+  }) => listSkills({ signal, ...fetchOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getListSkillsQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSkills>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type ListSkillsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSkills>>
+>;
+export type ListSkillsQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSkills>>> = ({ signal }) => listSkills({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ListSkillsQueryResult = NonNullable<Awaited<ReturnType<typeof listSkills>>>
-export type ListSkillsQueryError = unknown
-
-
-export function useListSkills<TData = Awaited<ReturnType<typeof listSkills>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>> & Pick<
+export function useListSkills<
+  TData = Awaited<ReturnType<typeof listSkills>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSkills>>,
           TError,
           Awaited<ReturnType<typeof listSkills>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListSkills<TData = Awaited<ReturnType<typeof listSkills>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListSkills<
+  TData = Awaited<ReturnType<typeof listSkills>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSkills>>,
           TError,
           Awaited<ReturnType<typeof listSkills>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useListSkills<TData = Awaited<ReturnType<typeof listSkills>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListSkills<
+  TData = Awaited<ReturnType<typeof listSkills>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Skills
  */
 
-export function useListSkills<TData = Awaited<ReturnType<typeof listSkills>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useListSkills<
+  TData = Awaited<ReturnType<typeof listSkills>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListSkillsQueryOptions(options);
 
-  const queryOptions = getListSkillsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
 export type createSkillResponse201 = {
-  data: SkillResponse
-  status: 201
-}
+  data: SkillResponse;
+  status: 201;
+};
 
 export type createSkillResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type createSkillResponseSuccess = (createSkillResponse201) & {
-  headers: Headers;
-};
-export type createSkillResponseError = (createSkillResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type createSkillResponse = (createSkillResponseSuccess | createSkillResponseError)
+export type createSkillResponseSuccess = createSkillResponse201 & {
+  headers: Headers;
+};
+export type createSkillResponseError = createSkillResponse422 & {
+  headers: Headers;
+};
+
+export type createSkillResponse =
+  | createSkillResponseSuccess
+  | createSkillResponseError;
 
 export const getCreateSkillUrl = () => {
-
-
-
-
-  return `/api/v1/skills/`
-}
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/`;
+};
 
 /**
  * @summary Create Skill
  */
-export const createSkill = async (skill: Skill, options?: RequestInit): Promise<createSkillResponse> => {
-
-  const res = await fetch(getCreateSkillUrl(),
-  {
+export const createSkill = async (
+  skillCreate: SkillCreate,
+  options?: RequestInit,
+): Promise<createSkillResponse> => {
+  const res = await fetch(getCreateSkillUrl(), {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(skill)
-  }
-)
-
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(skillCreate),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createSkillResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createSkillResponse
-}
+  const data: createSkillResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createSkillResponse;
+};
 
+export const getCreateSkillMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSkill>>,
+    TError,
+    { data: SkillCreate },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSkill>>,
+  TError,
+  { data: SkillCreate },
+  TContext
+> => {
+  const mutationKey = ["createSkill"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSkill>>,
+    { data: SkillCreate }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return createSkill(data, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getCreateSkillMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSkill>>, TError,{data: Skill}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof createSkill>>, TError,{data: Skill}, TContext> => {
+export type CreateSkillMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSkill>>
+>;
+export type CreateSkillMutationBody = SkillCreate;
+export type CreateSkillMutationError = HTTPValidationError;
 
-const mutationKey = ['createSkill'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSkill>>, {data: Skill}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createSkill(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateSkillMutationResult = NonNullable<Awaited<ReturnType<typeof createSkill>>>
-    export type CreateSkillMutationBody = Skill
-    export type CreateSkillMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Create Skill
  */
-export const useCreateSkill = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSkill>>, TError,{data: Skill}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createSkill>>,
-        TError,
-        {data: Skill},
-        TContext
-      > => {
-      return useMutation(getCreateSkillMutationOptions(options), queryClient);
-    }
-    export type getSkillResponse200 = {
-  data: SkillResponse
-  status: 200
-}
+export const useCreateSkill = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createSkill>>,
+      TError,
+      { data: SkillCreate },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createSkill>>,
+  TError,
+  { data: SkillCreate },
+  TContext
+> => {
+  return useMutation(getCreateSkillMutationOptions(options), queryClient);
+};
+export type getSkillResponse200 = {
+  data: SkillResponse;
+  status: 200;
+};
 
 export type getSkillResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type getSkillResponseSuccess = (getSkillResponse200) & {
-  headers: Headers;
-};
-export type getSkillResponseError = (getSkillResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type getSkillResponse = (getSkillResponseSuccess | getSkillResponseError)
+export type getSkillResponseSuccess = getSkillResponse200 & {
+  headers: Headers;
+};
+export type getSkillResponseError = getSkillResponse422 & {
+  headers: Headers;
+};
 
-export const getGetSkillUrl = (skillId: string,) => {
+export type getSkillResponse = getSkillResponseSuccess | getSkillResponseError;
 
-
-
-
-  return `/api/v1/skills/${skillId}`
-}
+export const getGetSkillUrl = (skillId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/${skillId}`;
+};
 
 /**
  * @summary Get Skill
  */
-export const getSkill = async (skillId: string, options?: RequestInit): Promise<getSkillResponse> => {
-
-  const res = await fetch(getGetSkillUrl(skillId),
-  {
+export const getSkill = async (
+  skillId: string,
+  options?: RequestInit,
+): Promise<getSkillResponse> => {
+  const res = await fetch(getGetSkillUrl(skillId), {
     ...options,
-    method: 'GET'
-
-
-  }
-)
-
+    method: "GET",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getSkillResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getSkillResponse
-}
+  const data: getSkillResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getSkillResponse;
+};
 
+export const getGetSkillQueryKey = (skillId: string) => {
+  return [
+    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/${skillId}`,
+  ] as const;
+};
 
-
-
-
-export const getGetSkillQueryKey = (skillId: string,) => {
-    return [
-    `/api/v1/skills/${skillId}`
-    ] as const;
-    }
-
-
-export const getGetSkillQueryOptions = <TData = Awaited<ReturnType<typeof getSkill>>, TError = HTTPValidationError>(skillId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>>, fetch?: RequestInit}
+export const getGetSkillQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSkill>>,
+  TError = HTTPValidationError,
+>(
+  skillId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
 ) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetSkillQueryKey(skillId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetSkillQueryKey(skillId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSkill>>> = ({
+    signal,
+  }) => getSkill(skillId, { signal, ...fetchOptions });
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: skillId !== null && skillId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
+export type GetSkillQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSkill>>
+>;
+export type GetSkillQueryError = HTTPValidationError;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSkill>>> = ({ signal }) => getSkill(skillId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: skillId !== null && skillId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetSkillQueryResult = NonNullable<Awaited<ReturnType<typeof getSkill>>>
-export type GetSkillQueryError = HTTPValidationError
-
-
-export function useGetSkill<TData = Awaited<ReturnType<typeof getSkill>>, TError = HTTPValidationError>(
- skillId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>> & Pick<
+export function useGetSkill<
+  TData = Awaited<ReturnType<typeof getSkill>>,
+  TError = HTTPValidationError,
+>(
+  skillId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSkill>>,
           TError,
           Awaited<ReturnType<typeof getSkill>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSkill<TData = Awaited<ReturnType<typeof getSkill>>, TError = HTTPValidationError>(
- skillId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetSkill<
+  TData = Awaited<ReturnType<typeof getSkill>>,
+  TError = HTTPValidationError,
+>(
+  skillId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSkill>>,
           TError,
           Awaited<ReturnType<typeof getSkill>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSkill<TData = Awaited<ReturnType<typeof getSkill>>, TError = HTTPValidationError>(
- skillId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetSkill<
+  TData = Awaited<ReturnType<typeof getSkill>>,
+  TError = HTTPValidationError,
+>(
+  skillId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Skill
  */
 
-export function useGetSkill<TData = Awaited<ReturnType<typeof getSkill>>, TError = HTTPValidationError>(
- skillId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useGetSkill<
+  TData = Awaited<ReturnType<typeof getSkill>>,
+  TError = HTTPValidationError,
+>(
+  skillId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetSkillQueryOptions(skillId, options);
 
-  const queryOptions = getGetSkillQueryOptions(skillId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
-
-
-
-
-
 export type updateSkillResponse200 = {
-  data: SkillResponse
-  status: 200
-}
+  data: SkillResponse;
+  status: 200;
+};
 
 export type updateSkillResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type updateSkillResponseSuccess = (updateSkillResponse200) & {
-  headers: Headers;
-};
-export type updateSkillResponseError = (updateSkillResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type updateSkillResponse = (updateSkillResponseSuccess | updateSkillResponseError)
+export type updateSkillResponseSuccess = updateSkillResponse200 & {
+  headers: Headers;
+};
+export type updateSkillResponseError = updateSkillResponse422 & {
+  headers: Headers;
+};
 
-export const getUpdateSkillUrl = (skillId: string,) => {
+export type updateSkillResponse =
+  | updateSkillResponseSuccess
+  | updateSkillResponseError;
 
-
-
-
-  return `/api/v1/skills/${skillId}`
-}
+export const getUpdateSkillUrl = (skillId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/${skillId}`;
+};
 
 /**
  * @summary Update Skill
  */
-export const updateSkill = async (skillId: string,
-    skillUpdate: SkillUpdate, options?: RequestInit): Promise<updateSkillResponse> => {
-
-  const res = await fetch(getUpdateSkillUrl(skillId),
-  {
+export const updateSkill = async (
+  skillId: string,
+  skillUpdate: SkillUpdate,
+  options?: RequestInit,
+): Promise<updateSkillResponse> => {
+  const res = await fetch(getUpdateSkillUrl(skillId), {
     ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(skillUpdate)
-  }
-)
-
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(skillUpdate),
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updateSkillResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as updateSkillResponse
-}
+  const data: updateSkillResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateSkillResponse;
+};
 
+export const getUpdateSkillMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSkill>>,
+    TError,
+    { skillId: string; data: SkillUpdate },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSkill>>,
+  TError,
+  { skillId: string; data: SkillUpdate },
+  TContext
+> => {
+  const mutationKey = ["updateSkill"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSkill>>,
+    { skillId: string; data: SkillUpdate }
+  > = (props) => {
+    const { skillId, data } = props ?? {};
 
+    return updateSkill(skillId, data, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getUpdateSkillMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSkill>>, TError,{skillId: string;data: SkillUpdate}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof updateSkill>>, TError,{skillId: string;data: SkillUpdate}, TContext> => {
+export type UpdateSkillMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSkill>>
+>;
+export type UpdateSkillMutationBody = SkillUpdate;
+export type UpdateSkillMutationError = HTTPValidationError;
 
-const mutationKey = ['updateSkill'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSkill>>, {skillId: string;data: SkillUpdate}> = (props) => {
-          const {skillId,data} = props ?? {};
-
-          return  updateSkill(skillId,data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateSkillMutationResult = NonNullable<Awaited<ReturnType<typeof updateSkill>>>
-    export type UpdateSkillMutationBody = SkillUpdate
-    export type UpdateSkillMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Update Skill
  */
-export const useUpdateSkill = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSkill>>, TError,{skillId: string;data: SkillUpdate}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateSkill>>,
-        TError,
-        {skillId: string;data: SkillUpdate},
-        TContext
-      > => {
-      return useMutation(getUpdateSkillMutationOptions(options), queryClient);
-    }
-    export type deleteSkillResponse204 = {
-  data: void
-  status: 204
-}
+export const useUpdateSkill = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateSkill>>,
+      TError,
+      { skillId: string; data: SkillUpdate },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateSkill>>,
+  TError,
+  { skillId: string; data: SkillUpdate },
+  TContext
+> => {
+  return useMutation(getUpdateSkillMutationOptions(options), queryClient);
+};
+export type deleteSkillResponse204 = {
+  data: void;
+  status: 204;
+};
 
 export type deleteSkillResponse422 = {
-  data: HTTPValidationError
-  status: 422
-}
-
-export type deleteSkillResponseSuccess = (deleteSkillResponse204) & {
-  headers: Headers;
-};
-export type deleteSkillResponseError = (deleteSkillResponse422) & {
-  headers: Headers;
+  data: HTTPValidationError;
+  status: 422;
 };
 
-export type deleteSkillResponse = (deleteSkillResponseSuccess | deleteSkillResponseError)
+export type deleteSkillResponseSuccess = deleteSkillResponse204 & {
+  headers: Headers;
+};
+export type deleteSkillResponseError = deleteSkillResponse422 & {
+  headers: Headers;
+};
 
-export const getDeleteSkillUrl = (skillId: string,) => {
+export type deleteSkillResponse =
+  | deleteSkillResponseSuccess
+  | deleteSkillResponseError;
 
-
-
-
-  return `/api/v1/skills/${skillId}`
-}
+export const getDeleteSkillUrl = (skillId: string) => {
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/skills/${skillId}`;
+};
 
 /**
  * @summary Delete Skill
  */
-export const deleteSkill = async (skillId: string, options?: RequestInit): Promise<deleteSkillResponse> => {
-
-  const res = await fetch(getDeleteSkillUrl(skillId),
-  {
+export const deleteSkill = async (
+  skillId: string,
+  options?: RequestInit,
+): Promise<deleteSkillResponse> => {
+  const res = await fetch(getDeleteSkillUrl(skillId), {
     ...options,
-    method: 'DELETE'
-
-
-  }
-)
-
+    method: "DELETE",
+  });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteSkillResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as deleteSkillResponse
-}
+  const data: deleteSkillResponse["data"] = body ? JSON.parse(body) : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteSkillResponse;
+};
 
+export const getDeleteSkillMutationOptions = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSkill>>,
+    TError,
+    { skillId: string },
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteSkill>>,
+  TError,
+  { skillId: string },
+  TContext
+> => {
+  const mutationKey = ["deleteSkill"];
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteSkill>>,
+    { skillId: string }
+  > = (props) => {
+    const { skillId } = props ?? {};
 
+    return deleteSkill(skillId, fetchOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getDeleteSkillMutationOptions = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSkill>>, TError,{skillId: string}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteSkill>>, TError,{skillId: string}, TContext> => {
+export type DeleteSkillMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteSkill>>
+>;
 
-const mutationKey = ['deleteSkill'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
+export type DeleteSkillMutationError = HTTPValidationError;
 
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSkill>>, {skillId: string}> = (props) => {
-          const {skillId} = props ?? {};
-
-          return  deleteSkill(skillId,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteSkillMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSkill>>>
-
-    export type DeleteSkillMutationError = HTTPValidationError
-
-    /**
+/**
  * @summary Delete Skill
  */
-export const useDeleteSkill = <TError = HTTPValidationError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSkill>>, TError,{skillId: string}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteSkill>>,
-        TError,
-        {skillId: string},
-        TContext
-      > => {
-      return useMutation(getDeleteSkillMutationOptions(options), queryClient);
-    }
+export const useDeleteSkill = <
+  TError = HTTPValidationError,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteSkill>>,
+      TError,
+      { skillId: string },
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteSkill>>,
+  TError,
+  { skillId: string },
+  TContext
+> => {
+  return useMutation(getDeleteSkillMutationOptions(options), queryClient);
+};
