@@ -7,12 +7,33 @@
 - **Database**: PostgreSQL with SQLAlchemy/SQLModel ORM, migrations already configured and working
 
 ## API Design Rules
+### Transaction Management
+
+#### Service-Owned Transactions
+- **Write Operations**: Use `with self.session.begin():` context manager
+- **Read Operations**: No transactions needed
+- **Error Handling**: 
+  - `IntegrityError` → 409 Conflict (generic message)
+  - Other `SQLAlchemyError` → 500 Internal Server Error (generic message)
+  - Full stack trace logged at ERROR level
+- **No Retry Logic**: Simple error propagation
+
+#### Repository Responsibilities
+- **Data Access Only**: Never call `session.commit()` or `session.rollback()`
+- **No Flush Needed**: UUID IDs are Python-generated
+
+#### Key Principles
+1. Services own transactions for write operations
+2. Repositories are data access only  
+3. Routes depend on services, not repositories
+4. Log errors with full details, return generic messages
+
 ### Request/Response DTOs (Domain-Oriented)
-- **Canonical schema naming**: Use domain entity names for creation schemas (e.g., `Worker` not `WorkerCreate`)
-- **Update schemas**: Keep `{Resource}Update` suffix for PATCH/PUT operations  
-- **Response schemas**: Keep `{Resource}Response` for GET responses
+- **Create schemas**: Use `{Resource}Create` suffix (e.g., `WorkerCreate` not `Worker`)
+- **Update schemas**: Use `{Resource}Update` suffix for PATCH/PUT operations  
+- **Response schemas**: Use `{Resource}Response` for GET responses
 - **Solve framework**: Use `ScheduleSolveRequest`, `ScheduleSolveCreateResponse`, `ScheduleSolveStatus`, `ScheduleSolveResult`
-- **Example**: `/v1/solves/schedule` uses `ScheduleSolveRequest` and `ScheduleSolveCreateResponse`
+- **Example**: `/v1/workers` uses `WorkerCreate` (POST), `WorkerUpdate` (PUT), `WorkerResponse` (GET)
 
 ### URL Pattern Rules
 - **POST endpoints go to collection base path** (e.g., `/v1/solves/schedule`), not to specific IDs
@@ -28,12 +49,6 @@
   - `solves/` - Solve framework resources
 - **Flat URL paths**: Routes use flat paths (e.g., `/workers`, `/skills`) not hierarchical URLs
 - **Clean imports**: Router organization is for code structure only, not URL paths
-
-### API Documentation & Client Generation
-- **Hierarchical tags**: Use domain-specific tags (e.g., `["workers"]`, `["shift-templates"]`, `["schedule-solves"]`)
-- **Operation IDs**: All endpoints must have unique `operation_id` for clean client code generation
-  - CRUD patterns: `list_{resources}`, `get_{resource}`, `create_{resource}`, `update_{resource}`, `delete_{resource}`
-  - Solve patterns: `create_schedule_solve`, `get_schedule_solve_status`, `get_schedule_solve_result`
 
 ## Development Commands
 ### Full stack development
@@ -81,6 +96,30 @@ pnpm run build                         # Production build
 - `vitest` with Vue Test Utils
 - `msw` (Mock Service Worker) for API mocking
 - Component tests in `test/vitest/__tests__/`
+
+## Code Quality & Review
+
+### Automated Code Review with opencode
+- **Agent**: `full-stack-code-reviewer` (available in opencode)
+- **Trigger**: After each significant code change in both plan and build modes
+- **Scope**: All TypeScript/React components and Python/FastAPI endpoints
+- **Focus Areas**:
+  - Component simplification and reusability
+  - API design compliance with project standards
+  - Error handling and loading state patterns
+  - Type safety and prop validation
+  - Code organization and separation of concerns
+  - Performance considerations (memoization, effect dependencies)
+
+### Review Workflow
+1. **Plan Mode Reviews**: During feature planning, the agent reviews proposed architecture
+2. **Build Mode Reviews**: After implementation, the agent verifies implementation quality
+3. **Feedback Integration**: Review findings are incorporated before finalizing changes
+
+### Quality Gates
+- All components must pass automated code review before PR submission
+- Review feedback should address critical issues before moving to testing phase
+- Complex components (>150 lines) receive additional scrutiny for simplification opportunities
 
 ## Environment & Ports
 ### Required services (docker-compose)
