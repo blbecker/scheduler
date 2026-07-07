@@ -1,7 +1,6 @@
 """No double booking constraint for schedule validation."""
 
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
 from uuid import UUID
 from datetime import datetime
 from ...interfaces import Constraint
@@ -18,7 +17,7 @@ class NoDoubleBookingConstraint(Constraint[ScheduleGenome, ScheduleSolveContext]
     def validate(self, genome: ScheduleGenome, context: ScheduleSolveContext) -> bool:
         """Return True if no worker has overlapping shifts."""
         # Build schedule for each worker
-        worker_schedules: Dict[UUID, List[Tuple[datetime, datetime]]] = {}
+        worker_schedules: dict[UUID, list[tuple[datetime, datetime]]] = {}
 
         for shift_id, assigned_workers in genome.assignments.items():
             shift_times = context.get_shift_times(shift_id)
@@ -53,7 +52,7 @@ class NoDoubleBookingConstraint(Constraint[ScheduleGenome, ScheduleSolveContext]
             # No time information, can't check overlaps
             return 0.0
 
-        worker_schedules: Dict[UUID, List[Tuple[datetime, datetime]]] = {}
+        worker_schedules: dict[UUID, list[tuple[datetime, datetime]]] = {}
         overlap_count = 0
 
         # Build schedule for each worker

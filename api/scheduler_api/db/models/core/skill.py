@@ -13,5 +13,4 @@ class SkillModel(BaseModel, table=True):
 
     shifts: list["ShiftModel"] = Relationship(
         back_populates="skills",
-        link_model=ShiftSkillLinkModel,
-    )
+        link_model=ShiftSkillLinkModel)

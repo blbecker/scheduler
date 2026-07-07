@@ -36,7 +36,7 @@ def schedule_solve_task(template_id: str, parameters_dict: dict) -> dict:
         orchestrator = SolveOrchestrator()
 
         # Run solve
-        result = orchestrator.solve(solver, template_uuid, parameters.dict())
+        result = orchestrator.solve(solver, template_uuid, parameters.model_dump())
 
         # Convert result to serializable format
         response = {
@@ -51,7 +51,7 @@ def schedule_solve_task(template_id: str, parameters_dict: dict) -> dict:
         # Include best genome if available
         if result.best_genome:
             genome_dto = ScheduleGenomeDTO.from_domain(result.best_genome)
-            response["best_genome"] = genome_dto.dict()
+            response["best_genome"] = genome_dto.model_dump()
 
         logger.info(
             f"Schedule solve completed for template {template_id}: "

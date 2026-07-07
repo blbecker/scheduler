@@ -1,7 +1,6 @@
 """Top N selector for population selection."""
 
 from dataclasses import dataclass
-from typing import List, Tuple
 from ...interfaces import Selector
 from ..genome import ScheduleGenome
 from ..context import ScheduleSolveContext
@@ -15,10 +14,9 @@ class TopNSelector(Selector[ScheduleGenome, ScheduleSolveContext]):
 
     def select(
         self,
-        population: List[Tuple[ScheduleGenome, float]],
+        population: list[tuple[ScheduleGenome, float]],
         context: ScheduleSolveContext,
-        count: int,
-    ) -> List[ScheduleGenome]:
+        count: int) -> list[ScheduleGenome]:
         """Select top N genomes by score."""
         if not population:
             return []

@@ -1,4 +1,5 @@
 """Test tasks for solve framework."""
+
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from uuid import uuid4
@@ -30,9 +31,15 @@ class TestSolveTasks:
         mock_result.best_genome = None
 
         with patch("scheduler_api.tasks.solve_tasks.UUID") as mock_uuid:
-            with patch("scheduler_api.tasks.solve_tasks.ScheduleSolveParameters") as mock_params:
-                with patch("scheduler_api.tasks.solve_tasks.ScheduleSolver") as mock_solver:
-                    with patch("scheduler_api.tasks.solve_tasks.SolveOrchestrator") as mock_orchestrator:
+            with patch(
+                "scheduler_api.tasks.solve_tasks.ScheduleSolveParameters"
+            ) as mock_params:
+                with patch(
+                    "scheduler_api.tasks.solve_tasks.ScheduleSolver"
+                ) as mock_solver:
+                    with patch(
+                        "scheduler_api.tasks.solve_tasks.SolveOrchestrator"
+                    ) as mock_orchestrator:
                         # Mock the orchestrator solve method
                         mock_orchestrator_instance = mock_orchestrator.return_value
                         mock_orchestrator_instance.solve.return_value = mock_result
@@ -46,7 +53,7 @@ class TestSolveTasks:
                         mock_solver.assert_called_once()
                         mock_orchestrator.assert_called_once()
                         mock_orchestrator_instance.solve.assert_called_once()
-                        
+
                         assert result["status"] == "completed"
                         assert result["best_fitness"] == 0.95
                         assert result["generations"] == 42
@@ -75,15 +82,23 @@ class TestSolveTasks:
         with patch("scheduler_api.tasks.solve_tasks.UUID"):
             with patch("scheduler_api.tasks.solve_tasks.ScheduleSolveParameters"):
                 with patch("scheduler_api.tasks.solve_tasks.ScheduleSolver"):
-                    with patch("scheduler_api.tasks.solve_tasks.SolveOrchestrator") as mock_orchestrator:
-                        with patch("scheduler_api.tasks.solve_tasks.ScheduleGenomeDTO") as mock_genome_dto:
+                    with patch(
+                        "scheduler_api.tasks.solve_tasks.SolveOrchestrator"
+                    ) as mock_orchestrator:
+                        with patch(
+                            "scheduler_api.tasks.solve_tasks.ScheduleGenomeDTO"
+                        ) as mock_genome_dto:
                             # Mock the orchestrator solve method
                             mock_orchestrator_instance = mock_orchestrator.return_value
                             mock_orchestrator_instance.solve.return_value = mock_result
 
                             mock_genome_dto_instance = Mock()
-                            mock_genome_dto_instance.dict.return_value = {"assignments": []}
-                            mock_genome_dto.from_domain.return_value = mock_genome_dto_instance
+                            mock_genome_dto_instance.model_dump.return_value = {
+                                "assignments": []
+                            }
+                            mock_genome_dto.from_domain.return_value = (
+                                mock_genome_dto_instance
+                            )
 
                             # Test
                             result = schedule_solve_task(template_id, parameters_dict)
@@ -92,7 +107,9 @@ class TestSolveTasks:
                             assert result["status"] == "completed"
                             assert "best_genome" in result
                             assert result["best_genome"] == {"assignments": []}
-                            mock_genome_dto.from_domain.assert_called_once_with(mock_result.best_genome)
+                            mock_genome_dto.from_domain.assert_called_once_with(
+                                mock_result.best_genome
+                            )
 
     def test_schedule_solve_task_invalid_uuid(self):
         """Test schedule_solve_task with invalid UUID."""
@@ -117,9 +134,11 @@ class TestSolveTasks:
 
         # Test
         with patch("scheduler_api.tasks.solve_tasks.UUID"):
-            with patch("scheduler_api.tasks.solve_tasks.ScheduleSolveParameters") as mock_params:
+            with patch(
+                "scheduler_api.tasks.solve_tasks.ScheduleSolveParameters"
+            ) as mock_params:
                 mock_params.side_effect = ValueError("Invalid parameters")
-                
+
                 result = schedule_solve_task(template_id, parameters_dict)
 
                 # Verify
@@ -136,9 +155,13 @@ class TestSolveTasks:
         with patch("scheduler_api.tasks.solve_tasks.UUID"):
             with patch("scheduler_api.tasks.solve_tasks.ScheduleSolveParameters"):
                 with patch("scheduler_api.tasks.solve_tasks.ScheduleSolver"):
-                    with patch("scheduler_api.tasks.solve_tasks.SolveOrchestrator") as mock_orchestrator:
+                    with patch(
+                        "scheduler_api.tasks.solve_tasks.SolveOrchestrator"
+                    ) as mock_orchestrator:
                         mock_orchestrator_instance = mock_orchestrator.return_value
-                        mock_orchestrator_instance.solve.side_effect = Exception("Solve failed")
+                        mock_orchestrator_instance.solve.side_effect = Exception(
+                            "Solve failed"
+                        )
 
                         # Test
                         result = schedule_solve_task(template_id, parameters_dict)

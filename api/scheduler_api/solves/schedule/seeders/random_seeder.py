@@ -2,7 +2,6 @@
 
 import random
 from dataclasses import dataclass
-from typing import List
 from uuid import UUID
 from ...interfaces import Seeder
 from ..genome import ScheduleGenome
@@ -15,7 +14,7 @@ class RandomSeeder(Seeder[ScheduleGenome, ScheduleSolveContext]):
 
     name: str = "random_seeder"
 
-    def seed(self, context: ScheduleSolveContext, count: int) -> List[ScheduleGenome]:
+    def seed(self, context: ScheduleSolveContext, count: int) -> list[ScheduleGenome]:
         """Generate random genomes for initial population."""
         genomes = []
 

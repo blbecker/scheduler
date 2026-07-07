@@ -17,8 +17,7 @@ class ShiftModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("schedules.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
-        )
+            index=True)
     )
 
     shift_template_id: uuid.UUID = Field(
@@ -26,8 +25,7 @@ class ShiftModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("shift_templates.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
-        )
+            index=True)
     )
 
     name: str = Field(sa_column=Column(String, nullable=False))
@@ -39,10 +37,8 @@ class ShiftModel(BaseModel, table=True):
 
     workers: list["WorkerModel"] = Relationship(
         back_populates="shifts",
-        link_model=ShiftWorkerLinkModel,
-    )
+        link_model=ShiftWorkerLinkModel)
 
     skills: list["SkillModel"] = Relationship(
         back_populates="shifts",
-        link_model=ShiftSkillLinkModel,
-    )
+        link_model=ShiftSkillLinkModel)

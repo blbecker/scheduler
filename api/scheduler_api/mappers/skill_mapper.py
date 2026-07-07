@@ -1,6 +1,6 @@
 # scheduler_api/mappers/skill_mapper.py
 from scheduler_api.db.models.core.skill import SkillModel
-from scheduler_api.schemas.skill import Skill, SkillResponse, SkillUpdate
+from scheduler_api.schemas.skill import SkillCreate, SkillResponse, SkillUpdate
 
 
 def to_response(model: SkillModel) -> SkillResponse:
@@ -9,11 +9,10 @@ def to_response(model: SkillModel) -> SkillResponse:
         name=model.name,
         description=model.description,
         created_at=model.created_at,
-        updated_at=model.updated_at,
-    )
+        updated_at=model.updated_at)
 
 
-def from_create(dto: Skill) -> SkillModel:
+def from_create(dto: SkillCreate) -> SkillModel:
     return SkillModel(**dto.model_dump())
 
 

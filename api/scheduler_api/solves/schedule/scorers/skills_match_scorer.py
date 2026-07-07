@@ -1,7 +1,6 @@
 """Skills match scorer for evaluating schedule genomes."""
 
 from dataclasses import dataclass
-from typing import List, Set
 from uuid import UUID
 from ...interfaces import Scorable
 from ..genome import ScheduleGenome
@@ -34,9 +33,8 @@ class SkillsMatchScorer(Scorable[ScheduleGenome, ScheduleSolveContext]):
     def _score_shift(
         self,
         shift_id: UUID,
-        assigned_workers: List[UUID],
-        context: ScheduleSolveContext,
-    ) -> float:
+        assigned_workers: list[UUID],
+        context: ScheduleSolveContext) -> float:
         """Calculate score for a single shift."""
         required_skills = set(context.get_shift_skills(shift_id))
 
@@ -49,7 +47,7 @@ class SkillsMatchScorer(Scorable[ScheduleGenome, ScheduleSolveContext]):
             return 0.0
 
         # Get union of all skills from assigned workers
-        available_skills: Set[UUID] = set()
+        available_skills: set[UUID] = set()
         for worker_id in assigned_workers:
             worker_skills = context.get_worker_skills(worker_id)
             available_skills.update(worker_skills)

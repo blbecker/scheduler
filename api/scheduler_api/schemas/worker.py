@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 
-class Worker(BaseModel):
+class WorkerCreate(BaseModel):
     name: str
 
 

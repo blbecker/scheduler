@@ -12,5 +12,4 @@ class WorkerModel(BaseModel, table=True):
 
     shifts: list["ShiftModel"] = Relationship(
         back_populates="workers",
-        link_model=ShiftWorkerLinkModel,
-    )
+        link_model=ShiftWorkerLinkModel)

@@ -1,14 +1,13 @@
 """Schedule solve pipeline configuration."""
 
-from typing import Dict, List, Any
+from typing import Any
 from ..interfaces import (
     GenomeOperator,
     Scorable,
     Constraint,
     Selector,
     Seeder,
-    Stoppable,
-)
+    Stoppable)
 from .genome import ScheduleGenome
 from .context import ScheduleSolveContext
 
@@ -18,13 +17,12 @@ class ScheduleSolvePipeline:
 
     def __init__(
         self,
-        seeders: List[Seeder[ScheduleGenome, ScheduleSolveContext]],
-        genome_operators: List[GenomeOperator[ScheduleGenome, ScheduleSolveContext]],
-        scorers: List[Scorable[ScheduleGenome, ScheduleSolveContext]],
-        constraints: List[Constraint[ScheduleGenome, ScheduleSolveContext]],
+        seeders: list[Seeder[ScheduleGenome, ScheduleSolveContext]],
+        genome_operators: list[GenomeOperator[ScheduleGenome, ScheduleSolveContext]],
+        scorers: list[Scorable[ScheduleGenome, ScheduleSolveContext]],
+        constraints: list[Constraint[ScheduleGenome, ScheduleSolveContext]],
         selector: Selector[ScheduleGenome, ScheduleSolveContext],
-        stop_conditions: List[Stoppable[List[ScheduleGenome], ScheduleSolveContext]],
-    ):
+        stop_conditions: list[Stoppable[list[ScheduleGenome], ScheduleSolveContext]]):
         self.seeders = seeders
         self.genome_operators = genome_operators
         self.scorers = scorers
@@ -32,7 +30,7 @@ class ScheduleSolvePipeline:
         self.selector = selector
         self.stop_conditions = stop_conditions
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert pipeline to dictionary representation."""
         return {
             "seeders": self.seeders,

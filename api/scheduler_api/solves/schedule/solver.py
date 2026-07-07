@@ -1,6 +1,5 @@
 """Schedule solver implementation."""
 
-from typing import Dict, List
 from uuid import UUID
 from ..interfaces import Solvable
 from .context import ScheduleSolveContext
@@ -12,7 +11,7 @@ class ScheduleSolver(
     Solvable[
         ScheduleSolveContext,
         ScheduleGenome,
-        List[ScheduleGenome],
+        list[ScheduleGenome],
         ScheduleSolvePipeline,
     ]
 ):
@@ -75,14 +74,13 @@ class ScheduleSolver(
                 worker_ids[1]: [skill_a],  # Has skill_a only
                 worker_ids[2]: [skill_b],  # Has skill_b only
             },
-            parameters=merged_params,
-        )
+            parameters=merged_params)
 
         return context
 
     def create_initial_population(
         self, context: ScheduleSolveContext, size: int
-    ) -> List[ScheduleGenome]:
+    ) -> list[ScheduleGenome]:
         """Generate initial population of genomes using configured seeder."""
         # Get the pipeline to access the seeder
         pipeline = self.create_pipeline()
@@ -103,8 +101,7 @@ class ScheduleSolver(
         from .constraints.no_double_booking_constraint import NoDoubleBookingConstraint
         from .selectors.top_n_selector import TopNSelector
         from ..engine.stop_conditions.generation_limit import (
-            GenerationLimitStopCondition,
-        )
+            GenerationLimitStopCondition)
 
         return ScheduleSolvePipeline(
             seeders=[RandomSeeder()],
@@ -116,5 +113,4 @@ class ScheduleSolver(
                 GenerationLimitStopCondition(
                     max_generations=self.DEFAULT_PARAMETERS["max_generations"]
                 )
-            ],
-        )
+            ])

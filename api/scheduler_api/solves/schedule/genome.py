@@ -1,7 +1,6 @@
 """Schedule genome domain model and DTO."""
 
 from dataclasses import dataclass, field
-from typing import Dict, List
 from uuid import UUID
 from copy import deepcopy
 from pydantic import BaseModel, Field
@@ -11,7 +10,7 @@ from pydantic import BaseModel, Field
 class ScheduleGenome:
     """Domain genome representation for schedule solves (immutable)."""
 
-    assignments: Dict[UUID, List[UUID]] = field(default_factory=dict)
+    assignments: dict[UUID, list[UUID]] = field(default_factory=dict)
     """Mapping of shift_id -> list of assigned worker_ids"""
 
     def copy(self) -> "ScheduleGenome":
@@ -22,14 +21,14 @@ class ScheduleGenome:
         """Return True if genome has no assignments."""
         return len(self.assignments) == 0
 
-    def get_assigned_workers(self) -> List[UUID]:
+    def get_assigned_workers(self) -> list[UUID]:
         """Get all unique worker IDs assigned across all shifts."""
         workers = set()
         for worker_list in self.assignments.values():
             workers.update(worker_list)
         return list(workers)
 
-    def get_shifts_for_worker(self, worker_id: UUID) -> List[UUID]:
+    def get_shifts_for_worker(self, worker_id: UUID) -> list[UUID]:
         """Get all shift IDs where a worker is assigned."""
         shifts = []
         for shift_id, worker_list in self.assignments.items():
@@ -41,10 +40,9 @@ class ScheduleGenome:
 class ScheduleGenomeDTO(BaseModel):
     """Pydantic DTO for schedule genome serialization."""
 
-    assignments: Dict[str, List[str]] = Field(
+    assignments: dict[str, list[str]] = Field(
         default_factory=dict,
-        description="Mapping of shift_id -> list of assigned worker_ids",
-    )
+        description="Mapping of shift_id -> list of assigned worker_ids")
 
     def to_domain(self) -> ScheduleGenome:
         """Convert to domain genome object."""

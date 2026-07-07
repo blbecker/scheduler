@@ -1,6 +1,6 @@
 # scheduler_api/mappers/worker_mapper.py
 from scheduler_api.db.models.core.worker import WorkerModel
-from scheduler_api.schemas.worker import Worker, WorkerResponse, WorkerUpdate
+from scheduler_api.schemas.worker import WorkerCreate, WorkerResponse, WorkerUpdate
 
 
 def to_response(model: WorkerModel) -> WorkerResponse:
@@ -8,11 +8,10 @@ def to_response(model: WorkerModel) -> WorkerResponse:
         id=model.id,
         name=model.name,
         created_at=model.created_at,
-        updated_at=model.updated_at,
-    )
+        updated_at=model.updated_at)
 
 
-def from_create(dto: Worker) -> WorkerModel:
+def from_create(dto: WorkerCreate) -> WorkerModel:
     return WorkerModel(**dto.model_dump())
 
 

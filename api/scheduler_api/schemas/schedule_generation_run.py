@@ -2,13 +2,13 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Any
 from scheduler_api.db.models.enums import ScheduleGenerationStatus
 
 
-class ScheduleGenerationRun(BaseModel):
+class ScheduleGenerationRunCreate(BaseModel):
     schedule_template_id: UUID
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
 
 
 class ScheduleGenerationRunUpdate(BaseModel):
@@ -17,7 +17,7 @@ class ScheduleGenerationRunUpdate(BaseModel):
     status: Optional[ScheduleGenerationStatus] = None
     started_at: Optional[datetime] = None
     finished_at: Optional[datetime] = None
-    parameters: Optional[Dict[str, Any]] = None
+    parameters: Optional[dict[str, Any]] = None
 
 
 class ScheduleGenerationRunResponse(BaseModel):
@@ -27,6 +27,6 @@ class ScheduleGenerationRunResponse(BaseModel):
     status: ScheduleGenerationStatus
     started_at: Optional[datetime]
     finished_at: Optional[datetime]
-    parameters: Dict[str, Any]
+    parameters: dict[str, Any]
     created_at: datetime
     updated_at: datetime

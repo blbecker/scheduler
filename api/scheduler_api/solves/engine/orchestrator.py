@@ -1,7 +1,7 @@
 """Main solve orchestrator."""
 
 import time
-from typing import Dict, Any, Optional, List
+from typing import Any, Optional
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from .evolution import EvolutionEngine
@@ -19,10 +19,10 @@ class SolveResult:
     best_fitness: float = 0.0
     generations: int = 0
     elapsed_time: float = 0.0
-    metrics: Dict[str, Any] = field(default_factory=dict)
+    metrics: dict[str, Any] = field(default_factory=dict)
     population: Optional[Population] = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary for serialization."""
         return {
             "id": str(self.id),
@@ -41,7 +41,7 @@ class SolveOrchestrator:
         self.evolution_engine = evolution_engine or EvolutionEngine()
 
     def solve(
-        self, solvable: Solvable, template_id: UUID, parameters: Dict[str, Any]
+        self, solvable: Solvable, template_id: UUID, parameters: dict[str, Any]
     ) -> SolveResult:
         """Execute solve using genetic algorithm."""
         start_time = time.time()
@@ -63,8 +63,7 @@ class SolveOrchestrator:
                 generation=0,
                 genome=genome,
                 fitness=0.0,  # Will be scored in first evolution cycle
-                metadata={"type": "initial"},
-            )
+                metadata={"type": "initial"})
             initial_population.add_candidate(candidate)
 
         # Score initial population
@@ -82,8 +81,7 @@ class SolveOrchestrator:
                 scorers=pipeline.scorers,
                 constraints=pipeline.constraints,
                 selector=pipeline.selector,
-                context=context,
-            )
+                context=context)
 
             generation += 1
 
@@ -101,8 +99,7 @@ class SolveOrchestrator:
                     population=current_population.candidates,
                     generation=generation,
                     start_time=start_time,
-                    context=context,
-                ):
+                    context=context):
                     should_stop = True
                     break
 
@@ -126,8 +123,7 @@ class SolveOrchestrator:
             generations=generation,
             elapsed_time=elapsed_time,
             metrics=metrics,
-            population=current_population,
-        )
+            population=current_population)
 
         return result
 
@@ -149,10 +145,9 @@ class SolveOrchestrator:
     def _calculate_metrics(
         self,
         generations: int,
-        best_fitness_history: List[float],
+        best_fitness_history: list[float],
         final_population: Population,
-        elapsed_time: float,
-    ) -> Dict[str, Any]:
+        elapsed_time: float) -> dict[str, Any]:
         """Calculate solve metrics."""
         if not best_fitness_history:
             return {}

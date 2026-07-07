@@ -17,8 +17,7 @@ class ScheduleGenerationRunModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("schedule_templates.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
-        )
+            index=True)
     )
 
     schedule_id: uuid.UUID | None = Field(
@@ -27,9 +26,7 @@ class ScheduleGenerationRunModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("schedules.id", ondelete="SET NULL"),
             nullable=True,
-            index=True,
-        ),
-    )
+            index=True))
 
     status: ScheduleGenerationStatus = Field(
         sa_column=Column(String, nullable=False, index=True)
@@ -45,5 +42,4 @@ class ScheduleGenerationRunModel(BaseModel, table=True):
 
     parameters: dict[str, Any] = Field(
         sa_column=Column(JSONB, nullable=False),
-        default_factory=dict,
-    )
+        default_factory=dict)

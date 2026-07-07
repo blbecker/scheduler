@@ -1,7 +1,7 @@
 # scheduler_api/services/schedule_template_service.py
-from typing import List
 from uuid import UUID
-from fastapi import HTTPException, status
+from typing import Optional
+from sqlmodel import Session
 
 from scheduler_api.repositories.schedule_template_repository import (
     ScheduleTemplateRepository,
@@ -12,60 +12,79 @@ from scheduler_api.mappers.schedule_template_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.schedule_template import (
-    ScheduleTemplate,
+    ScheduleTemplateCreate,
     ScheduleTemplateResponse,
     ScheduleTemplateUpdate,
 )
 
 
 class ScheduleTemplateService:
-    def __init__(self, repo: ScheduleTemplateRepository):
-        self.repo = repo
+    """
+    Service for schedule template operations.
 
-    def list_schedule_templates(self) -> List[ScheduleTemplateResponse]:
-        repo = self.repo
-        models = repo.get_all()
+    Services own transaction boundaries.
+    Repositories are data access only and never commit/rollback transactions.
+    """
+
+    def __init__(self, session: Session):
+        """
+        Initialize schedule template service.
+
+        Args:
+            session: SQLModel database session
+        """
+        self.session = session
+        self.repo = ScheduleTemplateRepository(session)
+
+    def list_schedule_templates(self) -> list[ScheduleTemplateResponse]:
+        """List all schedule templates."""
+        models = self.repo.get_all()
         return [to_response(model) for model in models]
 
-    def get_schedule_template(self, id: UUID) -> ScheduleTemplateResponse:
-        repo = self.repo
-        model = repo.get_by_id(id)
-        if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Schedule template with id {id} not found",
-            )
-        return to_response(model)
+    def get_schedule_template(self, id: UUID) -> Optional[ScheduleTemplateResponse]:
+        """Get schedule template by ID."""
+        model = self.repo.get_by_id(id)
+        return to_response(model) if model else None
 
     def create_schedule_template(
-        self, dto: ScheduleTemplate
+        self, dto: ScheduleTemplateCreate
     ) -> ScheduleTemplateResponse:
-        repo = self.repo
+        """
+        Create a new schedule template.
+        """
         model = from_create(dto)
-        saved_model = repo.add(model)
+        saved_model = self.repo.add(model)
+        self.session.flush()
+        self.session.commit()
         return to_response(saved_model)
 
     def update_schedule_template(
         self, id: UUID, dto: ScheduleTemplateUpdate
-    ) -> ScheduleTemplateResponse:
-        repo = self.repo
-        model = repo.get_by_id(id)
+    ) -> Optional[ScheduleTemplateResponse]:
+        """
+        Update an existing schedule template.
+
+        Returns None if schedule template not found.
+        """
+        model = self.repo.get_by_id(id)
         if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Schedule template with id {id} not found",
-            )
+            return None
+
         updated_model = apply_update(model, dto)
-        repo.add(updated_model)
+        self.session.flush()
+        self.session.commit()
         return to_response(updated_model)
 
     def delete_schedule_template(self, id: UUID) -> None:
-        repo = self.repo
-        model = repo.get_by_id(id)
+        """
+        Delete a schedule template.
+
+        Raises:
+            ValueError: If schedule template not found
+        """
+        model = self.repo.get_by_id(id)
         if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Schedule template with id {id} not found",
-            )
-        repo.delete(model)
-        # No flush needed for delete operations
+            raise ValueError(f"Schedule template with id {id} not found")
+        self.repo.delete(model)
+        self.session.flush()
+        self.session.commit()

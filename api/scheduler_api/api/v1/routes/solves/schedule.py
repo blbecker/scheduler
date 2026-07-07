@@ -1,6 +1,6 @@
 """API router for solve framework."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from uuid import UUID
 from datetime import datetime
 from celery.result import AsyncResult
@@ -119,8 +119,7 @@ def get_schedule_solve_result(solve_id: UUID):
 
     if not result.ready():
         raise HTTPException(
-            status_code=status.HTTP_202_ACCEPTED,
-            detail="Solve is still running",
+            status_code=status.HTTP_202_ACCEPTED, detail="Solve is still running"
         )
 
     if result.failed():

@@ -18,8 +18,7 @@ from scheduler_api.db.models.associations.worker_skill_link import WorkerSkillLi
 from scheduler_api.db.models.associations.shift_worker_link import ShiftWorkerLinkModel
 from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLinkModel
 from scheduler_api.db.models.associations.shift_template_skill import (
-    ShiftTemplateSkillModel,
-)
+    ShiftTemplateSkillModel)
 
 # ─────────────────────────────
 # TEMPLATES
@@ -37,8 +36,7 @@ from scheduler_api.db.models.schedules.shift import ShiftModel
 # RUNS / ORCHESTRATION
 # ─────────────────────────────
 from scheduler_api.db.models.runs.schedule_generation_run import (
-    ScheduleGenerationRunModel,
-)
+    ScheduleGenerationRunModel)
 
 # Optional convenience export (not required for Alembic)
 __all__ = [

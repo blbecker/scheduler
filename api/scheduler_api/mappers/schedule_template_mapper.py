@@ -1,10 +1,9 @@
 # scheduler_api/mappers/schedule_template_mapper.py
 from scheduler_api.db.models.templates.schedule_template import ScheduleTemplateModel
 from scheduler_api.schemas.schedule_template import (
-    ScheduleTemplate,
+    ScheduleTemplateCreate,
     ScheduleTemplateResponse,
-    ScheduleTemplateUpdate,
-)
+    ScheduleTemplateUpdate)
 
 
 def to_response(model: ScheduleTemplateModel) -> ScheduleTemplateResponse:
@@ -12,11 +11,10 @@ def to_response(model: ScheduleTemplateModel) -> ScheduleTemplateResponse:
         id=model.id,
         name=model.name,
         created_at=model.created_at,
-        updated_at=model.updated_at,
-    )
+        updated_at=model.updated_at)
 
 
-def from_create(dto: ScheduleTemplate) -> ScheduleTemplateModel:
+def from_create(dto: ScheduleTemplateCreate) -> ScheduleTemplateModel:
     return ScheduleTemplateModel(**dto.model_dump())
 
 

@@ -7,13 +7,11 @@ from datetime import datetime, time
 from sqlmodel import Session, select
 
 from scheduler_api.repositories.schedule_template_repository import (
-    ScheduleTemplateRepository,
-)
+    ScheduleTemplateRepository)
 from scheduler_api.repositories.shift_template_repository import ShiftTemplateRepository
 from scheduler_api.repositories.schedule_repository import ScheduleRepository
 from scheduler_api.repositories.schedule_generation_run_repository import (
-    ScheduleGenerationRunRepository,
-)
+    ScheduleGenerationRunRepository)
 
 
 class TestScheduleTemplateRepository:

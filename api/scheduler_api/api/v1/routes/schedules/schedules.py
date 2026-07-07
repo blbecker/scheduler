@@ -1,25 +1,21 @@
 # scheduler_api/routers/schedules.py
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
-from sqlmodel import Session
 
 from scheduler_api.services.schedule_service import ScheduleService
-from scheduler_api.repositories.schedule_repository import ScheduleRepository
 from scheduler_api.schemas.schedule_crud import (
-    Schedule,
+    ScheduleCreate,
     ScheduleUpdate,
     ScheduleResponse,
 )
 
-from ..deps import get_db_session
+from ..deps import get_schedule_service
 
 router = APIRouter(prefix="/schedules", tags=["schedules"])
 
 
 @router.get("/", response_model=list[ScheduleResponse], operation_id="list_schedules")
-def list_schedules(session: Session = Depends(get_db_session)):
-    repo = ScheduleRepository(session)
-    service = ScheduleService(repo)
+def list_schedules(service: ScheduleService = Depends(get_schedule_service)):
     return service.list_schedules()
 
 
@@ -27,17 +23,12 @@ def list_schedules(session: Session = Depends(get_db_session)):
     "/{schedule_id}", response_model=ScheduleResponse, operation_id="get_schedule"
 )
 def get_schedule(
-    schedule_id: UUID,
-    session: Session = Depends(get_db_session),
+    schedule_id: UUID, service: ScheduleService = Depends(get_schedule_service)
 ):
-    repo = ScheduleRepository(session)
-    service = ScheduleService(repo)
-    try:
-        return service.get_schedule(schedule_id)
-    except HTTPException:
-        raise
-    except Exception:
+    schedule = service.get_schedule(schedule_id)
+    if schedule is None:
         raise HTTPException(status_code=404, detail="Schedule not found")
+    return schedule
 
 
 @router.post(
@@ -47,11 +38,8 @@ def get_schedule(
     status_code=201,
 )
 def create_schedule(
-    schedule: Schedule,
-    session: Session = Depends(get_db_session),
+    schedule: ScheduleCreate, service: ScheduleService = Depends(get_schedule_service)
 ):
-    repo = ScheduleRepository(session)
-    service = ScheduleService(repo)
     return service.create_schedule(schedule)
 
 
@@ -61,29 +49,19 @@ def create_schedule(
 def update_schedule(
     schedule_id: UUID,
     schedule: ScheduleUpdate,
-    session: Session = Depends(get_db_session),
+    service: ScheduleService = Depends(get_schedule_service),
 ):
-    repo = ScheduleRepository(session)
-    service = ScheduleService(repo)
-    try:
-        return service.update_schedule(schedule_id, schedule)
-    except HTTPException:
-        raise
-    except Exception:
+    updated = service.update_schedule(schedule_id, schedule)
+    if updated is None:
         raise HTTPException(status_code=404, detail="Schedule not found")
+    return updated
 
 
 @router.delete("/{schedule_id}", operation_id="delete_schedule", status_code=204)
 def delete_schedule(
-    schedule_id: UUID,
-    session: Session = Depends(get_db_session),
+    schedule_id: UUID, service: ScheduleService = Depends(get_schedule_service)
 ):
-    repo = ScheduleRepository(session)
-    service = ScheduleService(repo)
     try:
         service.delete_schedule(schedule_id)
-    except HTTPException:
-        raise
-    except Exception:
+    except ValueError:
         raise HTTPException(status_code=404, detail="Schedule not found")
-    return None

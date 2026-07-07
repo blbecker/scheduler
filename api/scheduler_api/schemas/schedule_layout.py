@@ -1,17 +1,17 @@
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import Optional, Any
 from pydantic import BaseModel, Field
 from uuid import UUID
 
 
-class ScheduleLayout(BaseModel):
+class ScheduleLayoutCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
     date_range_start: datetime
     date_range_end: datetime
-    worker_ids: List[UUID] = Field(default_factory=list)
-    shift_templates: List[Dict[str, Any]] = Field(default_factory=list)
-    constraints: Dict[str, Any] = Field(default_factory=dict)
+    worker_ids: list[UUID] = Field(default_factory=list)
+    shift_templates: list[dict[str, Any]] = Field(default_factory=list)
+    constraints: dict[str, Any] = Field(default_factory=dict)
 
 
 class ScheduleLayoutUpdate(BaseModel):
@@ -19,9 +19,9 @@ class ScheduleLayoutUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=1000)
     date_range_start: Optional[datetime] = None
     date_range_end: Optional[datetime] = None
-    worker_ids: Optional[List[UUID]] = None
-    shift_templates: Optional[List[Dict[str, Any]]] = None
-    constraints: Optional[Dict[str, Any]] = None
+    worker_ids: Optional[list[UUID]] = None
+    shift_templates: Optional[list[dict[str, Any]]] = None
+    constraints: Optional[dict[str, Any]] = None
 
 
 class ScheduleLayoutResponse(BaseModel):
@@ -30,9 +30,9 @@ class ScheduleLayoutResponse(BaseModel):
     description: Optional[str]
     date_range_start: datetime
     date_range_end: datetime
-    worker_ids: List[UUID]
-    shift_templates: List[Dict[str, Any]]
-    constraints: Dict[str, Any]
+    worker_ids: list[UUID]
+    shift_templates: list[dict[str, Any]]
+    constraints: dict[str, Any]
     created_at: datetime
     updated_at: datetime
 

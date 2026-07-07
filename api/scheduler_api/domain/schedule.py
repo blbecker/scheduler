@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID, uuid4
 
 
@@ -16,7 +16,7 @@ class ShiftAssignment:
 class Schedule:
     id: UUID = field(default_factory=uuid4)
     name: str = ""
-    assignments: List[ShiftAssignment] = field(default_factory=list)
+    assignments: list[ShiftAssignment] = field(default_factory=list)
     fitness: Optional[float] = None
     created_at: datetime = field(default_factory=datetime.utcnow)
 

@@ -1,7 +1,7 @@
 # scheduler_api/services/schedule_generation_run_service.py
-from typing import List
 from uuid import UUID
-from fastapi import HTTPException, status
+from typing import Optional
+from sqlmodel import Session
 
 from scheduler_api.repositories.schedule_generation_run_repository import (
     ScheduleGenerationRunRepository,
@@ -12,60 +12,81 @@ from scheduler_api.mappers.schedule_generation_run_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.schedule_generation_run import (
-    ScheduleGenerationRun,
+    ScheduleGenerationRunCreate,
     ScheduleGenerationRunResponse,
     ScheduleGenerationRunUpdate,
 )
 
 
 class ScheduleGenerationRunService:
-    def __init__(self, repo: ScheduleGenerationRunRepository):
-        self.repo = repo
+    """
+    Service for schedule generation run operations.
 
-    def list_schedule_generation_runs(self) -> List[ScheduleGenerationRunResponse]:
-        repo = self.repo
-        models = repo.get_all()
+    Services own transaction boundaries.
+    Repositories are data access only and never commit/rollback transactions.
+    """
+
+    def __init__(self, session: Session):
+        """
+        Initialize schedule generation run service.
+
+        Args:
+            session: SQLModel database session
+        """
+        self.session = session
+        self.repo = ScheduleGenerationRunRepository(session)
+
+    def list_schedule_generation_runs(self) -> list[ScheduleGenerationRunResponse]:
+        """List all schedule generation runs."""
+        models = self.repo.get_all()
         return [to_response(model) for model in models]
 
-    def get_schedule_generation_run(self, id: UUID) -> ScheduleGenerationRunResponse:
-        repo = self.repo
-        model = repo.get_by_id(id)
-        if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Schedule generation run with id {id} not found",
-            )
-        return to_response(model)
+    def get_schedule_generation_run(
+        self, id: UUID
+    ) -> Optional[ScheduleGenerationRunResponse]:
+        """Get schedule generation run by ID."""
+        model = self.repo.get_by_id(id)
+        return to_response(model) if model else None
 
     def create_schedule_generation_run(
-        self, dto: ScheduleGenerationRun
+        self, dto: ScheduleGenerationRunCreate
     ) -> ScheduleGenerationRunResponse:
-        repo = self.repo
+        """
+        Create a new schedule generation run.
+        """
         model = from_create(dto)
-        saved_model = repo.add(model)
+        saved_model = self.repo.add(model)
+        self.session.flush()
+        self.session.commit()
         return to_response(saved_model)
 
     def update_schedule_generation_run(
         self, id: UUID, dto: ScheduleGenerationRunUpdate
-    ) -> ScheduleGenerationRunResponse:
-        repo = self.repo
-        model = repo.get_by_id(id)
+    ) -> Optional[ScheduleGenerationRunResponse]:
+        """
+        Update an existing schedule generation run.
+
+        Returns None if schedule generation run not found.
+        """
+        model = self.repo.get_by_id(id)
         if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Schedule generation run with id {id} not found",
-            )
+            return None
+
         updated_model = apply_update(model, dto)
-        repo.add(updated_model)
+        self.session.flush()
+        self.session.commit()
         return to_response(updated_model)
 
     def delete_schedule_generation_run(self, id: UUID) -> None:
-        repo = self.repo
-        model = repo.get_by_id(id)
+        """
+        Delete a schedule generation run.
+
+        Raises:
+            ValueError: If schedule generation run not found
+        """
+        model = self.repo.get_by_id(id)
         if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Schedule generation run with id {id} not found",
-            )
-        repo.delete(model)
-        # No flush needed for delete operations
+            raise ValueError(f"Schedule generation run with id {id} not found")
+        self.repo.delete(model)
+        self.session.flush()
+        self.session.commit()

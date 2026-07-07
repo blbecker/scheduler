@@ -15,8 +15,7 @@ class ShiftTemplateModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("schedule_templates.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
-        )
+            index=True)
     )
 
     name: str = Field(sa_column=Column(String, nullable=False))

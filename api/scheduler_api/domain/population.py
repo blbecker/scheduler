@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List
 from uuid import UUID, uuid4
 from .schedule import ScheduleModel
 
@@ -9,7 +8,7 @@ from .schedule import ScheduleModel
 class Population:
     id: UUID = field(default_factory=uuid4)
     generation: int = 0
-    schedules: List[Schedule] = field(default_factory=list)
+    schedules: list[Schedule] = field(default_factory=list)
     layout_id: UUID = field(default_factory=uuid4)
     created_at: datetime = field(default_factory=datetime.utcnow)
 

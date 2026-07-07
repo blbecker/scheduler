@@ -1,30 +1,33 @@
-"""Test ScheduleService with repository pattern."""
+"""Test ScheduleService with simplified approach."""
 
 import pytest
-from unittest.mock import MagicMock, patch
-from uuid import UUID, uuid4
+from unittest.mock import MagicMock, create_autospec, patch
+from uuid import uuid4
 from datetime import datetime, UTC
-from fastapi import HTTPException, status
+from sqlmodel import Session
 
 from scheduler_api.services.schedule_service import ScheduleService
 from scheduler_api.schemas.schedule_crud import (
-    Schedule,
+    ScheduleCreate,
     ScheduleUpdate,
     ScheduleResponse,
 )
 
 
 class TestScheduleService:
-    """Test ScheduleService."""
+    """Test ScheduleService with simplified approach."""
 
     @pytest.fixture
-    def mock_repo(self):
-        repo = MagicMock()
-        repo.get_all = MagicMock()
-        repo.get_by_id = MagicMock()
-        repo.add = MagicMock()
-        repo.delete = MagicMock()
-        return repo
+    def mock_session(self):
+        """Mock SQLModel session."""
+        return create_autospec(Session)
+
+    @pytest.fixture
+    def service(self, mock_session):
+        """ScheduleService instance with mocked session."""
+        service = ScheduleService(mock_session)
+        service.repo = MagicMock()
+        return service
 
     @pytest.fixture
     def sample_schedule_model(self):
@@ -46,133 +49,167 @@ class TestScheduleService:
             updated_at=sample_schedule_model.updated_at,
         )
 
+    def test_service_initialization(self, mock_session):
+        """Test that service initializes repository with session."""
+        service = ScheduleService(mock_session)
+        assert service.session == mock_session
+        assert hasattr(service, "repo")
+        # Repository should be instantiated with the same session
+        assert service.repo.session == mock_session
+
     def test_list_schedules(
-        self, mock_repo, sample_schedule_model, sample_schedule_response
+        self, service, sample_schedule_model, sample_schedule_response
     ):
         # Setup
-        mock_repo.get_all.return_value = [sample_schedule_model]
-        service = ScheduleService(mock_repo)
+        service.repo.get_all.return_value = [sample_schedule_model]
 
-        # Test
-        result = service.list_schedules()
+        # Mock mapper function
+        with patch(
+            "scheduler_api.services.schedule_service.to_response"
+        ) as mock_to_response:
+            mock_responses = [sample_schedule_response]
+            mock_to_response.side_effect = lambda x: (
+                mock_responses.pop(0) if mock_responses else MagicMock()
+            )
+
+            # Test
+            result = service.list_schedules()
 
         # Verify
-        mock_repo.get_all.assert_called_once()
+        service.repo.get_all.assert_called_once()
+        service.session.commit.assert_not_called()  # No commit for read
+        service.session.flush.assert_not_called()  # No flush for read
         assert len(result) == 1
-        assert result[0].id == sample_schedule_response.id
-        assert result[0].name == sample_schedule_response.name
 
-    def test_get_schedule(
-        self, mock_repo, sample_schedule_model, sample_schedule_response
+    def test_get_schedule_found(
+        self, service, sample_schedule_model, sample_schedule_response
     ):
         # Setup
         schedule_id = sample_schedule_model.id
-        mock_repo.get_by_id.return_value = sample_schedule_model
-        service = ScheduleService(mock_repo)
+        service.repo.get_by_id.return_value = sample_schedule_model
 
-        # Test
-        result = service.get_schedule(schedule_id)
+        # Mock mapper function
+        with patch(
+            "scheduler_api.services.schedule_service.to_response"
+        ) as mock_to_response:
+            mock_to_response.return_value = sample_schedule_response
+
+            # Test
+            result = service.get_schedule(schedule_id)
 
         # Verify
-        mock_repo.get_by_id.assert_called_once_with(schedule_id)
-        assert result.id == sample_schedule_response.id
-        assert result.name == sample_schedule_response.name
+        service.repo.get_by_id.assert_called_once_with(schedule_id)
+        service.session.commit.assert_not_called()  # No commit for read
+        service.session.flush.assert_not_called()  # No flush for read
+        assert result == sample_schedule_response
 
-    def test_get_schedule_not_found(self, mock_repo):
+    def test_get_schedule_not_found(self, service):
         # Setup
         schedule_id = uuid4()
-        mock_repo.get_by_id.return_value = None
-        service = ScheduleService(mock_repo)
+        service.repo.get_by_id.return_value = None
 
         # Test & Verify
-        with pytest.raises(HTTPException) as exc_info:
-            service.get_schedule(schedule_id)
+        result = service.get_schedule(schedule_id)
+        assert result is None
+        service.repo.get_by_id.assert_called_once_with(schedule_id)
+        service.session.commit.assert_not_called()  # No commit for read
+        service.session.flush.assert_not_called()  # No flush for read
 
-        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-        mock_repo.get_by_id.assert_called_once_with(schedule_id)
-
-    def test_create_schedule(
-        self, mock_repo, sample_schedule_model, sample_schedule_response
+    def test_create_schedule_success(
+        self, service, sample_schedule_model, sample_schedule_response
     ):
         # Setup
-        create_dto = Schedule(
+        create_dto = ScheduleCreate(
             name="January 2024 Schedule",
             schedule_template_id=sample_schedule_model.schedule_template_id,
         )
-        mock_repo.add.return_value = sample_schedule_model
-        
-        # Mock the mapper function
+
+        # Mock mapper functions
         with patch(
-            "scheduler_api.services.schedule_service.from_create",
-            return_value=sample_schedule_model
-        ), patch(
-            "scheduler_api.services.schedule_service.to_response",
-            return_value=sample_schedule_response
-        ):
-            service = ScheduleService(mock_repo)
+            "scheduler_api.services.schedule_service.from_create"
+        ) as mock_from_create, patch(
+            "scheduler_api.services.schedule_service.to_response"
+        ) as mock_to_response:
+            mock_from_create.return_value = sample_schedule_model
+            mock_to_response.return_value = sample_schedule_response
+            service.repo.add.return_value = sample_schedule_model
 
             # Test
             result = service.create_schedule(create_dto)
 
         # Verify
-        mock_repo.add.assert_called_once_with(sample_schedule_model)
-        assert result.id == sample_schedule_response.id
-        assert result.name == sample_schedule_response.name
+        mock_from_create.assert_called_once_with(create_dto)
+        service.repo.add.assert_called_once_with(sample_schedule_model)
+        service.session.flush.assert_called_once()
+        service.session.commit.assert_called_once()
+        assert result == sample_schedule_response
 
-    def test_update_schedule(
-        self, mock_repo, sample_schedule_model, sample_schedule_response
+    def test_update_schedule_success(
+        self, service, sample_schedule_model, sample_schedule_response
     ):
         # Setup
         schedule_id = sample_schedule_model.id
-        update_dto = ScheduleUpdate(name="Updated Schedule")
-        mock_repo.get_by_id.return_value = sample_schedule_model
-        mock_repo.add.return_value = sample_schedule_model
-        service = ScheduleService(mock_repo)
+        update_dto = ScheduleUpdate(name="Updated Schedule Name")
+        service.repo.get_by_id.return_value = sample_schedule_model
 
-        # Test
-        result = service.update_schedule(schedule_id, update_dto)
+        # Mock mapper functions
+        with patch(
+            "scheduler_api.services.schedule_service.apply_update"
+        ) as mock_apply_update, patch(
+            "scheduler_api.services.schedule_service.to_response"
+        ) as mock_to_response:
+            mock_apply_update.return_value = sample_schedule_model
+            mock_to_response.return_value = sample_schedule_response
+
+            # Test
+            result = service.update_schedule(schedule_id, update_dto)
 
         # Verify
-        mock_repo.get_by_id.assert_called_once_with(schedule_id)
-        mock_repo.add.assert_called_once()
-        assert result.id == sample_schedule_response.id
+        service.repo.get_by_id.assert_called_once_with(schedule_id)
+        mock_apply_update.assert_called_once_with(sample_schedule_model, update_dto)
+        service.session.flush.assert_called_once()
+        service.session.commit.assert_called_once()
+        assert result == sample_schedule_response
 
-    def test_update_schedule_not_found(self, mock_repo):
+    def test_update_schedule_not_found(self, service):
         # Setup
         schedule_id = uuid4()
-        update_dto = ScheduleUpdate(name="Updated Schedule")
-        mock_repo.get_by_id.return_value = None
-        service = ScheduleService(mock_repo)
+        update_dto = ScheduleUpdate(name="Updated Schedule Name")
+        service.repo.get_by_id.return_value = None
 
         # Test & Verify
-        with pytest.raises(HTTPException) as exc_info:
-            service.update_schedule(schedule_id, update_dto)
+        result = service.update_schedule(schedule_id, update_dto)
+        assert result is None
+        service.repo.get_by_id.assert_called_once_with(schedule_id)
+        service.session.commit.assert_not_called()  # No commit if not found
+        service.session.flush.assert_not_called()  # No flush if not found
 
-        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-        mock_repo.get_by_id.assert_called_once_with(schedule_id)
-
-    def test_delete_schedule(self, mock_repo, sample_schedule_model):
+    def test_delete_schedule_success(self, service, sample_schedule_model):
         # Setup
         schedule_id = sample_schedule_model.id
-        mock_repo.get_by_id.return_value = sample_schedule_model
-        service = ScheduleService(mock_repo)
+        service.repo.get_by_id.return_value = sample_schedule_model
+        service.repo.delete = MagicMock()
 
         # Test
         service.delete_schedule(schedule_id)
 
         # Verify
-        mock_repo.get_by_id.assert_called_once_with(schedule_id)
-        mock_repo.delete.assert_called_once_with(sample_schedule_model)
+        service.repo.get_by_id.assert_called_once_with(schedule_id)
+        service.repo.delete.assert_called_once_with(sample_schedule_model)
+        service.session.flush.assert_called_once()
+        service.session.commit.assert_called_once()
 
-    def test_delete_schedule_not_found(self, mock_repo):
+    def test_delete_schedule_not_found(self, service):
         # Setup
         schedule_id = uuid4()
-        mock_repo.get_by_id.return_value = None
-        service = ScheduleService(mock_repo)
+        service.repo.get_by_id.return_value = None
 
         # Test & Verify
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(
+            ValueError, match=f"Schedule with id {schedule_id} not found"
+        ):
             service.delete_schedule(schedule_id)
 
-        assert exc_info.value.status_code == status.HTTP_404_NOT_FOUND
-        mock_repo.get_by_id.assert_called_once_with(schedule_id)
+        service.repo.get_by_id.assert_called_once_with(schedule_id)
+        service.session.commit.assert_not_called()  # No commit if error
+        service.session.flush.assert_not_called()  # No flush if error

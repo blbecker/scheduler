@@ -2,7 +2,6 @@
 
 import random
 from dataclasses import dataclass
-from typing import List
 from uuid import UUID
 from ...interfaces import GenomeOperator
 from ..genome import ScheduleGenome

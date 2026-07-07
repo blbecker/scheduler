@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 
-class Skill(BaseModel):
+class SkillCreate(BaseModel):
     name: str
     description: Optional[str] = None
 

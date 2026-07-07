@@ -1,13 +1,11 @@
 # scheduler_api/mappers/schedule_generation_run_mapper.py
 from scheduler_api.db.models.runs.schedule_generation_run import (
-    ScheduleGenerationRunModel,
-)
+    ScheduleGenerationRunModel)
 from scheduler_api.db.models.enums import ScheduleGenerationStatus
 from scheduler_api.schemas.schedule_generation_run import (
-    ScheduleGenerationRun,
+    ScheduleGenerationRunCreate,
     ScheduleGenerationRunResponse,
-    ScheduleGenerationRunUpdate,
-)
+    ScheduleGenerationRunUpdate)
 
 
 def to_response(model: ScheduleGenerationRunModel) -> ScheduleGenerationRunResponse:
@@ -20,18 +18,16 @@ def to_response(model: ScheduleGenerationRunModel) -> ScheduleGenerationRunRespo
         finished_at=model.finished_at,
         parameters=model.parameters,
         created_at=model.created_at,
-        updated_at=model.updated_at,
-    )
+        updated_at=model.updated_at)
 
 
-def from_create(dto: ScheduleGenerationRun) -> ScheduleGenerationRunModel:
+def from_create(dto: ScheduleGenerationRunCreate) -> ScheduleGenerationRunModel:
     return ScheduleGenerationRunModel(
         schedule_template_id=dto.schedule_template_id,
         parameters=dto.parameters,
         status=ScheduleGenerationStatus.pending,
         started_at=None,
-        finished_at=None,
-    )
+        finished_at=None)
 
 
 def apply_update(

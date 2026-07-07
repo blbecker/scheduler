@@ -1,7 +1,7 @@
 """Schemas for solve framework."""
 
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Dict, Any, Optional, List
+from typing import Any, Optional
 from uuid import UUID
 from datetime import datetime
 
@@ -71,7 +71,7 @@ class ScheduleSolveStatus(BaseModel):
     progress: Optional[float] = Field(
         default=None, ge=0.0, le=1.0, description="Progress 0-1"
     )
-    result: Optional[Dict[str, Any]] = None
+    result: Optional[dict[str, Any]] = None
     error_message: Optional[str] = None
 
 
@@ -80,11 +80,11 @@ class ScheduleSolveResult(BaseModel):
 
     id: UUID
     status: str = Field(description="completed, failed")
-    best_genome: Optional[Dict[str, Any]] = None
+    best_genome: Optional[dict[str, Any]] = None
     best_fitness: float = Field(description="Fitness score of best genome (0.0-1.0)")
     generations: int = Field(description="Number of generations executed")
     elapsed_time: float = Field(description="Time taken in seconds")
-    metrics: Dict[str, Any] = Field(
+    metrics: dict[str, Any] = Field(
         default_factory=dict, description="Additional solve metrics"
     )
     created_at: datetime

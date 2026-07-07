@@ -1,17 +1,15 @@
 # scheduler_api/routers/shift_templates.py
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
-from sqlmodel import Session
 
 from scheduler_api.services.shift_template_service import ShiftTemplateService
-from scheduler_api.repositories.shift_template_repository import ShiftTemplateRepository
 from scheduler_api.schemas.shift_template import (
-    ShiftTemplate,
+    ShiftTemplateCreate,
     ShiftTemplateUpdate,
     ShiftTemplateResponse,
 )
 
-from ..deps import get_db_session
+from ..deps import get_shift_template_service
 
 router = APIRouter(prefix="/shift-templates", tags=["shift-templates"])
 
@@ -20,10 +18,8 @@ router = APIRouter(prefix="/shift-templates", tags=["shift-templates"])
     "/", response_model=list[ShiftTemplateResponse], operation_id="list_shift_templates"
 )
 def list_shift_templates(
-    session: Session = Depends(get_db_session),
+    service: ShiftTemplateService = Depends(get_shift_template_service),
 ):
-    repo = ShiftTemplateRepository(session)
-    service = ShiftTemplateService(repo)
     return service.list_shift_templates()
 
 
@@ -34,16 +30,12 @@ def list_shift_templates(
 )
 def get_shift_template(
     shift_template_id: UUID,
-    session: Session = Depends(get_db_session),
+    service: ShiftTemplateService = Depends(get_shift_template_service),
 ):
-    repo = ShiftTemplateRepository(session)
-    service = ShiftTemplateService(repo)
-    try:
-        return service.get_shift_template(shift_template_id)
-    except HTTPException:
-        raise
-    except Exception:
+    shift_template = service.get_shift_template(shift_template_id)
+    if shift_template is None:
         raise HTTPException(status_code=404, detail="Shift template not found")
+    return shift_template
 
 
 @router.post(
@@ -53,11 +45,9 @@ def get_shift_template(
     status_code=201,
 )
 def create_shift_template(
-    shift_template: ShiftTemplate,
-    session: Session = Depends(get_db_session),
+    shift_template: ShiftTemplateCreate,
+    service: ShiftTemplateService = Depends(get_shift_template_service),
 ):
-    repo = ShiftTemplateRepository(session)
-    service = ShiftTemplateService(repo)
     return service.create_shift_template(shift_template)
 
 
@@ -69,16 +59,12 @@ def create_shift_template(
 def update_shift_template(
     shift_template_id: UUID,
     shift_template: ShiftTemplateUpdate,
-    session: Session = Depends(get_db_session),
+    service: ShiftTemplateService = Depends(get_shift_template_service),
 ):
-    repo = ShiftTemplateRepository(session)
-    service = ShiftTemplateService(repo)
-    try:
-        return service.update_shift_template(shift_template_id, shift_template)
-    except HTTPException:
-        raise
-    except Exception:
+    updated = service.update_shift_template(shift_template_id, shift_template)
+    if updated is None:
         raise HTTPException(status_code=404, detail="Shift template not found")
+    return updated
 
 
 @router.delete(
@@ -86,14 +72,9 @@ def update_shift_template(
 )
 def delete_shift_template(
     shift_template_id: UUID,
-    session: Session = Depends(get_db_session),
+    service: ShiftTemplateService = Depends(get_shift_template_service),
 ):
-    repo = ShiftTemplateRepository(session)
-    service = ShiftTemplateService(repo)
     try:
         service.delete_shift_template(shift_template_id)
-    except HTTPException:
-        raise
-    except Exception:
+    except ValueError:
         raise HTTPException(status_code=404, detail="Shift template not found")
-    return None

@@ -1,7 +1,7 @@
 # scheduler_api/services/shift_template_service.py
-from typing import List
 from uuid import UUID
-from fastapi import HTTPException, status
+from typing import Optional
+from sqlmodel import Session
 
 from scheduler_api.repositories.shift_template_repository import ShiftTemplateRepository
 from scheduler_api.mappers.shift_template_mapper import (
@@ -10,58 +10,105 @@ from scheduler_api.mappers.shift_template_mapper import (
     apply_update,
 )
 from scheduler_api.schemas.shift_template import (
-    ShiftTemplate,
+    ShiftTemplateCreate,
     ShiftTemplateResponse,
     ShiftTemplateUpdate,
 )
 
 
 class ShiftTemplateService:
-    def __init__(self, repo: ShiftTemplateRepository):
-        self.repo = repo
+    """
+    Service for shift template operations.
 
-    def list_shift_templates(self) -> List[ShiftTemplateResponse]:
-        repo = self.repo
-        models = repo.get_all()
+    Services own transaction boundaries.
+    Repositories are data access only and never commit/rollback transactions.
+    """
+
+    def __init__(self, session: Session):
+        """
+        Initialize shift template service.
+
+        Args:
+            session: SQLModel session for database operations
+        """
+        self.session = session
+        self.repo = ShiftTemplateRepository(session)
+
+    def list_shift_templates(self) -> list[ShiftTemplateResponse]:
+        """
+        List all shift templates.
+
+        Returns:
+            List of shift template responses
+        """
+        models = self.repo.get_all()
         return [to_response(model) for model in models]
 
-    def get_shift_template(self, id: UUID) -> ShiftTemplateResponse:
-        repo = self.repo
-        model = repo.get_by_id(id)
-        if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Shift template with id {id} not found",
-            )
-        return to_response(model)
+    def get_shift_template(self, id: UUID) -> Optional[ShiftTemplateResponse]:
+        """
+        Get shift template by ID.
 
-    def create_shift_template(self, dto: ShiftTemplate) -> ShiftTemplateResponse:
-        repo = self.repo
+        Args:
+            id: Shift template ID
+
+        Returns:
+            Shift template response if found, None otherwise
+        """
+        model = self.repo.get_by_id(id)
+        return to_response(model) if model else None
+
+    def create_shift_template(self, dto: ShiftTemplateCreate) -> ShiftTemplateResponse:
+        """
+        Create a new shift template.
+
+        Args:
+            dto: Shift template creation data
+
+        Returns:
+            Created shift template response
+        """
         model = from_create(dto)
-        saved_model = repo.add(model)
+        saved_model = self.repo.add(model)
+        self.session.flush()
+        self.session.commit()
         return to_response(saved_model)
 
     def update_shift_template(
         self, id: UUID, dto: ShiftTemplateUpdate
-    ) -> ShiftTemplateResponse:
-        repo = self.repo
-        model = repo.get_by_id(id)
+    ) -> Optional[ShiftTemplateResponse]:
+        """
+        Update an existing shift template.
+
+        Args:
+            id: Shift template ID to update
+            dto: Shift template update data
+
+        Returns:
+            Updated shift template response if found, None otherwise
+        """
+        model = self.repo.get_by_id(id)
         if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Shift template with id {id} not found",
-            )
+            return None
+
         updated_model = apply_update(model, dto)
-        repo.add(updated_model)
+        self.repo.add(updated_model)
+        self.session.flush()
+        self.session.commit()
         return to_response(updated_model)
 
     def delete_shift_template(self, id: UUID) -> None:
-        repo = self.repo
-        model = repo.get_by_id(id)
+        """
+        Delete a shift template.
+
+        Args:
+            id: Shift template ID to delete
+
+        Raises:
+            ValueError: If shift template not found
+        """
+        model = self.repo.get_by_id(id)
         if not model:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Shift template with id {id} not found",
-            )
-        repo.delete(model)
-        # No flush needed for delete operations
+            raise ValueError(f"Shift template with id {id} not found")
+        self.repo.delete(model)
+        self.session.flush()
+        self.session.commit()
