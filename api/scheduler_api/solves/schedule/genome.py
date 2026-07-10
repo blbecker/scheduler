@@ -42,7 +42,8 @@ class ScheduleGenomeDTO(BaseModel):
 
     assignments: dict[str, list[str]] = Field(
         default_factory=dict,
-        description="Mapping of shift_id -> list of assigned worker_ids")
+        description="Mapping of shift_id -> list of assigned worker_ids",
+    )
 
     def to_domain(self) -> ScheduleGenome:
         """Convert to domain genome object."""

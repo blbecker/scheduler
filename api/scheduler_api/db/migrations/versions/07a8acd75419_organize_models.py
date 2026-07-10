@@ -29,7 +29,8 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(
         op.f("ix_schedule_templates_id"), "schedule_templates", ["id"], unique=False
     )
@@ -40,7 +41,8 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("description", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(op.f("ix_skills_id"), "skills", ["id"], unique=False)
     op.create_index(op.f("ix_skills_name"), "skills", ["name"], unique=True)
     op.create_table(
@@ -49,7 +51,8 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(op.f("ix_workers_id"), "workers", ["id"], unique=False)
     op.create_table(
         "schedules",
@@ -61,13 +64,15 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["schedule_template_id"], ["schedule_templates.id"], ondelete="CASCADE"
         ),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(op.f("ix_schedules_id"), "schedules", ["id"], unique=False)
     op.create_index(
         op.f("ix_schedules_schedule_template_id"),
         "schedules",
         ["schedule_template_id"],
-        unique=False)
+        unique=False,
+    )
     op.create_table(
         "shift_templates",
         sa.Column("id", sa.Uuid(), nullable=False),
@@ -80,7 +85,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["schedule_template_id"], ["schedule_templates.id"], ondelete="CASCADE"
         ),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(
         op.f("ix_shift_templates_id"), "shift_templates", ["id"], unique=False
     )
@@ -88,14 +94,16 @@ def upgrade() -> None:
         op.f("ix_shift_templates_schedule_template_id"),
         "shift_templates",
         ["schedule_template_id"],
-        unique=False)
+        unique=False,
+    )
     op.create_table(
         "worker_skill_links",
         sa.Column("worker_id", sa.UUID(), nullable=False),
         sa.Column("skill_id", sa.UUID(), nullable=False),
         sa.ForeignKeyConstraint(["skill_id"], ["skills.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["worker_id"], ["workers.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("worker_id", "skill_id"))
+        sa.PrimaryKeyConstraint("worker_id", "skill_id"),
+    )
     op.create_table(
         "schedule_generation_runs",
         sa.Column("id", sa.Uuid(), nullable=False),
@@ -113,27 +121,32 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["schedule_template_id"], ["schedule_templates.id"], ondelete="CASCADE"
         ),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(
         op.f("ix_schedule_generation_runs_id"),
         "schedule_generation_runs",
         ["id"],
-        unique=False)
+        unique=False,
+    )
     op.create_index(
         op.f("ix_schedule_generation_runs_schedule_id"),
         "schedule_generation_runs",
         ["schedule_id"],
-        unique=False)
+        unique=False,
+    )
     op.create_index(
         op.f("ix_schedule_generation_runs_schedule_template_id"),
         "schedule_generation_runs",
         ["schedule_template_id"],
-        unique=False)
+        unique=False,
+    )
     op.create_index(
         op.f("ix_schedule_generation_runs_status"),
         "schedule_generation_runs",
         ["status"],
-        unique=False)
+        unique=False,
+    )
     op.create_table(
         "shift_template_skills",
         sa.Column("shift_template_id", sa.UUID(), nullable=False),
@@ -142,7 +155,8 @@ def upgrade() -> None:
             ["shift_template_id"], ["shift_templates.id"], ondelete="CASCADE"
         ),
         sa.ForeignKeyConstraint(["skill_id"], ["skills.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("shift_template_id", "skill_id"))
+        sa.PrimaryKeyConstraint("shift_template_id", "skill_id"),
+    )
     op.create_table(
         "shifts",
         sa.Column("id", sa.Uuid(), nullable=False),
@@ -157,7 +171,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["shift_template_id"], ["shift_templates.id"], ondelete="CASCADE"
         ),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_index(op.f("ix_shifts_id"), "shifts", ["id"], unique=False)
     op.create_index(
         op.f("ix_shifts_schedule_id"), "shifts", ["schedule_id"], unique=False
@@ -166,21 +181,24 @@ def upgrade() -> None:
         op.f("ix_shifts_shift_template_id"),
         "shifts",
         ["shift_template_id"],
-        unique=False)
+        unique=False,
+    )
     op.create_table(
         "shift_skill_links",
         sa.Column("shift_id", sa.UUID(), nullable=False),
         sa.Column("skill_id", sa.UUID(), nullable=False),
         sa.ForeignKeyConstraint(["shift_id"], ["shifts.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["skill_id"], ["skills.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("shift_id", "skill_id"))
+        sa.PrimaryKeyConstraint("shift_id", "skill_id"),
+    )
     op.create_table(
         "shift_worker_links",
         sa.Column("shift_id", sa.UUID(), nullable=False),
         sa.Column("worker_id", sa.UUID(), nullable=False),
         sa.ForeignKeyConstraint(["shift_id"], ["shifts.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["worker_id"], ["workers.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("shift_id", "worker_id"))
+        sa.PrimaryKeyConstraint("shift_id", "worker_id"),
+    )
     op.drop_table("shiftworkerlink")
     op.drop_table("workerskilllink")
     op.drop_table("shiftskilllink")
@@ -198,7 +216,8 @@ def downgrade() -> None:
         sa.Column("id", sa.UUID(), autoincrement=False, nullable=False),
         sa.Column("name", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.PrimaryKeyConstraint("id", name="skill_pkey"),
-        postgresql_ignore_search_path=False)
+        postgresql_ignore_search_path=False,
+    )
     op.create_table(
         "shiftskilllink",
         sa.Column("shift_id", sa.UUID(), autoincrement=False, nullable=False),
@@ -211,7 +230,8 @@ def downgrade() -> None:
         ),
         sa.PrimaryKeyConstraint(
             "shift_id", "skill_id", name=op.f("shiftskilllink_pkey")
-        ))
+        ),
+    )
     op.create_table(
         "worker",
         sa.Column("id", sa.UUID(), autoincrement=False, nullable=False),
@@ -220,7 +240,8 @@ def downgrade() -> None:
         sa.Column("email", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column("phone", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.PrimaryKeyConstraint("id", name="worker_pkey"),
-        postgresql_ignore_search_path=False)
+        postgresql_ignore_search_path=False,
+    )
     op.create_table(
         "workerskilllink",
         sa.Column("worker_id", sa.UUID(), autoincrement=False, nullable=False),
@@ -233,7 +254,8 @@ def downgrade() -> None:
         ),
         sa.PrimaryKeyConstraint(
             "worker_id", "skill_id", name=op.f("workerskilllink_pkey")
-        ))
+        ),
+    )
     op.create_table(
         "shift",
         sa.Column("id", sa.UUID(), autoincrement=False, nullable=False),
@@ -246,7 +268,8 @@ def downgrade() -> None:
         sa.Column("location", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column("notes", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.PrimaryKeyConstraint("id", name="shift_pkey"),
-        postgresql_ignore_search_path=False)
+        postgresql_ignore_search_path=False,
+    )
     op.create_table(
         "shiftworkerlink",
         sa.Column("shift_id", sa.UUID(), autoincrement=False, nullable=False),
@@ -259,7 +282,8 @@ def downgrade() -> None:
         ),
         sa.PrimaryKeyConstraint(
             "shift_id", "worker_id", name=op.f("shiftworkerlink_pkey")
-        ))
+        ),
+    )
     op.drop_table("shift_worker_links")
     op.drop_table("shift_skill_links")
     op.drop_index(op.f("ix_shifts_shift_template_id"), table_name="shifts")
@@ -269,13 +293,16 @@ def downgrade() -> None:
     op.drop_table("shift_template_skills")
     op.drop_index(
         op.f("ix_schedule_generation_runs_status"),
-        table_name="schedule_generation_runs")
+        table_name="schedule_generation_runs",
+    )
     op.drop_index(
         op.f("ix_schedule_generation_runs_schedule_template_id"),
-        table_name="schedule_generation_runs")
+        table_name="schedule_generation_runs",
+    )
     op.drop_index(
         op.f("ix_schedule_generation_runs_schedule_id"),
-        table_name="schedule_generation_runs")
+        table_name="schedule_generation_runs",
+    )
     op.drop_index(
         op.f("ix_schedule_generation_runs_id"), table_name="schedule_generation_runs"
     )

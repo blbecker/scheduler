@@ -50,10 +50,13 @@ class ScheduleSolveCreateResponse(BaseModel):
 
     id: UUID
     status: str = Field(
-        default="pending", description="pending, running, completed, failed"
+        default="pending", description="pending, queued, running, completed, failed"
     )
     template_id: UUID
     parameters: ScheduleSolveParameters
+    schedule_solve_id: UUID = Field(
+        description="ID of the persisted ScheduleSolveModel record"
+    )
 
 
 class ScheduleSolveStatus(BaseModel):

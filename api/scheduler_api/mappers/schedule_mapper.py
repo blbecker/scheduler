@@ -3,7 +3,8 @@ from scheduler_api.db.models.schedules.schedule import ScheduleModel
 from scheduler_api.schemas.schedule_crud import (
     ScheduleCreate,
     ScheduleResponse,
-    ScheduleUpdate)
+    ScheduleUpdate,
+)
 
 
 def to_response(model: ScheduleModel) -> ScheduleResponse:
@@ -12,7 +13,8 @@ def to_response(model: ScheduleModel) -> ScheduleResponse:
         schedule_template_id=model.schedule_template_id,
         name=model.name,
         created_at=model.created_at,
-        updated_at=model.updated_at)
+        updated_at=model.updated_at,
+    )
 
 
 def from_create(dto: ScheduleCreate) -> ScheduleModel:

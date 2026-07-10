@@ -16,7 +16,8 @@ class TopNSelector(Selector[ScheduleGenome, ScheduleSolveContext]):
         self,
         population: list[tuple[ScheduleGenome, float]],
         context: ScheduleSolveContext,
-        count: int) -> list[ScheduleGenome]:
+        count: int,
+    ) -> list[ScheduleGenome]:
         """Select top N genomes by score."""
         if not population:
             return []

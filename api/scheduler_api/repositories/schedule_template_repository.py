@@ -9,11 +9,11 @@ from scheduler_api.db.models.templates.schedule_template import ScheduleTemplate
 class ScheduleTemplateRepository:
     """
     Repository for schedule template data access.
-    
+
     Repositories are responsible for data access only.
     They never commit or rollback transactions - services own transaction boundaries.
     """
-    
+
     def __init__(self, session: Session):
         self.session = session
 
@@ -30,7 +30,7 @@ class ScheduleTemplateRepository:
     def add(self, model: ScheduleTemplateModel) -> ScheduleTemplateModel:
         """
         Add a schedule template to the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.add(model)
@@ -40,7 +40,7 @@ class ScheduleTemplateRepository:
     def delete(self, model: ScheduleTemplateModel) -> None:
         """
         Delete a schedule template from the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.delete(model)

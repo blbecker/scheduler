@@ -1,8 +1,7 @@
-"""API router for solve framework."""
+"""API router for solve framework with persistence."""
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from uuid import UUID
-from datetime import datetime
 from celery.result import AsyncResult
 
 from scheduler_api.schemas.solve import (
@@ -12,8 +11,15 @@ from scheduler_api.schemas.solve import (
     ScheduleSolveStatus,
     ScheduleSolveResult,
 )
-from scheduler_api.tasks.solve_tasks import schedule_solve_task
+from scheduler_api.schemas.schedule_solve import (
+    ScheduleSolveCreate,
+    ScheduleSolveResponse,
+)
+from scheduler_api.tasks.solve_tasks import schedule_solve_pseudo_task
 from scheduler_api.celery import app
+from scheduler_api.api.v1.routes.deps import get_schedule_solve_service
+from scheduler_api.services.schedule_solve_service import ScheduleSolveService
+from scheduler_api.db.models.enums import ScheduleSolveStatus as StatusEnum
 
 router = APIRouter(prefix="/solves", tags=["schedule-solves"])
 
@@ -24,23 +30,38 @@ router = APIRouter(prefix="/solves", tags=["schedule-solves"])
     operation_id="create_schedule_solve",
     status_code=status.HTTP_202_ACCEPTED,
 )
-def create_schedule_solve(request: ScheduleSolveRequest):
+def create_schedule_solve(
+    request: ScheduleSolveRequest,
+    service: ScheduleSolveService = Depends(get_schedule_solve_service),
+):
     """
-    Create a new schedule solve.
+    Create a new schedule solve with persistence.
 
-    This starts a background task that runs the genetic algorithm
-    to optimize worker-shift assignments for the given template.
+    This creates a ScheduleSolveModel record and starts a background task
+    that runs the genetic algorithm to optimize worker-shift assignments.
     """
-    # Start the Celery task
-    task = schedule_solve_task.delay(
-        str(request.template_id), request.parameters.model_dump()
+    # Create ScheduleSolveModel record
+    solve_create = ScheduleSolveCreate(
+        schedule_template_id=request.template_id,
+        parameters=request.parameters.model_dump(),
+    )
+
+    schedule_solve = service.create_schedule_solve(solve_create)
+
+    # Start the Celery task with the schedule solve ID
+    task = schedule_solve_pseudo_task.delay(str(schedule_solve.id))
+
+    # Update the schedule solve with the celery task ID
+    service.update_schedule_solve_status(
+        schedule_solve.id, StatusEnum.queued, celery_task_id=task.id
     )
 
     return ScheduleSolveCreateResponse(
-        id=UUID(task.id),
-        status="pending",
+        id=schedule_solve.id,
+        status="queued",
         template_id=request.template_id,
         parameters=request.parameters,
+        schedule_solve_id=schedule_solve.id,
     )
 
 
@@ -49,57 +70,52 @@ def create_schedule_solve(request: ScheduleSolveRequest):
     response_model=ScheduleSolveStatus,
     operation_id="get_schedule_solve_status",
 )
-def get_schedule_solve_status(solve_id: UUID):
+def get_schedule_solve_status(
+    solve_id: UUID,
+    service: ScheduleSolveService = Depends(get_schedule_solve_service),
+):
     """
-    Get the status of a schedule solve.
+    Get the status of a schedule solve from persistence.
 
     Returns current progress, generation count, best fitness, etc.
     """
-    result = AsyncResult(str(solve_id), app=app)
+    # First try to get from database
+    schedule_solve = service.get_schedule_solve(solve_id)
+    if not schedule_solve:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Schedule solve {solve_id} not found",
+        )
 
-    # Celery task states
-    celery_state_to_status = {
-        "PENDING": "pending",
-        "STARTED": "running",
-        "SUCCESS": "completed",
-        "FAILURE": "failed",
-        "RETRY": "running",
-        "REVOKED": "failed",
-    }
-
-    status_str = celery_state_to_status.get(result.state, "unknown")
-
-    # Build base response
+    # Build response from persisted data
     response = ScheduleSolveStatus(
         id=solve_id,
-        status=status_str,
-        template_id=UUID(),  # TODO: Store template_id with task
-        parameters=ScheduleSolveParameters(),  # TODO: Store parameters
-        created_at=datetime.now(),  # TODO: Get actual creation time
+        status=schedule_solve.status,
+        template_id=schedule_solve.schedule_template_id,
+        parameters=ScheduleSolveParameters(**schedule_solve.parameters),
+        created_at=schedule_solve.created_at,
+        best_fitness=schedule_solve.best_fitness,
+        current_generation=schedule_solve.current_generation,
+        progress=schedule_solve.progress,
+        error_message=schedule_solve.error_details,
     )
 
-    # Add result data if task completed successfully
-    if result.ready() and result.successful():
-        result_data = result.result
-        if isinstance(result_data, dict):
-            response.result = result_data
-            response.best_fitness = result_data.get("best_fitness")
-            response.current_generation = result_data.get("generations")
-            response.progress = 1.0  # Completed
+    # If solve has a celery task ID, we can check Celery for additional info
+    if schedule_solve.celery_task_id:
+        celery_result = AsyncResult(schedule_solve.celery_task_id, app=app)
 
-    # Add error if task failed
-    elif result.failed():
-        response.status = "failed"
-        try:
-            result.get(propagate=False)  # Get result without raising
-        except Exception as e:
-            response.error_message = str(e)
-
-    # Estimate progress if running
-    elif result.state == "STARTED":
-        # TODO: Implement progress tracking
-        # For now, we can estimate or return None
-        response.progress = None
+        # If task is still running and we don't have current generation data,
+        # we can get it from Celery's result metadata
+        if celery_result.state == "STARTED" and celery_result.info:
+            info = celery_result.info
+            if isinstance(info, dict):
+                response.current_generation = (
+                    info.get("current_generation") or response.current_generation
+                )
+                response.best_fitness = (
+                    info.get("best_fitness") or response.best_fitness
+                )
+                response.progress = info.get("progress") or response.progress
 
     return response
 
@@ -109,39 +125,54 @@ def get_schedule_solve_status(solve_id: UUID):
     response_model=ScheduleSolveResult,
     operation_id="get_schedule_solve_result",
 )
-def get_schedule_solve_result(solve_id: UUID):
+def get_schedule_solve_result(
+    solve_id: UUID,
+    service: ScheduleSolveService = Depends(get_schedule_solve_service),
+):
     """
     Get the final result of a completed schedule solve.
 
     Only returns results for completed solves.
     """
-    result = AsyncResult(str(solve_id), app=app)
-
-    if not result.ready():
+    schedule_solve = service.get_schedule_solve(solve_id)
+    if not schedule_solve:
         raise HTTPException(
-            status_code=status.HTTP_202_ACCEPTED, detail="Solve is still running"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Schedule solve {solve_id} not found",
         )
 
-    if result.failed():
+    if schedule_solve.status != "completed":
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Solve failed: {getattr(result, 'traceback', 'Unknown error')}",
+            status_code=status.HTTP_202_ACCEPTED,
+            detail=f"Solve is {schedule_solve.status}, not completed",
         )
 
-    result_data = result.result
-    if not isinstance(result_data, dict):
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Invalid result format",
-        )
+    # Try to get additional result data from Celery if available
+    result_data = {}
+    if schedule_solve.celery_task_id:
+        celery_result = AsyncResult(schedule_solve.celery_task_id, app=app)
+        if celery_result.ready() and celery_result.successful():
+            celery_data = celery_result.result
+            if isinstance(celery_data, dict):
+                result_data = celery_data
+
+    # Calculate elapsed time
+    elapsed_time = 0.0
+    if schedule_solve.started_at and schedule_solve.finished_at:
+        elapsed_time = (
+            schedule_solve.finished_at - schedule_solve.started_at
+        ).total_seconds()
 
     return ScheduleSolveResult(
         id=solve_id,
-        status="completed",
-        best_genome=result_data.get("best_genome"),
-        best_fitness=result_data.get("best_fitness", 0.0),
-        generations=result_data.get("generations", 0),
-        elapsed_time=result_data.get("elapsed_time", 0.0),
-        metrics=result_data.get("metrics", {}),
-        created_at=datetime.now(),  # TODO: Get actual creation time
+        status=schedule_solve.status,
+        best_fitness=schedule_solve.best_fitness or 0.0,
+        generations=schedule_solve.current_generation or 0,
+        elapsed_time=elapsed_time,
+        metrics={
+            "population_size": schedule_solve.parameters.get("population_size", 0),
+            "max_generations": schedule_solve.parameters.get("max_generations", 0),
+            "schedule_solve_id": str(schedule_solve.id),
+        },
+        created_at=schedule_solve.created_at,
     )

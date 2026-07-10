@@ -1,8 +1,10 @@
 from enum import Enum
 
 
-class ScheduleGenerationStatus(str, Enum):
+class ScheduleSolveStatus(str, Enum):
     pending = "pending"
+    queued = "queued"
     running = "running"
-    succeeded = "succeeded"
+    completed = "completed"
     failed = "failed"
+    cancelled = "cancelled"

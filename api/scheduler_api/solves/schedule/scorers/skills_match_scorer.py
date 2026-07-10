@@ -34,7 +34,8 @@ class SkillsMatchScorer(Scorable[ScheduleGenome, ScheduleSolveContext]):
         self,
         shift_id: UUID,
         assigned_workers: list[UUID],
-        context: ScheduleSolveContext) -> float:
+        context: ScheduleSolveContext,
+    ) -> float:
         """Calculate score for a single shift."""
         required_skills = set(context.get_shift_skills(shift_id))
 

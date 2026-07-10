@@ -7,7 +7,8 @@ from ..interfaces import (
     Constraint,
     Selector,
     Seeder,
-    Stoppable)
+    Stoppable,
+)
 from .genome import ScheduleGenome
 from .context import ScheduleSolveContext
 
@@ -22,7 +23,8 @@ class ScheduleSolvePipeline:
         scorers: list[Scorable[ScheduleGenome, ScheduleSolveContext]],
         constraints: list[Constraint[ScheduleGenome, ScheduleSolveContext]],
         selector: Selector[ScheduleGenome, ScheduleSolveContext],
-        stop_conditions: list[Stoppable[list[ScheduleGenome], ScheduleSolveContext]]):
+        stop_conditions: list[Stoppable[list[ScheduleGenome], ScheduleSolveContext]],
+    ):
         self.seeders = seeders
         self.genome_operators = genome_operators
         self.scorers = scorers

@@ -12,7 +12,8 @@ def to_response(model: ShiftModel) -> ShiftResponse:
         start_time=model.start_time,
         end_time=model.end_time,
         created_at=model.created_at,
-        updated_at=model.updated_at)
+        updated_at=model.updated_at,
+    )
 
 
 def from_create(dto: ShiftCreate) -> ShiftModel:

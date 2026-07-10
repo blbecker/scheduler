@@ -87,7 +87,8 @@ class TestSolveOrchestrator:
             best_fitness=0.85,
             generations=10,
             elapsed_time=2.5,
-            metrics={"avg_fitness": 0.7})
+            metrics={"avg_fitness": 0.7},
+        )
 
         assert result.status == "completed"
         assert result.best_fitness == 0.85
@@ -174,7 +175,8 @@ class TestSolveSchemas:
             max_generations=100,
             mutation_rate=0.1,
             selection_top_n=25,
-            elite_size=1)
+            elite_size=1,
+        )
 
         assert params.population_size == 50
         assert params.max_generations == 100

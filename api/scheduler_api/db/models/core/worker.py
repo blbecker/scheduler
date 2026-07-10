@@ -11,5 +11,5 @@ class WorkerModel(BaseModel, table=True):
     name: str = Field(sa_column=Column(String, nullable=False))
 
     shifts: list["ShiftModel"] = Relationship(
-        back_populates="workers",
-        link_model=ShiftWorkerLinkModel)
+        back_populates="workers", link_model=ShiftWorkerLinkModel
+    )

@@ -1,10 +1,16 @@
 import uuid
 from datetime import time
+from typing import TYPE_CHECKING
 from sqlalchemy import Column, String, Time, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field, Relationship
 
 from scheduler_api.db.models.base import BaseModel
+from scheduler_api.db.models.associations.shift_template_skill import ShiftTemplateSkillModel
+
+if TYPE_CHECKING:
+    from scheduler_api.db.models.templates.schedule_template import ScheduleTemplateModel
+    from scheduler_api.db.models.core.skill import SkillModel
 
 
 class ShiftTemplateModel(BaseModel, table=True):
@@ -15,7 +21,8 @@ class ShiftTemplateModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("schedule_templates.id", ondelete="CASCADE"),
             nullable=False,
-            index=True)
+            index=True,
+        )
     )
 
     name: str = Field(sa_column=Column(String, nullable=False))
@@ -24,4 +31,9 @@ class ShiftTemplateModel(BaseModel, table=True):
 
     schedule_template: "ScheduleTemplateModel" = Relationship(
         back_populates="shift_templates"
+    )
+
+    skills: list["SkillModel"] = Relationship(
+        back_populates="shift_templates",
+        link_model=ShiftTemplateSkillModel
     )

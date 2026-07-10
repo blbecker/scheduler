@@ -3,7 +3,8 @@ from scheduler_api.domain.schedule_layout import ScheduleLayout
 from scheduler_api.schemas.schedule_layout import (
     ScheduleLayoutCreate,
     ScheduleLayoutUpdate,
-    ScheduleLayoutResponse)
+    ScheduleLayoutResponse,
+)
 
 
 def to_response(model: ScheduleLayout) -> ScheduleLayoutResponse:
@@ -17,7 +18,8 @@ def to_response(model: ScheduleLayout) -> ScheduleLayoutResponse:
         shift_templates=model.shift_templates,
         constraints=model.constraints,
         created_at=model.created_at,
-        updated_at=model.updated_at or model.created_at)
+        updated_at=model.updated_at or model.created_at,
+    )
 
 
 def from_create(dto: ScheduleLayoutCreate) -> ScheduleLayout:
@@ -28,7 +30,8 @@ def from_create(dto: ScheduleLayoutCreate) -> ScheduleLayout:
         date_range_end=dto.date_range_end,
         worker_ids=dto.worker_ids,
         shift_templates=dto.shift_templates,
-        constraints=dto.constraints)
+        constraints=dto.constraints,
+    )
 
 
 def apply_update(model: ScheduleLayout, dto: ScheduleLayoutUpdate) -> ScheduleLayout:

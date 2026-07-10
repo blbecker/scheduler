@@ -9,7 +9,8 @@ def to_response(model: SkillModel) -> SkillResponse:
         name=model.name,
         description=model.description,
         created_at=model.created_at,
-        updated_at=model.updated_at)
+        updated_at=model.updated_at,
+    )
 
 
 def from_create(dto: SkillCreate) -> SkillModel:

@@ -7,11 +7,11 @@ from scheduler_api.db.models.schedules.shift import ShiftModel
 class ShiftRepository:
     """
     Repository for shift data access.
-    
+
     Repositories are responsible for data access only.
     They never commit or rollback transactions - services own transaction boundaries.
     """
-    
+
     def __init__(self, session: Session):
         self.session = session
 
@@ -28,7 +28,7 @@ class ShiftRepository:
     def add(self, shift: ShiftModel) -> ShiftModel:
         """
         Add a shift to the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.add(shift)
@@ -38,7 +38,7 @@ class ShiftRepository:
     def delete(self, shift: ShiftModel) -> None:
         """
         Delete a shift from the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.delete(shift)

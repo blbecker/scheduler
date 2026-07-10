@@ -3,7 +3,8 @@ from scheduler_api.db.models.templates.schedule_template import ScheduleTemplate
 from scheduler_api.schemas.schedule_template import (
     ScheduleTemplateCreate,
     ScheduleTemplateResponse,
-    ScheduleTemplateUpdate)
+    ScheduleTemplateUpdate,
+)
 
 
 def to_response(model: ScheduleTemplateModel) -> ScheduleTemplateResponse:
@@ -11,7 +12,8 @@ def to_response(model: ScheduleTemplateModel) -> ScheduleTemplateResponse:
         id=model.id,
         name=model.name,
         created_at=model.created_at,
-        updated_at=model.updated_at)
+        updated_at=model.updated_at,
+    )
 
 
 def from_create(dto: ScheduleTemplateCreate) -> ScheduleTemplateModel:

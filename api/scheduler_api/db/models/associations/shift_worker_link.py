@@ -11,12 +11,14 @@ class ShiftWorkerLinkModel(SQLModel, table=True):
         sa_column=Column(
             UUID(as_uuid=True),
             ForeignKey("shifts.id", ondelete="CASCADE"),
-            primary_key=True)
+            primary_key=True,
+        )
     )
 
     worker_id: uuid.UUID = Field(
         sa_column=Column(
             UUID(as_uuid=True),
             ForeignKey("workers.id", ondelete="CASCADE"),
-            primary_key=True)
+            primary_key=True,
+        )
     )

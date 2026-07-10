@@ -7,11 +7,11 @@ from datetime import datetime, time
 from sqlmodel import Session, select
 
 from scheduler_api.repositories.schedule_template_repository import (
-    ScheduleTemplateRepository)
+    ScheduleTemplateRepository,
+)
 from scheduler_api.repositories.shift_template_repository import ShiftTemplateRepository
 from scheduler_api.repositories.schedule_repository import ScheduleRepository
-from scheduler_api.repositories.schedule_generation_run_repository import (
-    ScheduleGenerationRunRepository)
+from scheduler_api.repositories.schedule_solve_repository import ScheduleSolveRepository
 
 
 class TestScheduleTemplateRepository:
@@ -282,8 +282,8 @@ class TestScheduleRepository:
         # mock_session.commit.assert_called_once()
 
 
-class TestScheduleGenerationRunRepository:
-    """Test ScheduleGenerationRunRepository."""
+class TestScheduleSolveRepository:
+    """Test ScheduleSolveRepository."""
 
     @pytest.fixture
     def mock_session(self):
@@ -291,7 +291,7 @@ class TestScheduleGenerationRunRepository:
 
     @pytest.fixture
     def repository(self, mock_session):
-        return ScheduleGenerationRunRepository(mock_session)
+        return ScheduleSolveRepository(mock_session)
 
     @pytest.fixture
     def sample_run(self):

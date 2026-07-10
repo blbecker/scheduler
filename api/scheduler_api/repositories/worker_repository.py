@@ -7,11 +7,11 @@ from scheduler_api.db.models.core.worker import WorkerModel
 class WorkerRepository:
     """
     Repository for worker data access.
-    
+
     Repositories are responsible for data access only.
     They never commit or rollback transactions - services own transaction boundaries.
     """
-    
+
     def __init__(self, session: Session):
         self.session = session
 
@@ -28,7 +28,7 @@ class WorkerRepository:
     def add(self, worker: WorkerModel) -> WorkerModel:
         """
         Add a worker to the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.add(worker)
@@ -38,7 +38,7 @@ class WorkerRepository:
     def delete(self, worker: WorkerModel) -> None:
         """
         Delete a worker from the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.delete(worker)

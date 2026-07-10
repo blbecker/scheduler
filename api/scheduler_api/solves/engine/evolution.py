@@ -10,7 +10,8 @@ from ..interfaces import (
     Constraint,
     Selector,
     Seeder,
-    Stoppable)
+    Stoppable,
+)
 from .population import Population, Candidate
 
 
@@ -28,7 +29,8 @@ class EvolutionEngine:
         scorers: list[Scorable],
         constraints: list[Constraint],
         selector: Selector,
-        context: Any) -> Population:
+        context: Any,
+    ) -> Population:
         """Execute one evolution cycle on population."""
         if population.is_empty():
             return population
@@ -60,7 +62,8 @@ class EvolutionEngine:
                 fitness=elite.fitness,
                 score_breakdown=elite.score_breakdown.copy(),
                 parent_ids=[elite.id],
-                metadata={"type": "elite"})
+                metadata={"type": "elite"},
+            )
             new_population.add_candidate(elite_candidate)
 
         # Apply genetic operators to create offspring from selected genomes
@@ -96,7 +99,8 @@ class EvolutionEngine:
         candidates: list[Candidate],
         scorers: list[Scorable],
         constraints: list[Constraint],
-        context: Any) -> list[tuple[Candidate, float]]:
+        context: Any,
+    ) -> list[tuple[Candidate, float]]:
         """Score candidates and return list of (candidate, total_score)."""
         scored = []
 
@@ -128,7 +132,8 @@ class EvolutionEngine:
         self,
         selected_genomes: list[Any],
         genome_operators: list[GenomeOperator],
-        context: Any) -> list[Any]:
+        context: Any,
+    ) -> list[Any]:
         """Create offspring genomes using genetic operators."""
         if not genome_operators or not selected_genomes:
             return []
@@ -155,7 +160,8 @@ class EvolutionEngine:
         generation: int,
         scorers: list[Scorable],
         constraints: list[Constraint],
-        context: Any) -> Candidate:
+        context: Any,
+    ) -> Candidate:
         """Create a Candidate from a single genome with scoring."""
         total_score = 0.0
         score_breakdown = {}
@@ -178,4 +184,5 @@ class EvolutionEngine:
             genome=genome,
             fitness=max(0.0, total_score),
             score_breakdown=score_breakdown,
-            metadata={"created_by": "evolution"})
+            metadata={"created_by": "evolution"},
+        )

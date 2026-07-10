@@ -14,7 +14,8 @@ def create_v1_api() -> FastAPI:
         version="1.0.0",
         openapi_url="/openapi.json",
         docs_url="/docs",
-        redoc_url=None)
+        redoc_url=None,
+    )
 
     app.include_router(skills.router)
     app.include_router(shifts.router)

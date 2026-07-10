@@ -14,7 +14,18 @@ class ScheduleModel(BaseModel, table=True):
             UUID(as_uuid=True),
             ForeignKey("schedule_templates.id", ondelete="CASCADE"),
             nullable=False,
-            index=True)
+            index=True,
+        )
+    )
+
+    schedule_solve_id: uuid.UUID | None = Field(
+        default=None,
+        sa_column=Column(
+            UUID(as_uuid=True),
+            ForeignKey("schedule_solves.id", ondelete="SET NULL"),
+            nullable=True,
+            index=True,
+        ),
     )
 
     name: str = Field(sa_column=Column(String, nullable=False))

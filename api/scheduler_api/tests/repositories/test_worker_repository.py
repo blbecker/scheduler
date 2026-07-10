@@ -1,4 +1,5 @@
 """Unit tests for WorkerRepository."""
+
 from unittest.mock import Mock, MagicMock, patch
 from uuid import uuid4
 import pytest
@@ -36,14 +37,17 @@ class TestWorkerRepository:
     @pytest.fixture
     def mock_worker_model(self):
         """Mock WorkerModel class."""
-        with patch('scheduler_api.repositories.worker_repository.WorkerModel') as mock:
+        with patch("scheduler_api.repositories.worker_repository.WorkerModel") as mock:
             yield mock
 
     def test_get_all(self, repository, mock_session, sample_worker, mock_worker_model):
         """Test get_all returns all workers."""
         # Arrange
         mock_select = Mock()
-        with patch('scheduler_api.repositories.worker_repository.select', return_value=mock_select):
+        with patch(
+            "scheduler_api.repositories.worker_repository.select",
+            return_value=mock_select,
+        ):
             mock_result = Mock()
             mock_result.all.return_value = [sample_worker]
             mock_session.exec.return_value = mock_result
@@ -56,7 +60,9 @@ class TestWorkerRepository:
             assert result[0] == sample_worker
             mock_session.exec.assert_called_once_with(mock_select)
 
-    def test_get_by_id_found(self, repository, mock_session, sample_worker, mock_worker_model):
+    def test_get_by_id_found(
+        self, repository, mock_session, sample_worker, mock_worker_model
+    ):
         """Test get_by_id returns worker when found."""
         # Arrange
         mock_session.get.return_value = sample_worker

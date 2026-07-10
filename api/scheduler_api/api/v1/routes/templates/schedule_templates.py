@@ -11,7 +11,7 @@ from scheduler_api.schemas.schedule_template import (
 
 from ..deps import get_schedule_template_service
 
-router = APIRouter(prefix="/schedule-templates", tags=["schedule-templates"])
+router = APIRouter(prefix="/templates/schedule", tags=["schedule-templates"])
 
 
 @router.get(

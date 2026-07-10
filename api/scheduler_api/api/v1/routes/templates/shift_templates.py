@@ -11,7 +11,7 @@ from scheduler_api.schemas.shift_template import (
 
 from ..deps import get_shift_template_service
 
-router = APIRouter(prefix="/shift-templates", tags=["shift-templates"])
+router = APIRouter(prefix="/templates/shift", tags=["shift-templates"])
 
 
 @router.get(

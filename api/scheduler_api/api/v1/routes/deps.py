@@ -9,9 +9,7 @@ from scheduler_api.services.worker_service import WorkerService
 from scheduler_api.services.schedule_template_service import ScheduleTemplateService
 from scheduler_api.services.shift_template_service import ShiftTemplateService
 from scheduler_api.services.schedule_service import ScheduleService
-from scheduler_api.services.schedule_generation_run_service import (
-    ScheduleGenerationRunService,
-)
+from scheduler_api.services.schedule_solve_service import ScheduleSolveService
 
 
 # -----------------------------
@@ -77,10 +75,10 @@ def get_schedule_service(session: Session = Depends(get_db_session)) -> Schedule
     return ScheduleService(session)
 
 
-def get_schedule_generation_run_service(
+def get_schedule_solve_service(
     session: Session = Depends(get_db_session),
-) -> ScheduleGenerationRunService:
+) -> ScheduleSolveService:
     """
-    Schedule generation run service (application/business boundary).
+    Schedule solve service (application/business boundary).
     """
-    return ScheduleGenerationRunService(session)
+    return ScheduleSolveService(session)

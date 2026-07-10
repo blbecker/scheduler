@@ -63,7 +63,8 @@ class SolveOrchestrator:
                 generation=0,
                 genome=genome,
                 fitness=0.0,  # Will be scored in first evolution cycle
-                metadata={"type": "initial"})
+                metadata={"type": "initial"},
+            )
             initial_population.add_candidate(candidate)
 
         # Score initial population
@@ -81,7 +82,8 @@ class SolveOrchestrator:
                 scorers=pipeline.scorers,
                 constraints=pipeline.constraints,
                 selector=pipeline.selector,
-                context=context)
+                context=context,
+            )
 
             generation += 1
 
@@ -99,7 +101,8 @@ class SolveOrchestrator:
                     population=current_population.candidates,
                     generation=generation,
                     start_time=start_time,
-                    context=context):
+                    context=context,
+                ):
                     should_stop = True
                     break
 
@@ -123,7 +126,8 @@ class SolveOrchestrator:
             generations=generation,
             elapsed_time=elapsed_time,
             metrics=metrics,
-            population=current_population)
+            population=current_population,
+        )
 
         return result
 
@@ -147,7 +151,8 @@ class SolveOrchestrator:
         generations: int,
         best_fitness_history: list[float],
         final_population: Population,
-        elapsed_time: float) -> dict[str, Any]:
+        elapsed_time: float,
+    ) -> dict[str, Any]:
         """Calculate solve metrics."""
         if not best_fitness_history:
             return {}

@@ -8,7 +8,8 @@ def to_response(model: WorkerModel) -> WorkerResponse:
         id=model.id,
         name=model.name,
         created_at=model.created_at,
-        updated_at=model.updated_at)
+        updated_at=model.updated_at,
+    )
 
 
 def from_create(dto: WorkerCreate) -> WorkerModel:

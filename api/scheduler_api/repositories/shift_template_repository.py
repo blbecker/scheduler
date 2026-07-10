@@ -9,11 +9,11 @@ from scheduler_api.db.models.templates.shift_template import ShiftTemplateModel
 class ShiftTemplateRepository:
     """
     Repository for shift template data access.
-    
+
     Repositories are responsible for data access only.
     They never commit or rollback transactions - services own transaction boundaries.
     """
-    
+
     def __init__(self, session: Session):
         self.session = session
 
@@ -30,7 +30,7 @@ class ShiftTemplateRepository:
     def add(self, model: ShiftTemplateModel) -> ShiftTemplateModel:
         """
         Add a shift template to the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.add(model)
@@ -40,7 +40,7 @@ class ShiftTemplateRepository:
     def delete(self, model: ShiftTemplateModel) -> None:
         """
         Delete a shift template from the session.
-        
+
         Note: Does not commit - service owns transaction boundaries.
         """
         self.session.delete(model)

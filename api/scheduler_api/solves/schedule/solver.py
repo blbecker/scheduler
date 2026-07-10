@@ -74,7 +74,8 @@ class ScheduleSolver(
                 worker_ids[1]: [skill_a],  # Has skill_a only
                 worker_ids[2]: [skill_b],  # Has skill_b only
             },
-            parameters=merged_params)
+            parameters=merged_params,
+        )
 
         return context
 
@@ -101,7 +102,8 @@ class ScheduleSolver(
         from .constraints.no_double_booking_constraint import NoDoubleBookingConstraint
         from .selectors.top_n_selector import TopNSelector
         from ..engine.stop_conditions.generation_limit import (
-            GenerationLimitStopCondition)
+            GenerationLimitStopCondition,
+        )
 
         return ScheduleSolvePipeline(
             seeders=[RandomSeeder()],
@@ -113,4 +115,5 @@ class ScheduleSolver(
                 GenerationLimitStopCondition(
                     max_generations=self.DEFAULT_PARAMETERS["max_generations"]
                 )
-            ])
+            ],
+        )

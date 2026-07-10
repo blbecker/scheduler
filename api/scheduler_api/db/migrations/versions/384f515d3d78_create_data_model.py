@@ -30,12 +30,14 @@ def upgrade() -> None:
         sa.Column("end_time", sa.DateTime(), nullable=False),
         sa.Column("location", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("notes", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_table(
         "skill",
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("name", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_table(
         "worker",
         sa.Column("id", sa.Uuid(), nullable=False),
@@ -43,40 +45,32 @@ def upgrade() -> None:
         sa.Column("birthdate", sa.Date(), nullable=False),
         sa.Column("email", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("phone", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.PrimaryKeyConstraint("id"))
+        sa.PrimaryKeyConstraint("id"),
+    )
     op.create_table(
         "shiftskilllink",
         sa.Column("shift_id", sa.Uuid(), nullable=False),
         sa.Column("skill_id", sa.Uuid(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["shift_id"],
-            ["shift.id"]),
-        sa.ForeignKeyConstraint(
-            ["skill_id"],
-            ["skill.id"]),
-        sa.PrimaryKeyConstraint("shift_id", "skill_id"))
+        sa.ForeignKeyConstraint(["shift_id"], ["shift.id"]),
+        sa.ForeignKeyConstraint(["skill_id"], ["skill.id"]),
+        sa.PrimaryKeyConstraint("shift_id", "skill_id"),
+    )
     op.create_table(
         "shiftworkerlink",
         sa.Column("shift_id", sa.Uuid(), nullable=False),
         sa.Column("worker_id", sa.Uuid(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["shift_id"],
-            ["shift.id"]),
-        sa.ForeignKeyConstraint(
-            ["worker_id"],
-            ["worker.id"]),
-        sa.PrimaryKeyConstraint("shift_id", "worker_id"))
+        sa.ForeignKeyConstraint(["shift_id"], ["shift.id"]),
+        sa.ForeignKeyConstraint(["worker_id"], ["worker.id"]),
+        sa.PrimaryKeyConstraint("shift_id", "worker_id"),
+    )
     op.create_table(
         "workerskilllink",
         sa.Column("worker_id", sa.Uuid(), nullable=False),
         sa.Column("skill_id", sa.Uuid(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["skill_id"],
-            ["skill.id"]),
-        sa.ForeignKeyConstraint(
-            ["worker_id"],
-            ["worker.id"]),
-        sa.PrimaryKeyConstraint("worker_id", "skill_id"))
+        sa.ForeignKeyConstraint(["skill_id"], ["skill.id"]),
+        sa.ForeignKeyConstraint(["worker_id"], ["worker.id"]),
+        sa.PrimaryKeyConstraint("worker_id", "skill_id"),
+    )
     # ### end Alembic commands ###
 
 
