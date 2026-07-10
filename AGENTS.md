@@ -5,22 +5,22 @@
 - **Core feature**: Extensible solve framework for schedule optimization (`api/scheduler_api/solves/`)
 - **Async processing**: Celery tasks with RabbitMQ broker and Redis result backend
 - **Database**: PostgreSQL with SQLAlchemy/SQLModel ORM, migrations already configured and working
+- **Solve persistence**: Complete solve framework with ScheduleSolveModel tracking solve lifecycle and progress
 
 ## API Design Rules
 ### Transaction Management
 
 #### Service-Owned Transactions
-- **Write Operations**: Use `with self.session.begin():` context manager
+- **Write Operations**: Services call `session.flush()` and `session.commit()` explicitly
 - **Read Operations**: No transactions needed
 - **Error Handling**: 
-  - `IntegrityError` → 409 Conflict (generic message)
-  - Other `SQLAlchemyError` → 500 Internal Server Error (generic message)
-  - Full stack trace logged at ERROR level
+  - Services raise `ValueError` for resource not found cases
+  - Routes convert to appropriate HTTP status codes (404 for not found)
 - **No Retry Logic**: Simple error propagation
 
 #### Repository Responsibilities
 - **Data Access Only**: Never call `session.commit()` or `session.rollback()`
-- **No Flush Needed**: UUID IDs are Python-generated
+- **UUID IDs**: Python-generated, no database sequence needed
 
 #### Key Principles
 1. Services own transactions for write operations
@@ -61,9 +61,9 @@ docker-compose up  # Starts all services: API (8000), UI (9000), worker, RabbitM
 cd api
 pip install -r requirements.txt
 uvicorn scheduler_api.main:app --reload  # Dev server (port 8000)
-pytest --cov --cov-fail-under 90        # Tests with 90% coverage requirement
+pytest --cov --cov-fail-under 90        # Tests with 90% coverage requirement (currently met at 90%)
 black --check .                         # Formatting check
-flake8 .                                # Linting (max line length:84)
+flake8 .                                # Linting (max line length: 180)
 ```
 
 ### UI (Quasar Vue frontend)
@@ -79,7 +79,7 @@ pnpm run build                         # Production build
 ```
 
 ## CI/CD Pipeline Notes
-- **GitHub Actions**: Enforces 90% test coverage for API (strict)
+- **GitHub Actions**: Enforces 90% test coverage for API (strict, currently met at 90%)
 - **Parallel jobs**: Lint and test run separately for API and UI
 - **Build triggers**: Docker images built on push/release only, not on PRs
 - **Image registry**: GitHub Container Registry with semantic version tags
@@ -87,10 +87,10 @@ pnpm run build                         # Production build
 
 ## Testing Strategy
 ### API testing
-- `pytest` with 90% coverage enforcement (CI will fail below threshold)
-- Mock-based unit tests (`pytest-mock`) - tests mock external dependencies
-- Integration tests use `conftest.py` fixtures
-- No test database required - tests mock database interactions
+- `pytest` with 90% coverage enforcement (CI will fail below threshold, currently met)
+- Mock-based unit tests (`pytest-mock`) - tests mock external dependencies including database
+- All tests are unit tests with comprehensive mocking - no integration test fixtures or test database
+- Solve framework components have comprehensive test coverage
 
 ### UI testing
 - `vitest` with Vue Test Utils
@@ -141,31 +141,47 @@ CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672//
 CELERY_RESULT_BACKEND=redis://redis:6379/0
 ```
 
+## Solve Framework Architecture
+### Solve Lifecycle & Persistence
+- **ScheduleSolveModel**: Complete persistence model tracking solve lifecycle (replaces legacy ScheduleGenerationRun)
+- **Solve Statuses**: `pending`, `queued`, `running`, `completed`, `failed`, `cancelled`
+- **Progress Tracking**: Real-time tracking of current generation, best fitness, and progress percentage
+- **Task Orchestration**: Celery tasks orchestrate solve execution with persistence updates
+- **Result Storage**: Completed solves link to generated schedules
+
+### Task Orchestration
+- **Background Processing**: Celery tasks handle long-running solve operations
+- **Progress Updates**: Task session utility updates solve progress at intervals
+- **Error Handling**: Failed solves persist error details for debugging
+- **Status Transitions**: Automatic status updates throughout solve lifecycle
+
 ## Gotchas & Important Details
 1. **Package manager**: UI uses `pnpm` despite README mentioning yarn/npm (check `pnpm-lock.yaml`)
 2. **Database migrations**: Already configured with alembic and working migrations
-3. **Solve framework**: Extensible genetic algorithm framework in `solves/` directory
+3. **Solve framework**: Complete extensible genetic algorithm framework in `solves/` directory (replaces old genetic/)
 4. **Bruno API testing**: Contains `.bru` files in `/bruno/` for manual API validation
 5. **Volume mounts**: Development code mounted for hot reload; `node_modules` volume avoids host conflicts
 6. **Non-root users**: Docker containers run as `appuser` (UID/GID 1000) for security
 7. **Python version**: 3.12 specific (see Dockerfile and CI)
 8. **Node version**: Wide range (18-28) in UI package.json engines
-9. **Coverage strictness**: 90% minimum enforced in CI - failing tests block builds
+9. **Coverage strictness**: 90% minimum enforced in CI - currently met at 90% with comprehensive test suite
 10. **Flake8 config**: 180 character line length limit (not standard 79/88)
 11. **API DTOs**: All endpoints must use Pydantic models - no raw dict returns
+12. **Transaction management**: Services use explicit `session.flush()` and `session.commit()` calls
+13. **Error handling**: Simple pattern - services raise `ValueError` for not found, routes return HTTP 404
 
 ## Project Structure Key Points
 ### API (`/api/scheduler_api/`)
 - `db/` - Database models and configuration with working migrations
 - `domain/` - Core business logic (Schedule, Population, ScheduleLayout)
-- `solves/` - Extensible solve framework for schedule optimization (replaces old genetic/)
+- `solves/` - Complete extensible solve framework for schedule optimization
   - `engine/` - Evolution engine, population management, orchestration
   - `interfaces/` - Protocol definitions for extensible components
-  - `schedule/` - Schedule-specific implementations (genome, solver, components)
+  - `schedule/` - Schedule-specific implementations (genome, solver, constraints, mutators, scorers)
 - `routers/` - FastAPI route handlers (shifts, skills, workers, schedules, solves)
 - `schemas/` - Pydantic models for request/response validation (REQUIRED for all APIs)
-- `services/` - Business logic services
-- `tasks/` - Celery background tasks
+- `services/` - Business logic services with transaction ownership
+- `tasks/` - Celery background tasks with solve orchestration
 
 ### UI (`/ui/scheduler_ui/`)
 - Quasar framework with TypeScript
@@ -182,10 +198,32 @@ CELERY_RESULT_BACKEND=redis://redis:6379/0
 5. **docker-compose.yml**: Provides complete working dev environment - no additional env vars needed
 6. **API design**: Always define request/response DTOs in schemas/, never return raw dicts
 
+## Code Quality Best Practices
+### Type Hints with SQLModel
+- Use forward references (`"ModelName"`) for type hints with SQLModel circular dependencies
+- Import SQLModel classes inside functions when needed to avoid circular imports
+- Maintain consistent type hinting throughout the codebase
+
+### Transaction Management
+- Services own transaction boundaries with explicit `session.flush()` and `session.commit()`
+- Repositories are data access only - never commit or rollback
+- Keep transaction logic in service layer only
+
+### Mock-Based Testing
+- Mock all external dependencies (database, external services)
+- Use `unittest.mock` for comprehensive test isolation
+- Test service layer with mocked repositories and sessions
+- Solve framework components tested with mock objects
+
+### Import Organization
+- Group imports: standard library, third-party, local modules
+- Avoid circular imports with careful module organization
+- Use absolute imports within the project
+
 ## Workflow Constraints
 1. **Test order**: CI runs lint → test (both API and UI)
 2. **Build dependencies**: UI build requires API tests to pass
-3. **Coverage enforcement**: API tests must maintain 90% coverage (strict)
+3. **Coverage enforcement**: API tests must maintain 90% coverage (strict, currently met)
 4. **Docker caching**: Uses GitHub Actions cache for pnpm and Docker layers
 5. **Release automation**: Auto-creates GitHub releases with changelog on push to main
 6. **API consistency**: All endpoints must follow DTO pattern - violations block PRs
