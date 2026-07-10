@@ -44,12 +44,12 @@ describe("SchedulesTable", () => {
     expect(screen.getByText("Week 1 Schedule")).toBeInTheDocument();
     expect(screen.getByText("Week 2 Schedule")).toBeInTheDocument();
     expect(screen.getByText("Week 3 Schedule")).toBeInTheDocument();
-    
+
     const template1Elements = screen.getAllByText("template-1");
     expect(template1Elements).toHaveLength(2);
     const template2Elements = screen.getAllByText("template-2");
     expect(template2Elements).toHaveLength(1);
-    
+
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.getByText("Schedule Template ID")).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();

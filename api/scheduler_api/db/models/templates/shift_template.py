@@ -6,10 +6,14 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlmodel import Field, Relationship
 
 from scheduler_api.db.models.base import BaseModel
-from scheduler_api.db.models.associations.shift_template_skill import ShiftTemplateSkillModel
+from scheduler_api.db.models.associations.shift_template_skill import (
+    ShiftTemplateSkillModel,
+)
 
 if TYPE_CHECKING:
-    from scheduler_api.db.models.templates.schedule_template import ScheduleTemplateModel
+    from scheduler_api.db.models.templates.schedule_template import (
+        ScheduleTemplateModel,
+    )
     from scheduler_api.db.models.core.skill import SkillModel
 
 
@@ -34,6 +38,5 @@ class ShiftTemplateModel(BaseModel, table=True):
     )
 
     skills: list["SkillModel"] = Relationship(
-        back_populates="shift_templates",
-        link_model=ShiftTemplateSkillModel
+        back_populates="shift_templates", link_model=ShiftTemplateSkillModel
     )

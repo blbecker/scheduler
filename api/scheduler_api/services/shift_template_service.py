@@ -40,19 +40,19 @@ class ShiftTemplateService:
     def _get_skill_models(self, skill_ids: list[UUID]) -> list:
         """
         Get skill models for the given skill IDs.
-        
+
         Args:
             skill_ids: List of skill UUIDs
-            
+
         Returns:
             List of SkillModel instances
-            
+
         Raises:
             ValueError: If any skill ID is not found (will be caught by DB constraint)
         """
         if not skill_ids:
             return []
-        
+
         # Fetch skill models
         skill_models = self.skill_repo.get_by_ids(skill_ids)
         return skill_models
@@ -95,23 +95,23 @@ class ShiftTemplateService:
         """
         # Create base model without skills
         model = from_create(dto)
-        
+
         # Get skill models for the skill IDs
         skill_models = self._get_skill_models(dto.skill_ids)
-        
+
         # Set the skills relationship - SQLModel will create association records
         model.skills = skill_models
-        
+
         # Save the model
         saved_model = self.shift_template_repo.add(model)
-        
+
         try:
             self.session.flush()
             self.session.commit()
         except IntegrityError as e:
             self.session.rollback()
             raise ValueError(f"Database constraint violation: {str(e)}")
-            
+
         return to_response(saved_model)
 
     def update_shift_template(
@@ -136,23 +136,23 @@ class ShiftTemplateService:
 
         # Update basic fields
         updated_model = apply_update(model, dto)
-        
+
         # Handle skill updates if skill_ids is provided
         if dto.skill_ids is not None:
             # Get skill models for the new skill IDs
             skill_models = self._get_skill_models(dto.skill_ids)
             # Set the skills relationship - SQLModel will update association records
             updated_model.skills = skill_models
-        
+
         self.shift_template_repo.add(updated_model)
-        
+
         try:
             self.session.flush()
             self.session.commit()
         except IntegrityError as e:
             self.session.rollback()
             raise ValueError(f"Database constraint violation: {str(e)}")
-            
+
         return to_response(updated_model)
 
     def delete_shift_template(self, id: UUID) -> None:

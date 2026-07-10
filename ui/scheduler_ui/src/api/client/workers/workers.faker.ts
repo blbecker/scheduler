@@ -20,4 +20,3 @@ export const getCreateWorkerResponseMock = (overrideResponse: Partial<Extract<Wo
 export const getGetWorkerResponseMock = (overrideResponse: Partial<Extract<WorkerResponse, object>> = {}): WorkerResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getUpdateWorkerResponseMock = (overrideResponse: Partial<Extract<WorkerResponse, object>> = {}): WorkerResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-

@@ -133,7 +133,11 @@ class TestShiftTemplateService:
         service.session.flush.assert_not_called()  # No flush for read
 
     def test_create_shift_template_success(
-        self, service, sample_shift_template_model, sample_shift_template_response, sample_skill_model
+        self,
+        service,
+        sample_shift_template_model,
+        sample_shift_template_response,
+        sample_skill_model,
     ):
         # Setup
         skill_id = sample_skill_model.id
@@ -162,7 +166,9 @@ class TestShiftTemplateService:
         # Verify
         mock_from_create.assert_called_once_with(create_dto)
         service.skill_repo.get_by_ids.assert_called_once_with([skill_id])
-        service.shift_template_repo.add.assert_called_once_with(sample_shift_template_model)
+        service.shift_template_repo.add.assert_called_once_with(
+            sample_shift_template_model
+        )
         # Verify skills were set on the model
         assert sample_shift_template_model.skills == [sample_skill_model]
         service.session.flush.assert_called_once()
@@ -198,7 +204,9 @@ class TestShiftTemplateService:
         mock_from_create.assert_called_once_with(create_dto)
         # get_by_ids should NOT be called with empty list
         service.skill_repo.get_by_ids.assert_not_called()
-        service.shift_template_repo.add.assert_called_once_with(sample_shift_template_model)
+        service.shift_template_repo.add.assert_called_once_with(
+            sample_shift_template_model
+        )
         # The model.skills should have been set (but we can't assert exact value due to mock)
         service.session.flush.assert_called_once()
         service.session.commit.assert_called_once()
@@ -234,7 +242,11 @@ class TestShiftTemplateService:
             service.session.rollback.assert_called_once()
 
     def test_update_shift_template_success(
-        self, service, sample_shift_template_model, sample_shift_template_response, sample_skill_model
+        self,
+        service,
+        sample_shift_template_model,
+        sample_shift_template_response,
+        sample_skill_model,
     ):
         # Setup
         template_id = sample_shift_template_model.id
@@ -390,7 +402,9 @@ class TestShiftTemplateService:
 
         # Verify
         service.shift_template_repo.get_by_id.assert_called_once_with(template_id)
-        service.shift_template_repo.delete.assert_called_once_with(sample_shift_template_model)
+        service.shift_template_repo.delete.assert_called_once_with(
+            sample_shift_template_model
+        )
         service.session.flush.assert_called_once()
         service.session.commit.assert_called_once()
 

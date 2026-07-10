@@ -10,7 +10,7 @@ from scheduler_api.schemas.shift_template import (
 def to_response(model: ShiftTemplateModel) -> ShiftTemplateResponse:
     # Extract skill IDs from the hydrated relationship
     skill_ids = [skill.id for skill in model.skills] if model.skills else []
-    
+
     return ShiftTemplateResponse(
         id=model.id,
         schedule_template_id=model.schedule_template_id,

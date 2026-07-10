@@ -41,7 +41,7 @@ describe("ScheduleTemplatesTable", () => {
     expect(screen.getByText("Weekly Schedule")).toBeInTheDocument();
     expect(screen.getByText("Monthly Rotation")).toBeInTheDocument();
     expect(screen.getByText("Shift Rotation")).toBeInTheDocument();
-    
+
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Created At")).toBeInTheDocument();

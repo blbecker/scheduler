@@ -4,7 +4,9 @@ from sqlmodel import Field, Relationship
 
 from scheduler_api.db.models.base import BaseModel
 from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLinkModel
-from scheduler_api.db.models.associations.shift_template_skill import ShiftTemplateSkillModel
+from scheduler_api.db.models.associations.shift_template_skill import (
+    ShiftTemplateSkillModel,
+)
 
 if TYPE_CHECKING:
     from scheduler_api.db.models.schedules.shift import ShiftModel

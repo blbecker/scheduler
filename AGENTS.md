@@ -13,7 +13,7 @@
 #### Service-Owned Transactions
 - **Write Operations**: Services call `session.flush()` and `session.commit()` explicitly
 - **Read Operations**: No transactions needed
-- **Error Handling**: 
+- **Error Handling**:
   - Services raise `ValueError` for resource not found cases
   - Routes convert to appropriate HTTP status codes (404 for not found)
 - **No Retry Logic**: Simple error propagation
@@ -24,13 +24,13 @@
 
 #### Key Principles
 1. Services own transactions for write operations
-2. Repositories are data access only  
+2. Repositories are data access only
 3. Routes depend on services, not repositories
 4. Log errors with full details, return generic messages
 
 ### Request/Response DTOs (Domain-Oriented)
 - **Create schemas**: Use `{Resource}Create` suffix (e.g., `WorkerCreate` not `Worker`)
-- **Update schemas**: Use `{Resource}Update` suffix for PATCH/PUT operations  
+- **Update schemas**: Use `{Resource}Update` suffix for PATCH/PUT operations
 - **Response schemas**: Use `{Resource}Response` for GET responses
 - **Solve framework**: Use `ScheduleSolveRequest`, `ScheduleSolveCreateResponse`, `ScheduleSolveStatus`, `ScheduleSolveResult`
 - **Example**: `/v1/workers` uses `WorkerCreate` (POST), `WorkerUpdate` (PUT), `WorkerResponse` (GET)

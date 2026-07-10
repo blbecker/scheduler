@@ -20,4 +20,3 @@ export const getCreateScheduleResponseMock = (overrideResponse: Partial<Extract<
 export const getGetScheduleResponseMock = (overrideResponse: Partial<Extract<ScheduleResponse, object>> = {}): ScheduleResponse => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 export const getUpdateScheduleResponseMock = (overrideResponse: Partial<Extract<ScheduleResponse, object>> = {}): ScheduleResponse => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
-

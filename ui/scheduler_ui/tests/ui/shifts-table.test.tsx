@@ -53,12 +53,12 @@ describe("ShiftsTable", () => {
     expect(screen.getByText("Morning Shift")).toBeInTheDocument();
     expect(screen.getByText("Night Shift")).toBeInTheDocument();
     expect(screen.getByText("Weekend Shift")).toBeInTheDocument();
-    
+
     const schedule1Elements = screen.getAllByText("schedule-1");
     expect(schedule1Elements).toHaveLength(2);
     const schedule2Elements = screen.getAllByText("schedule-2");
     expect(schedule2Elements).toHaveLength(1);
-    
+
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.getByText("Schedule ID")).toBeInTheDocument();
     expect(screen.getByText("Shift Template ID")).toBeInTheDocument();

@@ -402,9 +402,3 @@ export function useGetScheduleSolveResult<TData = Awaited<ReturnType<typeof getS
 
   return withQueryKey(query, queryOptions.queryKey);
 }
-
-
-
-
-
-

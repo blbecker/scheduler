@@ -30,7 +30,7 @@ class SkillRepository:
         """Get skills by IDs."""
         if not skill_ids:
             return []
-        
+
         # Convert UUIDs to strings for the IN clause
         statement = select(SkillModel).where(SkillModel.id.in_(skill_ids))
         result = self.session.exec(statement)

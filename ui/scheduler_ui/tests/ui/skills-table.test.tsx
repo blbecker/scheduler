@@ -47,7 +47,7 @@ describe("SkillsTable", () => {
     expect(screen.getByText("Advanced Python development skills")).toBeInTheDocument();
     expect(screen.getByText("Data analysis with SQL and Python")).toBeInTheDocument();
     expect(screen.getByText("No description")).toBeInTheDocument();
-    
+
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Description")).toBeInTheDocument();
