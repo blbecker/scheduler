@@ -4,48 +4,20 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import { faker } from "@faker-js/faker";
+import {
+  faker
+} from '@faker-js/faker';
 
-import type { ScheduleTemplateResponse } from "../../models";
+import type {
+  ScheduleTemplateResponse
+} from '../../models';
 
-export const getListScheduleTemplatesResponseMock =
-  (): ScheduleTemplateResponse[] =>
-    Array.from(
-      { length: faker.number.int({ min: 1, max: 10 }) },
-      (_, i) => i + 1,
-    ).map(() => ({
-      id: faker.string.uuid(),
-      name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-      created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-      updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-    }));
 
-export const getCreateScheduleTemplateResponseMock = (
-  overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {},
-): ScheduleTemplateResponse => ({
-  id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getListScheduleTemplatesResponseMock = (): ScheduleTemplateResponse[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
-export const getGetScheduleTemplateResponseMock = (
-  overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {},
-): ScheduleTemplateResponse => ({
-  id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getCreateScheduleTemplateResponseMock = (overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {}): ScheduleTemplateResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getUpdateScheduleTemplateResponseMock = (
-  overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {},
-): ScheduleTemplateResponse => ({
-  id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getGetScheduleTemplateResponseMock = (overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {}): ScheduleTemplateResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+
+export const getUpdateScheduleTemplateResponseMock = (overrideResponse: Partial<Extract<ScheduleTemplateResponse, object>> = {}): ScheduleTemplateResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+

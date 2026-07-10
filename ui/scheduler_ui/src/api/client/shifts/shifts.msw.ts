@@ -4,190 +4,93 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import { faker } from "@faker-js/faker";
+import {
+  faker
+} from '@faker-js/faker';
 
-import { HttpResponse, http } from "msw";
-import type { RequestHandlerOptions } from "msw";
+import {
+  HttpResponse,
+  http
+} from 'msw';
+import type {
+  RequestHandlerOptions
+} from 'msw';
 
-import type { ShiftResponse } from "../../models";
+import type {
+  ShiftResponse
+} from '../../models';
 
-export const getListShiftsResponseMock = (): ShiftResponse[] =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.string.uuid(),
-    schedule_id: faker.string.uuid(),
-    shift_template_id: faker.string.uuid(),
-    name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    start_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-    end_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-    created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-    updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  }));
 
-export const getCreateShiftResponseMock = (
-  overrideResponse: Partial<Extract<ShiftResponse, object>> = {},
-): ShiftResponse => ({
-  id: faker.string.uuid(),
-  schedule_id: faker.string.uuid(),
-  shift_template_id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  start_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-  end_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getListShiftsResponseMock = (): ShiftResponse[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), schedule_id: faker.string.uuid(), shift_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.date.past().toISOString().slice(0, 19) + 'Z', end_time: faker.date.past().toISOString().slice(0, 19) + 'Z', created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
-export const getGetShiftResponseMock = (
-  overrideResponse: Partial<Extract<ShiftResponse, object>> = {},
-): ShiftResponse => ({
-  id: faker.string.uuid(),
-  schedule_id: faker.string.uuid(),
-  shift_template_id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  start_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-  end_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getCreateShiftResponseMock = (overrideResponse: Partial<Extract<ShiftResponse, object>> = {}): ShiftResponse => ({id: faker.string.uuid(), schedule_id: faker.string.uuid(), shift_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.date.past().toISOString().slice(0, 19) + 'Z', end_time: faker.date.past().toISOString().slice(0, 19) + 'Z', created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getUpdateShiftResponseMock = (
-  overrideResponse: Partial<Extract<ShiftResponse, object>> = {},
-): ShiftResponse => ({
-  id: faker.string.uuid(),
-  schedule_id: faker.string.uuid(),
-  shift_template_id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  start_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-  end_time: faker.date.past().toISOString().slice(0, 19) + "Z",
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getGetShiftResponseMock = (overrideResponse: Partial<Extract<ShiftResponse, object>> = {}): ShiftResponse => ({id: faker.string.uuid(), schedule_id: faker.string.uuid(), shift_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.date.past().toISOString().slice(0, 19) + 'Z', end_time: faker.date.past().toISOString().slice(0, 19) + 'Z', created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getListShiftsMockHandler = (
-  overrideResponse?:
-    | ShiftResponse[]
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ShiftResponse[]> | ShiftResponse[]),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/shifts/",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getListShiftsResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getUpdateShiftResponseMock = (overrideResponse: Partial<Extract<ShiftResponse, object>> = {}): ShiftResponse => ({id: faker.string.uuid(), schedule_id: faker.string.uuid(), shift_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.date.past().toISOString().slice(0, 19) + 'Z', end_time: faker.date.past().toISOString().slice(0, 19) + 'Z', created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getCreateShiftMockHandler = (
-  overrideResponse?:
-    | ShiftResponse
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<ShiftResponse> | ShiftResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/shifts/",
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getCreateShiftResponseMock(),
-        { status: 201 },
-      );
-    },
-    options,
-  );
-};
 
-export const getGetShiftMockHandler = (
-  overrideResponse?:
-    | ShiftResponse
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ShiftResponse> | ShiftResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/shifts/:shiftId",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetShiftResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getListShiftsMockHandler = (overrideResponse?: ShiftResponse[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ShiftResponse[]> | ShiftResponse[]), options?: RequestHandlerOptions) => {
+  return http.get('*/shifts/', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-export const getUpdateShiftMockHandler = (
-  overrideResponse?:
-    | ShiftResponse
-    | ((
-        info: Parameters<Parameters<typeof http.put>[1]>[0],
-      ) => Promise<ShiftResponse> | ShiftResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.put(
-    "*/shifts/:shiftId",
-    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getUpdateShiftResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
 
-export const getDeleteShiftMockHandler = (
-  overrideResponse?:
-    | void
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0],
-      ) => Promise<void> | void),
-  options?: RequestHandlerOptions,
-) => {
-  return http.delete(
-    "*/shifts/:shiftId",
-    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListShiftsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
-      return new HttpResponse(null, { status: 204 });
-    },
-    options,
-  );
-};
+export const getCreateShiftMockHandler = (overrideResponse?: ShiftResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ShiftResponse> | ShiftResponse), options?: RequestHandlerOptions) => {
+  return http.post('*/shifts/', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateShiftResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getGetShiftMockHandler = (overrideResponse?: ShiftResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ShiftResponse> | ShiftResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/shifts/:shiftId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetShiftResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getUpdateShiftMockHandler = (overrideResponse?: ShiftResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<ShiftResponse> | ShiftResponse), options?: RequestHandlerOptions) => {
+  return http.put('*/shifts/:shiftId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateShiftResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDeleteShiftMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete('*/shifts/:shiftId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
 export const getShiftsMock = () => [
   getListShiftsMockHandler(),
   getCreateShiftMockHandler(),
   getGetShiftMockHandler(),
   getUpdateShiftMockHandler(),
-  getDeleteShiftMockHandler(),
-];
+  getDeleteShiftMockHandler()
+]

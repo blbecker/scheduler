@@ -4,190 +4,93 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import { faker } from "@faker-js/faker";
+import {
+  faker
+} from '@faker-js/faker';
 
-import { HttpResponse, http } from "msw";
-import type { RequestHandlerOptions } from "msw";
+import {
+  HttpResponse,
+  http
+} from 'msw';
+import type {
+  RequestHandlerOptions
+} from 'msw';
 
-import type { SkillResponse } from "../../models";
+import type {
+  SkillResponse
+} from '../../models';
 
-export const getListSkillsResponseMock = (): SkillResponse[] =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.string.uuid(),
-    name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    description: faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      null,
-    ]),
-    created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-    updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  }));
 
-export const getCreateSkillResponseMock = (
-  overrideResponse: Partial<Extract<SkillResponse, object>> = {},
-): SkillResponse => ({
-  id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  description: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    null,
-  ]),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getListSkillsResponseMock = (): SkillResponse[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
-export const getGetSkillResponseMock = (
-  overrideResponse: Partial<Extract<SkillResponse, object>> = {},
-): SkillResponse => ({
-  id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  description: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    null,
-  ]),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getCreateSkillResponseMock = (overrideResponse: Partial<Extract<SkillResponse, object>> = {}): SkillResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getUpdateSkillResponseMock = (
-  overrideResponse: Partial<Extract<SkillResponse, object>> = {},
-): SkillResponse => ({
-  id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  description: faker.helpers.arrayElement([
-    faker.string.alpha({ length: { min: 10, max: 20 } }),
-    null,
-  ]),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getGetSkillResponseMock = (overrideResponse: Partial<Extract<SkillResponse, object>> = {}): SkillResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getListSkillsMockHandler = (
-  overrideResponse?:
-    | SkillResponse[]
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<SkillResponse[]> | SkillResponse[]),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/skills/",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getListSkillsResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getUpdateSkillResponseMock = (overrideResponse: Partial<Extract<SkillResponse, object>> = {}): SkillResponse => ({id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), description: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getCreateSkillMockHandler = (
-  overrideResponse?:
-    | SkillResponse
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<SkillResponse> | SkillResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/skills/",
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getCreateSkillResponseMock(),
-        { status: 201 },
-      );
-    },
-    options,
-  );
-};
 
-export const getGetSkillMockHandler = (
-  overrideResponse?:
-    | SkillResponse
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<SkillResponse> | SkillResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/skills/:skillId",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetSkillResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getListSkillsMockHandler = (overrideResponse?: SkillResponse[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SkillResponse[]> | SkillResponse[]), options?: RequestHandlerOptions) => {
+  return http.get('*/skills/', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-export const getUpdateSkillMockHandler = (
-  overrideResponse?:
-    | SkillResponse
-    | ((
-        info: Parameters<Parameters<typeof http.put>[1]>[0],
-      ) => Promise<SkillResponse> | SkillResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.put(
-    "*/skills/:skillId",
-    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getUpdateSkillResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
 
-export const getDeleteSkillMockHandler = (
-  overrideResponse?:
-    | void
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0],
-      ) => Promise<void> | void),
-  options?: RequestHandlerOptions,
-) => {
-  return http.delete(
-    "*/skills/:skillId",
-    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListSkillsResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
-      return new HttpResponse(null, { status: 204 });
-    },
-    options,
-  );
-};
+export const getCreateSkillMockHandler = (overrideResponse?: SkillResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<SkillResponse> | SkillResponse), options?: RequestHandlerOptions) => {
+  return http.post('*/skills/', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateSkillResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getGetSkillMockHandler = (overrideResponse?: SkillResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SkillResponse> | SkillResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/skills/:skillId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetSkillResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getUpdateSkillMockHandler = (overrideResponse?: SkillResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<SkillResponse> | SkillResponse), options?: RequestHandlerOptions) => {
+  return http.put('*/skills/:skillId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateSkillResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDeleteSkillMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete('*/skills/:skillId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
 export const getSkillsMock = () => [
   getListSkillsMockHandler(),
   getCreateSkillMockHandler(),
   getGetSkillMockHandler(),
   getUpdateSkillMockHandler(),
-  getDeleteSkillMockHandler(),
-];
+  getDeleteSkillMockHandler()
+]

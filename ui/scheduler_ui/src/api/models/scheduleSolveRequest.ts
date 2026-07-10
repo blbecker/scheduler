@@ -4,7 +4,7 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import type { ScheduleSolveParameters } from "./scheduleSolveParameters";
+import type { ScheduleSolveParameters } from './scheduleSolveParameters';
 
 /**
  * Request to create a schedule solve.

@@ -4,186 +4,93 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import { faker } from "@faker-js/faker";
+import {
+  faker
+} from '@faker-js/faker';
 
-import { HttpResponse, http } from "msw";
-import type { RequestHandlerOptions } from "msw";
+import {
+  HttpResponse,
+  http
+} from 'msw';
+import type {
+  RequestHandlerOptions
+} from 'msw';
 
-import type { ShiftTemplateResponse } from "../../models";
+import type {
+  ShiftTemplateResponse
+} from '../../models';
 
-export const getListShiftTemplatesResponseMock = (): ShiftTemplateResponse[] =>
-  Array.from(
-    { length: faker.number.int({ min: 1, max: 10 }) },
-    (_, i) => i + 1,
-  ).map(() => ({
-    id: faker.string.uuid(),
-    schedule_template_id: faker.string.uuid(),
-    name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    start_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    end_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-    updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  }));
 
-export const getCreateShiftTemplateResponseMock = (
-  overrideResponse: Partial<Extract<ShiftTemplateResponse, object>> = {},
-): ShiftTemplateResponse => ({
-  id: faker.string.uuid(),
-  schedule_template_id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  start_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  end_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getListShiftTemplatesResponseMock = (): ShiftTemplateResponse[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.string.alpha({length: {min: 10, max: 20}}), end_time: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
 
-export const getGetShiftTemplateResponseMock = (
-  overrideResponse: Partial<Extract<ShiftTemplateResponse, object>> = {},
-): ShiftTemplateResponse => ({
-  id: faker.string.uuid(),
-  schedule_template_id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  start_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  end_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getCreateShiftTemplateResponseMock = (overrideResponse: Partial<Extract<ShiftTemplateResponse, object>> = {}): ShiftTemplateResponse => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.string.alpha({length: {min: 10, max: 20}}), end_time: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getUpdateShiftTemplateResponseMock = (
-  overrideResponse: Partial<Extract<ShiftTemplateResponse, object>> = {},
-): ShiftTemplateResponse => ({
-  id: faker.string.uuid(),
-  schedule_template_id: faker.string.uuid(),
-  name: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  start_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  end_time: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  updated_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getGetShiftTemplateResponseMock = (overrideResponse: Partial<Extract<ShiftTemplateResponse, object>> = {}): ShiftTemplateResponse => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.string.alpha({length: {min: 10, max: 20}}), end_time: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getListShiftTemplatesMockHandler = (
-  overrideResponse?:
-    | ShiftTemplateResponse[]
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ShiftTemplateResponse[]> | ShiftTemplateResponse[]),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/shift-templates/",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getListShiftTemplatesResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getUpdateShiftTemplateResponseMock = (overrideResponse: Partial<Extract<ShiftTemplateResponse, object>> = {}): ShiftTemplateResponse => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), name: faker.string.alpha({length: {min: 10, max: 20}}), start_time: faker.string.alpha({length: {min: 10, max: 20}}), end_time: faker.string.alpha({length: {min: 10, max: 20}}), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
-export const getCreateShiftTemplateMockHandler = (
-  overrideResponse?:
-    | ShiftTemplateResponse
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0],
-      ) => Promise<ShiftTemplateResponse> | ShiftTemplateResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.post(
-    "*/shift-templates/",
-    async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getCreateShiftTemplateResponseMock(),
-        { status: 201 },
-      );
-    },
-    options,
-  );
-};
 
-export const getGetShiftTemplateMockHandler = (
-  overrideResponse?:
-    | ShiftTemplateResponse
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0],
-      ) => Promise<ShiftTemplateResponse> | ShiftTemplateResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.get(
-    "*/shift-templates/:shiftTemplateId",
-    async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getGetShiftTemplateResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
+export const getListShiftTemplatesMockHandler = (overrideResponse?: ShiftTemplateResponse[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ShiftTemplateResponse[]> | ShiftTemplateResponse[]), options?: RequestHandlerOptions) => {
+  return http.get('*/templates/shift/', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
-export const getUpdateShiftTemplateMockHandler = (
-  overrideResponse?:
-    | ShiftTemplateResponse
-    | ((
-        info: Parameters<Parameters<typeof http.put>[1]>[0],
-      ) => Promise<ShiftTemplateResponse> | ShiftTemplateResponse),
-  options?: RequestHandlerOptions,
-) => {
-  return http.put(
-    "*/shift-templates/:shiftTemplateId",
-    async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-      return HttpResponse.json(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === "function"
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getUpdateShiftTemplateResponseMock(),
-        { status: 200 },
-      );
-    },
-    options,
-  );
-};
 
-export const getDeleteShiftTemplateMockHandler = (
-  overrideResponse?:
-    | void
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0],
-      ) => Promise<void> | void),
-  options?: RequestHandlerOptions,
-) => {
-  return http.delete(
-    "*/shift-templates/:shiftTemplateId",
-    async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-      if (typeof overrideResponse === "function") {
-        await overrideResponse(info);
-      }
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListShiftTemplatesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
 
-      return new HttpResponse(null, { status: 204 });
-    },
-    options,
-  );
-};
+export const getCreateShiftTemplateMockHandler = (overrideResponse?: ShiftTemplateResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ShiftTemplateResponse> | ShiftTemplateResponse), options?: RequestHandlerOptions) => {
+  return http.post('*/templates/shift/', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getCreateShiftTemplateResponseMock(),
+      { status: 201
+      })
+  }, options)
+}
+
+export const getGetShiftTemplateMockHandler = (overrideResponse?: ShiftTemplateResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ShiftTemplateResponse> | ShiftTemplateResponse), options?: RequestHandlerOptions) => {
+  return http.get('*/templates/shift/:shiftTemplateId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getGetShiftTemplateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getUpdateShiftTemplateMockHandler = (overrideResponse?: ShiftTemplateResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<ShiftTemplateResponse> | ShiftTemplateResponse), options?: RequestHandlerOptions) => {
+  return http.put('*/templates/shift/:shiftTemplateId', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getUpdateShiftTemplateResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
+export const getDeleteShiftTemplateMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
+  return http.delete('*/templates/shift/:shiftTemplateId', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
+
+    return new HttpResponse(null,
+      { status: 204
+      })
+  }, options)
+}
 export const getShiftTemplatesMock = () => [
   getListShiftTemplatesMockHandler(),
   getCreateShiftTemplateMockHandler(),
   getGetShiftTemplateMockHandler(),
   getUpdateShiftTemplateMockHandler(),
-  getDeleteShiftTemplateMockHandler(),
-];
+  getDeleteShiftTemplateMockHandler()
+]

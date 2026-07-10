@@ -4,7 +4,10 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -17,25 +20,26 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   HTTPValidationError,
   ScheduleCreate,
   ScheduleResponse,
-  ScheduleUpdate,
-} from "../../models";
+  ScheduleUpdate
+} from '../../models';
 
-const withQueryKey = <T extends object, K>(
-  query: T,
-  queryKey: K,
-): T & { queryKey: K } => {
+
+
+
+
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
     // The explicit queryKey always wins, matching the previous
     // `{ ...query, queryKey }` spread where it was set last.
-    if (key === "queryKey") continue;
+    if (key === 'queryKey') continue;
     Object.defineProperty(result, key, {
       enumerable: true,
       configurable: true,
@@ -46,692 +50,536 @@ const withQueryKey = <T extends object, K>(
 };
 
 export type listSchedulesResponse200 = {
-  data: ScheduleResponse[];
-  status: 200;
-};
+  data: ScheduleResponse[]
+  status: 200
+}
 
-export type listSchedulesResponseSuccess = listSchedulesResponse200 & {
+export type listSchedulesResponseSuccess = (listSchedulesResponse200) & {
   headers: Headers;
 };
+;
 
-export type listSchedulesResponse = listSchedulesResponseSuccess;
+export type listSchedulesResponse = (listSchedulesResponseSuccess)
 
 export const getListSchedulesUrl = () => {
-  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/`;
-};
+
+
+
+
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/`
+}
 
 /**
  * @summary List Schedules
  */
-export const listSchedules = async (
-  options?: RequestInit,
-): Promise<listSchedulesResponse> => {
-  const res = await fetch(getListSchedulesUrl(), {
+export const listSchedules = async ( options?: RequestInit): Promise<listSchedulesResponse> => {
+
+  const res = await fetch(getListSchedulesUrl(),
+  {
     ...options,
-    method: "GET",
-  });
+    method: 'GET'
+
+
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: listSchedulesResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as listSchedulesResponse;
-};
+  const data: listSchedulesResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listSchedulesResponse
+}
+
+
+
+
 
 export const getListSchedulesQueryKey = () => {
-  return [`${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/`] as const;
-};
+    return [
+    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/`
+    ] as const;
+    }
 
-export const getListSchedulesQueryOptions = <
-  TData = Awaited<ReturnType<typeof listSchedules>>,
-  TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>
-  >;
-  fetch?: RequestInit;
-}) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getListSchedulesQueryKey();
+export const getListSchedulesQueryOptions = <TData = Awaited<ReturnType<typeof listSchedules>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>>, fetch?: RequestInit}
+) => {
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof listSchedules>>> = ({
-    signal,
-  }) => listSchedules({ signal, ...fetchOptions });
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listSchedules>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  const queryKey =  queryOptions?.queryKey ?? getListSchedulesQueryKey();
 
-export type ListSchedulesQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listSchedules>>
->;
-export type ListSchedulesQueryError = unknown;
 
-export function useListSchedules<
-  TData = Awaited<ReturnType<typeof listSchedules>>,
-  TError = unknown,
->(
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>
-    > &
-      Pick<
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSchedules>>> = ({ signal }) => listSchedules({ signal, ...fetchOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListSchedulesQueryResult = NonNullable<Awaited<ReturnType<typeof listSchedules>>>
+export type ListSchedulesQueryError = unknown
+
+
+export function useListSchedules<TData = Awaited<ReturnType<typeof listSchedules>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSchedules>>,
           TError,
           Awaited<ReturnType<typeof listSchedules>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListSchedules<
-  TData = Awaited<ReturnType<typeof listSchedules>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSchedules<TData = Awaited<ReturnType<typeof listSchedules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listSchedules>>,
           TError,
           Awaited<ReturnType<typeof listSchedules>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListSchedules<
-  TData = Awaited<ReturnType<typeof listSchedules>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSchedules<TData = Awaited<ReturnType<typeof listSchedules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Schedules
  */
 
-export function useListSchedules<
-  TData = Awaited<ReturnType<typeof listSchedules>>,
-  TError = unknown,
->(
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getListSchedulesQueryOptions(options);
+export function useListSchedules<TData = Awaited<ReturnType<typeof listSchedules>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSchedules>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getListSchedulesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+
+
+
+
+
 export type createScheduleResponse201 = {
-  data: ScheduleResponse;
-  status: 201;
-};
+  data: ScheduleResponse
+  status: 201
+}
 
 export type createScheduleResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
-};
+  data: HTTPValidationError
+  status: 422
+}
 
-export type createScheduleResponseSuccess = createScheduleResponse201 & {
+export type createScheduleResponseSuccess = (createScheduleResponse201) & {
   headers: Headers;
 };
-export type createScheduleResponseError = createScheduleResponse422 & {
+export type createScheduleResponseError = (createScheduleResponse422) & {
   headers: Headers;
 };
 
-export type createScheduleResponse =
-  | createScheduleResponseSuccess
-  | createScheduleResponseError;
+export type createScheduleResponse = (createScheduleResponseSuccess | createScheduleResponseError)
 
 export const getCreateScheduleUrl = () => {
-  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/`;
-};
+
+
+
+
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/`
+}
 
 /**
  * @summary Create Schedule
  */
-export const createSchedule = async (
-  scheduleCreate: ScheduleCreate,
-  options?: RequestInit,
-): Promise<createScheduleResponse> => {
-  const res = await fetch(getCreateScheduleUrl(), {
+export const createSchedule = async (scheduleCreate: ScheduleCreate, options?: RequestInit): Promise<createScheduleResponse> => {
+
+  const res = await fetch(getCreateScheduleUrl(),
+  {
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(scheduleCreate),
-  });
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(scheduleCreate)
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: createScheduleResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as createScheduleResponse;
-};
+  const data: createScheduleResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createScheduleResponse
+}
 
-export const getCreateScheduleMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createSchedule>>,
-    TError,
-    { data: ScheduleCreate },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createSchedule>>,
-  TError,
-  { data: ScheduleCreate },
-  TContext
-> => {
-  const mutationKey = ["createSchedule"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createSchedule>>,
-    { data: ScheduleCreate }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return createSchedule(data, fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type CreateScheduleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createSchedule>>
->;
-export type CreateScheduleMutationBody = ScheduleCreate;
-export type CreateScheduleMutationError = HTTPValidationError;
+export const getCreateScheduleMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSchedule>>, TError,{data: ScheduleCreate}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof createSchedule>>, TError,{data: ScheduleCreate}, TContext> => {
 
-/**
+const mutationKey = ['createSchedule'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSchedule>>, {data: ScheduleCreate}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSchedule(data,fetchOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateScheduleMutationResult = NonNullable<Awaited<ReturnType<typeof createSchedule>>>
+    export type CreateScheduleMutationBody = ScheduleCreate
+    export type CreateScheduleMutationError = HTTPValidationError
+
+    /**
  * @summary Create Schedule
  */
-export const useCreateSchedule = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createSchedule>>,
-      TError,
-      { data: ScheduleCreate },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createSchedule>>,
-  TError,
-  { data: ScheduleCreate },
-  TContext
-> => {
-  return useMutation(getCreateScheduleMutationOptions(options), queryClient);
-};
-export type getScheduleResponse200 = {
-  data: ScheduleResponse;
-  status: 200;
-};
+export const useCreateSchedule = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSchedule>>, TError,{data: ScheduleCreate}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createSchedule>>,
+        TError,
+        {data: ScheduleCreate},
+        TContext
+      > => {
+      return useMutation(getCreateScheduleMutationOptions(options), queryClient);
+    }
+    export type getScheduleResponse200 = {
+  data: ScheduleResponse
+  status: 200
+}
 
 export type getScheduleResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
-};
+  data: HTTPValidationError
+  status: 422
+}
 
-export type getScheduleResponseSuccess = getScheduleResponse200 & {
+export type getScheduleResponseSuccess = (getScheduleResponse200) & {
   headers: Headers;
 };
-export type getScheduleResponseError = getScheduleResponse422 & {
+export type getScheduleResponseError = (getScheduleResponse422) & {
   headers: Headers;
 };
 
-export type getScheduleResponse =
-  | getScheduleResponseSuccess
-  | getScheduleResponseError;
+export type getScheduleResponse = (getScheduleResponseSuccess | getScheduleResponseError)
 
-export const getGetScheduleUrl = (scheduleId: string) => {
-  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`;
-};
+export const getGetScheduleUrl = (scheduleId: string,) => {
+
+
+
+
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`
+}
 
 /**
  * @summary Get Schedule
  */
-export const getSchedule = async (
-  scheduleId: string,
-  options?: RequestInit,
-): Promise<getScheduleResponse> => {
-  const res = await fetch(getGetScheduleUrl(scheduleId), {
+export const getSchedule = async (scheduleId: string, options?: RequestInit): Promise<getScheduleResponse> => {
+
+  const res = await fetch(getGetScheduleUrl(scheduleId),
+  {
     ...options,
-    method: "GET",
-  });
+    method: 'GET'
+
+
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: getScheduleResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as getScheduleResponse;
-};
+  const data: getScheduleResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getScheduleResponse
+}
 
-export const getGetScheduleQueryKey = (scheduleId: string) => {
-  return [
-    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`,
-  ] as const;
-};
 
-export const getGetScheduleQueryOptions = <
-  TData = Awaited<ReturnType<typeof getSchedule>>,
-  TError = HTTPValidationError,
->(
-  scheduleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
+
+
+
+export const getGetScheduleQueryKey = (scheduleId: string,) => {
+    return [
+    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`
+    ] as const;
+    }
+
+
+export const getGetScheduleQueryOptions = <TData = Awaited<ReturnType<typeof getSchedule>>, TError = HTTPValidationError>(scheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>>, fetch?: RequestInit}
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetScheduleQueryKey(scheduleId);
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSchedule>>> = ({
-    signal,
-  }) => getSchedule(scheduleId, { signal, ...fetchOptions });
+  const queryKey =  queryOptions?.queryKey ?? getGetScheduleQueryKey(scheduleId);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: scheduleId !== null && scheduleId !== undefined,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getSchedule>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
 
-export type GetScheduleQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getSchedule>>
->;
-export type GetScheduleQueryError = HTTPValidationError;
 
-export function useGetSchedule<
-  TData = Awaited<ReturnType<typeof getSchedule>>,
-  TError = HTTPValidationError,
->(
-  scheduleId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>
-    > &
-      Pick<
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSchedule>>> = ({ signal }) => getSchedule(scheduleId, { signal, ...fetchOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: scheduleId !== null && scheduleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetScheduleQueryResult = NonNullable<Awaited<ReturnType<typeof getSchedule>>>
+export type GetScheduleQueryError = HTTPValidationError
+
+
+export function useGetSchedule<TData = Awaited<ReturnType<typeof getSchedule>>, TError = HTTPValidationError>(
+ scheduleId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSchedule>>,
           TError,
           Awaited<ReturnType<typeof getSchedule>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetSchedule<
-  TData = Awaited<ReturnType<typeof getSchedule>>,
-  TError = HTTPValidationError,
->(
-  scheduleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>
-    > &
-      Pick<
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSchedule<TData = Awaited<ReturnType<typeof getSchedule>>, TError = HTTPValidationError>(
+ scheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSchedule>>,
           TError,
           Awaited<ReturnType<typeof getSchedule>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useGetSchedule<
-  TData = Awaited<ReturnType<typeof getSchedule>>,
-  TError = HTTPValidationError,
->(
-  scheduleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSchedule<TData = Awaited<ReturnType<typeof getSchedule>>, TError = HTTPValidationError>(
+ scheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Schedule
  */
 
-export function useGetSchedule<
-  TData = Awaited<ReturnType<typeof getSchedule>>,
-  TError = HTTPValidationError,
->(
-  scheduleId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getGetScheduleQueryOptions(scheduleId, options);
+export function useGetSchedule<TData = Awaited<ReturnType<typeof getSchedule>>, TError = HTTPValidationError>(
+ scheduleId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSchedule>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  const queryOptions = getGetScheduleQueryOptions(scheduleId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+
+
+
+
+
 export type updateScheduleResponse200 = {
-  data: ScheduleResponse;
-  status: 200;
-};
+  data: ScheduleResponse
+  status: 200
+}
 
 export type updateScheduleResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
-};
+  data: HTTPValidationError
+  status: 422
+}
 
-export type updateScheduleResponseSuccess = updateScheduleResponse200 & {
+export type updateScheduleResponseSuccess = (updateScheduleResponse200) & {
   headers: Headers;
 };
-export type updateScheduleResponseError = updateScheduleResponse422 & {
+export type updateScheduleResponseError = (updateScheduleResponse422) & {
   headers: Headers;
 };
 
-export type updateScheduleResponse =
-  | updateScheduleResponseSuccess
-  | updateScheduleResponseError;
+export type updateScheduleResponse = (updateScheduleResponseSuccess | updateScheduleResponseError)
 
-export const getUpdateScheduleUrl = (scheduleId: string) => {
-  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`;
-};
+export const getUpdateScheduleUrl = (scheduleId: string,) => {
+
+
+
+
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`
+}
 
 /**
  * @summary Update Schedule
  */
-export const updateSchedule = async (
-  scheduleId: string,
-  scheduleUpdate: ScheduleUpdate,
-  options?: RequestInit,
-): Promise<updateScheduleResponse> => {
-  const res = await fetch(getUpdateScheduleUrl(scheduleId), {
+export const updateSchedule = async (scheduleId: string,
+    scheduleUpdate: ScheduleUpdate, options?: RequestInit): Promise<updateScheduleResponse> => {
+
+  const res = await fetch(getUpdateScheduleUrl(scheduleId),
+  {
     ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(scheduleUpdate),
-  });
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(scheduleUpdate)
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: updateScheduleResponse["data"] = body ? JSON.parse(body) : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as updateScheduleResponse;
-};
+  const data: updateScheduleResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as updateScheduleResponse
+}
 
-export const getUpdateScheduleMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateSchedule>>,
-    TError,
-    { scheduleId: string; data: ScheduleUpdate },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateSchedule>>,
-  TError,
-  { scheduleId: string; data: ScheduleUpdate },
-  TContext
-> => {
-  const mutationKey = ["updateSchedule"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateSchedule>>,
-    { scheduleId: string; data: ScheduleUpdate }
-  > = (props) => {
-    const { scheduleId, data } = props ?? {};
 
-    return updateSchedule(scheduleId, data, fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type UpdateScheduleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateSchedule>>
->;
-export type UpdateScheduleMutationBody = ScheduleUpdate;
-export type UpdateScheduleMutationError = HTTPValidationError;
+export const getUpdateScheduleMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSchedule>>, TError,{scheduleId: string;data: ScheduleUpdate}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSchedule>>, TError,{scheduleId: string;data: ScheduleUpdate}, TContext> => {
 
-/**
+const mutationKey = ['updateSchedule'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSchedule>>, {scheduleId: string;data: ScheduleUpdate}> = (props) => {
+          const {scheduleId,data} = props ?? {};
+
+          return  updateSchedule(scheduleId,data,fetchOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateScheduleMutationResult = NonNullable<Awaited<ReturnType<typeof updateSchedule>>>
+    export type UpdateScheduleMutationBody = ScheduleUpdate
+    export type UpdateScheduleMutationError = HTTPValidationError
+
+    /**
  * @summary Update Schedule
  */
-export const useUpdateSchedule = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateSchedule>>,
-      TError,
-      { scheduleId: string; data: ScheduleUpdate },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof updateSchedule>>,
-  TError,
-  { scheduleId: string; data: ScheduleUpdate },
-  TContext
-> => {
-  return useMutation(getUpdateScheduleMutationOptions(options), queryClient);
-};
-export type deleteScheduleResponse204 = {
-  data: void;
-  status: 204;
-};
+export const useUpdateSchedule = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSchedule>>, TError,{scheduleId: string;data: ScheduleUpdate}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSchedule>>,
+        TError,
+        {scheduleId: string;data: ScheduleUpdate},
+        TContext
+      > => {
+      return useMutation(getUpdateScheduleMutationOptions(options), queryClient);
+    }
+    export type deleteScheduleResponse204 = {
+  data: void
+  status: 204
+}
 
 export type deleteScheduleResponse422 = {
-  data: HTTPValidationError;
-  status: 422;
-};
+  data: HTTPValidationError
+  status: 422
+}
 
-export type deleteScheduleResponseSuccess = deleteScheduleResponse204 & {
+export type deleteScheduleResponseSuccess = (deleteScheduleResponse204) & {
   headers: Headers;
 };
-export type deleteScheduleResponseError = deleteScheduleResponse422 & {
+export type deleteScheduleResponseError = (deleteScheduleResponse422) & {
   headers: Headers;
 };
 
-export type deleteScheduleResponse =
-  | deleteScheduleResponseSuccess
-  | deleteScheduleResponseError;
+export type deleteScheduleResponse = (deleteScheduleResponseSuccess | deleteScheduleResponseError)
 
-export const getDeleteScheduleUrl = (scheduleId: string) => {
-  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`;
-};
+export const getDeleteScheduleUrl = (scheduleId: string,) => {
+
+
+
+
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/schedules/${scheduleId}`
+}
 
 /**
  * @summary Delete Schedule
  */
-export const deleteSchedule = async (
-  scheduleId: string,
-  options?: RequestInit,
-): Promise<deleteScheduleResponse> => {
-  const res = await fetch(getDeleteScheduleUrl(scheduleId), {
+export const deleteSchedule = async (scheduleId: string, options?: RequestInit): Promise<deleteScheduleResponse> => {
+
+  const res = await fetch(getDeleteScheduleUrl(scheduleId),
+  {
     ...options,
-    method: "DELETE",
-  });
+    method: 'DELETE'
+
+
+  }
+)
+
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: deleteScheduleResponse["data"] = body
-    ? JSON.parse(body)
-    : undefined;
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as deleteScheduleResponse;
-};
+  const data: deleteScheduleResponse['data'] = body ? JSON.parse(body) : undefined
+  return { data, status: res.status, headers: res.headers } as deleteScheduleResponse
+}
 
-export const getDeleteScheduleMutationOptions = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteSchedule>>,
-    TError,
-    { scheduleId: string },
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteSchedule>>,
-  TError,
-  { scheduleId: string },
-  TContext
-> => {
-  const mutationKey = ["deleteSchedule"];
-  const { mutation: mutationOptions, fetch: fetchOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, fetch: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteSchedule>>,
-    { scheduleId: string }
-  > = (props) => {
-    const { scheduleId } = props ?? {};
 
-    return deleteSchedule(scheduleId, fetchOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
 
-export type DeleteScheduleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteSchedule>>
->;
+export const getDeleteScheduleMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSchedule>>, TError,{scheduleId: string}, TContext>, fetch?: RequestInit}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSchedule>>, TError,{scheduleId: string}, TContext> => {
 
-export type DeleteScheduleMutationError = HTTPValidationError;
+const mutationKey = ['deleteSchedule'];
+const {mutation: mutationOptions, fetch: fetchOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, fetch: undefined};
 
-/**
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSchedule>>, {scheduleId: string}> = (props) => {
+          const {scheduleId} = props ?? {};
+
+          return  deleteSchedule(scheduleId,fetchOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteScheduleMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSchedule>>>
+
+    export type DeleteScheduleMutationError = HTTPValidationError
+
+    /**
  * @summary Delete Schedule
  */
-export const useDeleteSchedule = <
-  TError = HTTPValidationError,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteSchedule>>,
-      TError,
-      { scheduleId: string },
-      TContext
-    >;
-    fetch?: RequestInit;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof deleteSchedule>>,
-  TError,
-  { scheduleId: string },
-  TContext
-> => {
-  return useMutation(getDeleteScheduleMutationOptions(options), queryClient);
-};
+export const useDeleteSchedule = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSchedule>>, TError,{scheduleId: string}, TContext>, fetch?: RequestInit}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSchedule>>,
+        TError,
+        {scheduleId: string},
+        TContext
+      > => {
+      return useMutation(getDeleteScheduleMutationOptions(options), queryClient);
+    }

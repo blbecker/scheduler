@@ -4,103 +4,20 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import { faker } from "@faker-js/faker";
+import {
+  faker
+} from '@faker-js/faker';
 
 import type {
   ScheduleSolveCreateResponse,
   ScheduleSolveResult,
-  ScheduleSolveStatus,
-} from "../../models";
+  ScheduleSolveStatus
+} from '../../models';
 
-export const getCreateScheduleSolveResponseMock = (
-  overrideResponse: Partial<Extract<ScheduleSolveCreateResponse, object>> = {},
-): ScheduleSolveCreateResponse => ({
-  id: faker.string.uuid(),
-  status: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  template_id: faker.string.uuid(),
-  parameters: {
-    population_size: faker.number.int({ min: 5, max: 1000 }),
-    max_generations: faker.number.int({ min: 1, max: 10000 }),
-    mutation_rate: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
-    selection_top_n: faker.number.int({ min: 1, max: 1000 }),
-    elite_size: faker.number.int({ min: 0, max: 100 }),
-  },
-  ...overrideResponse,
-});
 
-export const getGetScheduleSolveStatusResponseMock = (
-  overrideResponse: Partial<Extract<ScheduleSolveStatus, object>> = {},
-): ScheduleSolveStatus => ({
-  id: faker.string.uuid(),
-  status: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  template_id: faker.string.uuid(),
-  parameters: {
-    population_size: faker.number.int({ min: 5, max: 1000 }),
-    max_generations: faker.number.int({ min: 1, max: 10000 }),
-    mutation_rate: faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
-    selection_top_n: faker.number.int({ min: 1, max: 1000 }),
-    elite_size: faker.number.int({ min: 0, max: 100 }),
-  },
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  started_at: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([
-      faker.date.past().toISOString().slice(0, 19) + "Z",
-      null,
-    ]),
-    undefined,
-  ]),
-  finished_at: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([
-      faker.date.past().toISOString().slice(0, 19) + "Z",
-      null,
-    ]),
-    undefined,
-  ]),
-  current_generation: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.number.int(), null]),
-    undefined,
-  ]),
-  best_fitness: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([
-      faker.number.float({ fractionDigits: 2 }),
-      null,
-    ]),
-    undefined,
-  ]),
-  progress: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([
-      faker.number.float({ min: 0, max: 1, fractionDigits: 2 }),
-      null,
-    ]),
-    undefined,
-  ]),
-  result: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([null]),
-    undefined,
-  ]),
-  error_message: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([
-      faker.string.alpha({ length: { min: 10, max: 20 } }),
-      null,
-    ]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
+export const getCreateScheduleSolveResponseMock = (overrideResponse: Partial<Extract<ScheduleSolveCreateResponse, object>> = {}): ScheduleSolveCreateResponse => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), template_id: faker.string.uuid(), parameters: {population_size: faker.number.int({min: 5, max: 1000}), max_generations: faker.number.int({min: 1, max: 10000}), mutation_rate: faker.number.float({min: 0, max: 1, fractionDigits: 2}), selection_top_n: faker.number.int({min: 1, max: 1000}), elite_size: faker.number.int({min: 0, max: 100})}, schedule_solve_id: faker.string.uuid(), ...overrideResponse})
 
-export const getGetScheduleSolveResultResponseMock = (
-  overrideResponse: Partial<Extract<ScheduleSolveResult, object>> = {},
-): ScheduleSolveResult => ({
-  id: faker.string.uuid(),
-  status: faker.string.alpha({ length: { min: 10, max: 20 } }),
-  best_genome: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([null]),
-    undefined,
-  ]),
-  best_fitness: faker.number.float({ fractionDigits: 2 }),
-  generations: faker.number.int(),
-  elapsed_time: faker.number.float({ fractionDigits: 2 }),
-  metrics: faker.helpers.arrayElement([{}, undefined]),
-  created_at: faker.date.past().toISOString().slice(0, 19) + "Z",
-  ...overrideResponse,
-});
+export const getGetScheduleSolveStatusResponseMock = (overrideResponse: Partial<Extract<ScheduleSolveStatus, object>> = {}): ScheduleSolveStatus => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), template_id: faker.string.uuid(), parameters: {population_size: faker.number.int({min: 5, max: 1000}), max_generations: faker.number.int({min: 1, max: 10000}), mutation_rate: faker.number.float({min: 0, max: 1, fractionDigits: 2}), selection_top_n: faker.number.int({min: 1, max: 1000}), elite_size: faker.number.int({min: 0, max: 100})}, created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', started_at: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), undefined]), finished_at: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), undefined]), current_generation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(),null,]), undefined]), best_fitness: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), undefined]), progress: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({min: 0, max: 1, fractionDigits: 2}),null,]), undefined]), result: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), error_message: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), undefined]), ...overrideResponse})
+
+export const getGetScheduleSolveResultResponseMock = (overrideResponse: Partial<Extract<ScheduleSolveResult, object>> = {}): ScheduleSolveResult => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), best_genome: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), best_fitness: faker.number.float({fractionDigits: 2}), generations: faker.number.int(), elapsed_time: faker.number.float({fractionDigits: 2}), metrics: faker.helpers.arrayElement([{}, undefined]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
+

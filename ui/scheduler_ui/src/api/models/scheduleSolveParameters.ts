@@ -10,33 +10,33 @@
  */
 export interface ScheduleSolveParameters {
   /**
-   * Size of population
-   * @minimum 5
-   * @maximum 1000
-   */
+     * Size of population
+     * @minimum 5
+     * @maximum 1000
+     */
   population_size?: number;
   /**
-   * Maximum generations
-   * @minimum 1
-   * @maximum 10000
-   */
+     * Maximum generations
+     * @minimum 1
+     * @maximum 10000
+     */
   max_generations?: number;
   /**
-   * Mutation probability
-   * @minimum 0
-   * @maximum 1
-   */
+     * Mutation probability
+     * @minimum 0
+     * @maximum 1
+     */
   mutation_rate?: number;
   /**
-   * Top N to select
-   * @minimum 1
-   * @maximum 1000
-   */
+     * Top N to select
+     * @minimum 1
+     * @maximum 1000
+     */
   selection_top_n?: number;
   /**
-   * Number of elites to preserve
-   * @minimum 0
-   * @maximum 100
-   */
+     * Number of elites to preserve
+     * @minimum 0
+     * @maximum 100
+     */
   elite_size?: number;
 }

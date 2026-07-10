@@ -4,15 +4,17 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import type { ScheduleSolveParameters } from "./scheduleSolveParameters";
+import type { ScheduleSolveParameters } from './scheduleSolveParameters';
 
 /**
  * Response for schedule solve creation.
  */
 export interface ScheduleSolveCreateResponse {
   id: string;
-  /** pending, running, completed, failed */
+  /** pending, queued, running, completed, failed */
   status?: string;
   template_id: string;
   parameters: ScheduleSolveParameters;
+  /** ID of the persisted ScheduleSolveModel record */
+  schedule_solve_id: string;
 }

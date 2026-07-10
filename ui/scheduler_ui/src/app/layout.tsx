@@ -1,3 +1,4 @@
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import type { Metadata } from "next";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -15,12 +16,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <EmotionRegistry>
           <MuiProvider>
             <QueryProvider>
               <AppRouterCacheProvider>
+                {/* must come before the <main> element */}
+                {/* <InitColorSchemeScript attribute="element" /> */}
                 <MainLayout>{children}</MainLayout>
               </AppRouterCacheProvider>
             </QueryProvider>

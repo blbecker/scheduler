@@ -4,8 +4,8 @@
  * Scheduler API
  * OpenAPI spec version: 1.0.0
  */
-import type { ScheduleSolveParameters } from "./scheduleSolveParameters";
-import type { ScheduleSolveStatusResult } from "./scheduleSolveStatusResult";
+import type { ScheduleSolveParameters } from './scheduleSolveParameters';
+import type { ScheduleSolveStatusResult } from './scheduleSolveStatusResult';
 
 /**
  * Response for schedule solve status.
