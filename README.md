@@ -1,5 +1,11 @@
 # scheduler
 
+## UI
+
+### Generate API client
+
+`pushd ui/scheduler_ui && orval && popd`
+
 ## Database
 
 ### Running migrations (local dev)
