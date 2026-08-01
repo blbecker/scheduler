@@ -1,8 +1,8 @@
 """Debug test for solve framework."""
 
 from uuid import uuid4
-from scheduler_api.solves.schedule.solver import ScheduleSolver
-from scheduler_api.solves.engine.orchestrator import SolveOrchestrator
+from scheduler_api.solves.schedule_solve.solver import ScheduleSolver
+from scheduler_api.engine.orchestrator import SolveOrchestrator
 
 
 def debug_solve():
@@ -46,7 +46,7 @@ def debug_solve():
             print(f"     Shift {str(shift_id)[:8]}... -> {len(workers)} workers")
 
     print("\n3. Testing scorer...")
-    from scheduler_api.solves.schedule.scorers.skills_match_scorer import (
+    from scheduler_api.solves.schedule_solve.scorers.skills_match_scorer import (
         SkillsMatchScorer,
     )
 

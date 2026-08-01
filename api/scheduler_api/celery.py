@@ -1,6 +1,10 @@
 from celery import Celery
 import os
 
+# Import model registry to ensure all models are registered with SQLAlchemy
+# This ensures SQLAlchemy can resolve all relationships when initializing mappers
+from scheduler_api.db.models import registry  # noqa: F401
+
 app = Celery(
     "scheduler_api",
     broker=os.getenv(

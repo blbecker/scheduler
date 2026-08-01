@@ -10,4 +10,5 @@ export interface ShiftTemplateUpdate {
   name?: string | null;
   start_time?: string | null;
   end_time?: string | null;
+  skill_ids?: string[];
 }

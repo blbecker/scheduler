@@ -10,6 +10,7 @@ from scheduler_api.services.schedule_template_service import ScheduleTemplateSer
 from scheduler_api.services.shift_template_service import ShiftTemplateService
 from scheduler_api.services.schedule_service import ScheduleService
 from scheduler_api.services.schedule_solve_service import ScheduleSolveService
+from scheduler_api.services.shift_assignment_service import ShiftAssignmentService
 
 
 # -----------------------------
@@ -82,3 +83,12 @@ def get_schedule_solve_service(
     Schedule solve service (application/business boundary).
     """
     return ScheduleSolveService(session)
+
+
+def get_shift_assignment_service(
+    session: Session = Depends(get_db_session),
+) -> ShiftAssignmentService:
+    """
+    Shift assignment service (application/business boundary).
+    """
+    return ShiftAssignmentService(session)

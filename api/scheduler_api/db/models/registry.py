@@ -12,10 +12,14 @@ from scheduler_api.db.models.core.skill import SkillModel
 from scheduler_api.db.models.core.worker import WorkerModel
 
 # ─────────────────────────────
+# ASSIGNMENTS
+# ─────────────────────────────
+from scheduler_api.db.models.assignments.shift_assignment import ShiftAssignmentModel
+
+# ─────────────────────────────
 # ASSOCIATIONS (must load before relationships resolve)
 # ─────────────────────────────
 from scheduler_api.db.models.associations.worker_skill_link import WorkerSkillLinkModel
-from scheduler_api.db.models.associations.shift_worker_link import ShiftWorkerLinkModel
 from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLinkModel
 from scheduler_api.db.models.associations.shift_template_skill import (
     ShiftTemplateSkillModel,
@@ -43,9 +47,10 @@ __all__ = [
     # core
     "SkillModel",
     "WorkerModel",
+    # assignments
+    "ShiftAssignmentModel",
     # associations
     "WorkerSkillLinkModel",
-    "ShiftWorkerLinkModel",
     "ShiftSkillLinkModel",
     "ShiftTemplateSkillModel",
     # templates

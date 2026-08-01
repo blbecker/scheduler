@@ -5,8 +5,8 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 import random
 
-from scheduler_api.solves.engine.evolution import EvolutionEngine
-from scheduler_api.solves.engine.population import Population, Candidate
+from scheduler_api.engine.evolution import EvolutionEngine
+from scheduler_api.engine.population import Population, Candidate
 
 
 class TestEvolutionEngine:
@@ -153,7 +153,10 @@ class TestEvolutionEngine:
         selected_genomes = [{"genome": "test1"}, {"genome": "test2"}]
         offspring = engine._create_offspring(selected_genomes, [], {})
 
-        assert offspring == []
+        # With enhanced engine, should return copies of parents even without operators
+        assert len(offspring) == 2
+        assert {"genome": "test1"} in offspring
+        assert {"genome": "test2"} in offspring
 
     def test_create_offspring_no_genomes(self):
         """Test _create_offspring with no selected genomes."""
@@ -182,7 +185,7 @@ class TestEvolutionEngine:
         with patch("random.choice", return_value=mock_operator):
             offspring = engine._create_offspring(selected_genomes, [mock_operator], {})
 
-        # Should have mutated genome and possibly original (50% chance)
+        # Should have mutated genome (enhanced engine always produces offspring)
         assert len(offspring) >= 1
         mock_operator.apply.assert_called_once_with({"genome": "test"}, {})
 
@@ -246,9 +249,8 @@ class TestEvolutionEngine:
             metadata={"type": "initial"},
         )
 
-        population = Population(
-            generation=0, candidates=[candidate1, candidate2, candidate3]
-        )
+        population = Population(generation=0)
+        population.add_candidates([candidate1, candidate2, candidate3])
 
         # Mock components
         mock_operator = Mock()
@@ -313,7 +315,8 @@ class TestEvolutionEngine:
             generation=0, genome={"genome": "1"}, fitness=0.9, score_breakdown={}
         )
 
-        population = Population(generation=0, candidates=[candidate])
+        population = Population(generation=0)
+        population.add_candidates([candidate])
 
         # Mock selector to return empty list (simulating selection failure)
         mock_selector = Mock()
@@ -387,7 +390,8 @@ class TestEvolutionEngine:
 
         # Test with elite_size = 0
         candidate = Candidate(fitness=0.8)
-        population = Population(candidates=[candidate])
+        population = Population(generation=0)
+        population.add_candidates([candidate])
 
         # Mock simple components
         mock_selector = Mock()
@@ -421,7 +425,8 @@ class TestEvolutionEngine:
             Candidate(id=uuid4(), generation=0, fitness=0.6, genome={"g": "4"}),
         ]
 
-        population = Population(generation=0, candidates=candidates)
+        population = Population(generation=0)
+        population.add_candidates(candidates)
 
         # Mock selector to return some genomes
         mock_selector = Mock()

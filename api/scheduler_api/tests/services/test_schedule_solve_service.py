@@ -427,23 +427,30 @@ class TestScheduleSolveService:
             mock_schedule = MagicMock()
             mock_schedule.name = schedule_name
             mock_schedule.schedule_template_id = sample_solve_model.schedule_template_id
-            mock_schedule.schedule_solve_id = sample_solve_model.id
+            mock_schedule.id = uuid4()  # Add an ID for the schedule
             mock_schedule_model.return_value = mock_schedule
 
-            # Test
-            result = service.create_schedule_from_solve(solve_id, schedule_name)
+            # Mock complete_schedule_solve to track calls without affecting get_by_id
+            with patch.object(service, "complete_schedule_solve") as mock_complete:
 
-            # Verify
-            service.repo.get_by_id.assert_called_once_with(solve_id)
-            mock_schedule_model.assert_called_once_with(
-                name=schedule_name,
-                schedule_template_id=sample_solve_model.schedule_template_id,
-                schedule_solve_id=sample_solve_model.id,
-            )
-            service.session.add.assert_called_once_with(mock_schedule)
-            service.session.flush.assert_called_once()
-            service.session.commit.assert_called_once()
-            assert result == mock_schedule
+                # Test
+                result = service.create_schedule_from_solve(solve_id, schedule_name)
+
+                # Verify
+                # get_by_id is called once in create_schedule_from_solve
+                # complete_schedule_solve is mocked so it won't call get_by_id again
+                service.repo.get_by_id.assert_called_once_with(solve_id)
+
+                mock_schedule_model.assert_called_once_with(
+                    name=schedule_name,
+                    schedule_template_id=sample_solve_model.schedule_template_id,
+                )
+                service.session.add.assert_called_once_with(mock_schedule)
+                service.session.flush.assert_called_once()
+                service.session.commit.assert_called_once()
+                # complete_schedule_solve should be called
+                mock_complete.assert_called_once_with(solve_id, mock_schedule.id)
+                assert result == mock_schedule
 
     def test_create_schedule_from_solve_not_found(self, service):
         """Test creating schedule from solve when solve not found."""

@@ -1,12 +1,13 @@
 # scheduler_api/schemas/shift.py
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
+
+from scheduler_api.schemas.skill import SkillResponse
 
 
 class ShiftCreate(BaseModel):
-    schedule_id: UUID
     shift_template_id: UUID
     name: str
     start_time: datetime
@@ -14,7 +15,6 @@ class ShiftCreate(BaseModel):
 
 
 class ShiftUpdate(BaseModel):
-    schedule_id: Optional[UUID] = None
     shift_template_id: Optional[UUID] = None
     name: Optional[str] = None
     start_time: Optional[datetime] = None
@@ -23,10 +23,16 @@ class ShiftUpdate(BaseModel):
 
 class ShiftResponse(BaseModel):
     id: UUID
-    schedule_id: UUID
     shift_template_id: UUID
     name: str
     start_time: datetime
     end_time: datetime
     created_at: datetime
     updated_at: datetime
+
+
+class ShiftDetailResponse(ShiftResponse):
+    """Shift response with relationships (skills and assignment)."""
+
+    skills: List[SkillResponse] = []
+    assignment: Optional[dict] = None  # Will contain assignment info if exists

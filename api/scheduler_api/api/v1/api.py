@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from scheduler_api.api.v1.routes.core import workers, skills, shifts
+from scheduler_api.api.v1.routes.core import workers, skills, shifts, assignments
 from scheduler_api.api.v1.routes.templates import schedule_templates, shift_templates
 from scheduler_api.api.v1.routes.schedules import schedules
 from scheduler_api.api.v1.routes.solves import schedule
@@ -20,6 +20,7 @@ def create_v1_api() -> FastAPI:
     app.include_router(skills.router)
     app.include_router(shifts.router)
     app.include_router(workers.router)
+    app.include_router(assignments.router)
     app.include_router(schedule_templates.router)
     app.include_router(shift_templates.router)
     app.include_router(schedules.router)

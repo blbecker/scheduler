@@ -5,11 +5,29 @@ from unittest.mock import Mock
 from uuid import uuid4
 from datetime import datetime, timedelta
 
-from scheduler_api.solves.schedule.constraints.no_double_booking_constraint import (
+from scheduler_api.solves.schedule_solve.constraints.no_double_booking_constraint import (
     NoDoubleBookingConstraint,
 )
-from scheduler_api.solves.schedule.genome import ScheduleGenome
-from scheduler_api.solves.schedule.context import ScheduleSolveContext
+from scheduler_api.solves.schedule_solve.context import ScheduleSolveContext
+from scheduler_api.domain.schedule import (
+    Schedule,
+    ShiftAssignment,
+    ShiftAssignmentStatus,
+)
+
+
+def _make_schedule(assignments: dict) -> Schedule:
+    shift_assignments = []
+    for shift_id, worker_ids in assignments.items():
+        for worker_id in worker_ids:
+            shift_assignments.append(
+                ShiftAssignment(
+                    shift_id=shift_id,
+                    worker_id=worker_id,
+                    status=ShiftAssignmentStatus.ASSIGNED,
+                )
+            )
+    return Schedule(shift_assignments=shift_assignments)
 
 
 class TestNoDoubleBookingConstraint:
@@ -43,12 +61,10 @@ class TestNoDoubleBookingConstraint:
             ),  # 1pm-5pm
         }.get(shift_id)
 
-        # Create genome with non-overlapping assignments
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        # Create schedule with non-overlapping assignments
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        result = constraint.validate(genome, mock_context)
+        result = constraint.validate(schedule, mock_context)
 
         assert result is True
         assert mock_context.get_shift_times.call_count == 2
@@ -75,12 +91,10 @@ class TestNoDoubleBookingConstraint:
             ),  # 11am-3pm (overlaps!)
         }.get(shift_id)
 
-        # Create genome with overlapping assignments
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        # Create schedule with overlapping assignments
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        result = constraint.validate(genome, mock_context)
+        result = constraint.validate(schedule, mock_context)
 
         assert result is False  # Should detect overlap
 
@@ -99,11 +113,9 @@ class TestNoDoubleBookingConstraint:
             shift2_id: None,  # No time information
         }.get(shift_id)
 
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        result = constraint.validate(genome, mock_context)
+        result = constraint.validate(schedule, mock_context)
 
         # Should return True since shift2 is skipped
         assert result is True
@@ -126,11 +138,9 @@ class TestNoDoubleBookingConstraint:
         }.get(shift_id)
 
         # Worker1 has shift1, Worker2 has shift2 - no overlaps
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker1_id], shift2_id: [worker2_id]}
-        )
+        schedule = _make_schedule({shift1_id: [worker1_id], shift2_id: [worker2_id]})
 
-        result = constraint.validate(genome, mock_context)
+        result = constraint.validate(schedule, mock_context)
 
         assert result is True
 
@@ -161,15 +171,15 @@ class TestNoDoubleBookingConstraint:
 
         # Worker1 has non-overlapping shifts (1 & 2)
         # Worker2 has overlapping shifts (1 & 3)
-        genome = ScheduleGenome(
-            assignments={
+        schedule = _make_schedule(
+            {
                 shift1_id: [worker1_id, worker2_id],
                 shift2_id: [worker1_id],
                 shift3_id: [worker2_id],
             }
         )
 
-        result = constraint.validate(genome, mock_context)
+        result = constraint.validate(schedule, mock_context)
 
         assert result is False  # Worker2 has overlapping shifts 1 and 3
 
@@ -193,11 +203,9 @@ class TestNoDoubleBookingConstraint:
         mock_context.worker_ids = [worker_id]
         mock_context.shift_ids = [shift1_id, shift2_id]
 
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         assert penalty == 0.0  # No overlaps
 
@@ -221,11 +229,9 @@ class TestNoDoubleBookingConstraint:
         mock_context.worker_ids = [worker_id]
         mock_context.shift_ids = [shift1_id, shift2_id]
 
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         # 1 overlap / max_possible_overlaps(1 * (2-1) = 1) = 1.0
         assert penalty == 1.0
@@ -237,9 +243,9 @@ class TestNoDoubleBookingConstraint:
         mock_context = Mock(spec=ScheduleSolveContext)
         mock_context.shift_schedule = False  # No time information
 
-        genome = ScheduleGenome(assignments={})
+        schedule = _make_schedule({})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         assert penalty == 0.0  # Can't check overlaps without schedule
 
@@ -262,11 +268,9 @@ class TestNoDoubleBookingConstraint:
         mock_context.worker_ids = [worker_id]
         mock_context.shift_ids = [shift1_id, shift2_id]
 
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         # Shift2 has no times, so no overlaps can be detected
         assert penalty == 0.0
@@ -294,15 +298,15 @@ class TestNoDoubleBookingConstraint:
         mock_context.shift_ids = [shift1_id, shift2_id, shift3_id]
 
         # Worker assigned to all 3 overlapping shifts
-        genome = ScheduleGenome(
-            assignments={
+        schedule = _make_schedule(
+            {
                 shift1_id: [worker_id],
                 shift2_id: [worker_id],
                 shift3_id: [worker_id],
             }
         )
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         # With 3 shifts, max_possible_overlaps = 1 * (3-1) = 2
         # Overlap pairs: (1,2), (1,3), (2,3) = 3 overlaps
@@ -336,15 +340,15 @@ class TestNoDoubleBookingConstraint:
 
         # Worker1: shift1 and shift2 (no overlap)
         # Worker2: shift1 and shift3 (overlap!)
-        genome = ScheduleGenome(
-            assignments={
+        schedule = _make_schedule(
+            {
                 shift1_id: [worker1_id, worker2_id],
                 shift2_id: [worker1_id],
                 shift3_id: [worker2_id],
             }
         )
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         # Max possible overlaps: 2 workers * (3-1) = 4
         # Actual overlaps: Worker2 has shift1 and shift3 overlapping = 1 overlap
@@ -355,15 +359,15 @@ class TestNoDoubleBookingConstraint:
         """Test penalty edge cases."""
         constraint = NoDoubleBookingConstraint()
 
-        # Test with empty genome
+        # Test with empty schedule
         mock_context = Mock(spec=ScheduleSolveContext)
         mock_context.shift_schedule = True
         mock_context.worker_ids = []
         mock_context.shift_ids = []
 
-        genome = ScheduleGenome(assignments={})
+        schedule = _make_schedule({})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         assert penalty == 0.0
 
@@ -387,11 +391,9 @@ class TestNoDoubleBookingConstraint:
         mock_context.shift_ids = shift_ids
 
         # Worker assigned to all shifts (all overlap)
-        genome = ScheduleGenome(
-            assignments={shift_id: [worker_id] for shift_id in shift_ids}
-        )
+        schedule = _make_schedule({shift_id: [worker_id] for shift_id in shift_ids})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         # Should be capped at 1.0
         assert penalty == 1.0
@@ -415,11 +417,9 @@ class TestNoDoubleBookingConstraint:
             ),  # 12pm-4pm (exactly adjacent)
         }.get(shift_id)
 
-        genome = ScheduleGenome(
-            assignments={shift1_id: [worker_id], shift2_id: [worker_id]}
-        )
+        schedule = _make_schedule({shift1_id: [worker_id], shift2_id: [worker_id]})
 
-        result = constraint.validate(genome, mock_context)
+        result = constraint.validate(schedule, mock_context)
 
         # Back-to-back shifts (end time = start time) should not be considered overlapping
         assert result is True
@@ -440,9 +440,9 @@ class TestNoDoubleBookingConstraint:
         mock_context.worker_ids = [worker_id]
         mock_context.shift_ids = [shift_id]
 
-        genome = ScheduleGenome(assignments={shift_id: [worker_id]})
+        schedule = _make_schedule({shift_id: [worker_id]})
 
-        penalty = constraint.penalty(genome, mock_context)
+        penalty = constraint.penalty(schedule, mock_context)
 
         # Single shift can't overlap with anything
         assert penalty == 0.0

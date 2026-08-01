@@ -5,9 +5,9 @@ from unittest.mock import Mock, patch, AsyncMock
 from uuid import uuid4
 from datetime import datetime, UTC
 
-from scheduler_api.solves.schedule.solver import ScheduleSolver
-from scheduler_api.solves.engine.orchestrator import SolveOrchestrator
-from scheduler_api.solves.schedule.genome import ScheduleGenomeDTO
+from scheduler_api.solves.schedule_solve.solver import ScheduleSolver
+from scheduler_api.engine.orchestrator import SolveOrchestrator
+from scheduler_api.solves.schedule_solve.genome import ScheduleGenomeDTO
 from scheduler_api.schemas.solve import ScheduleSolveParameters
 
 
@@ -80,7 +80,7 @@ class TestSolveOrchestrator:
 
     def test_solve_result_dataclass(self):
         """Test the SolveResult dataclass."""
-        from scheduler_api.solves.engine.orchestrator import SolveResult
+        from scheduler_api.engine.orchestrator import SolveResult
 
         result = SolveResult(
             status="completed",
@@ -102,7 +102,7 @@ class TestSolveOrchestrator:
         assert result_dict["status"] == "completed"
         assert result_dict["best_fitness"] == 0.85
 
-    @patch("scheduler_api.solves.engine.orchestrator.EvolutionEngine")
+    @patch("scheduler_api.engine.orchestrator.EvolutionEngine")
     def test_solve_with_mock_solvable(self, mock_evolution_engine):
         """Test solve execution with mocked solvable."""
         template_id = uuid4()
@@ -116,7 +116,15 @@ class TestSolveOrchestrator:
         mock_solvable.create_context.return_value = mock_context
 
         # Mock create_initial_population to return list
-        mock_solvable.create_initial_population.return_value = [Mock(), Mock()]
+        mock_population = Mock()
+        mock_population.get_top_n.return_value = []
+        mock_population.get_best_fitness.return_value = 0.8
+        mock_population.size.return_value = 10
+        mock_population.get_average_fitness.return_value = 0.6
+        mock_population.get_worst_fitness.return_value = 0.4
+        mock_population.get_fitness_range.return_value = (0.4, 0.8)
+        mock_population.get_best.return_value = Mock(fitness=0.8, genome=Mock())
+        mock_solvable.create_initial_population.return_value = mock_population
 
         # Mock pipeline
         mock_pipeline = Mock()
@@ -135,15 +143,16 @@ class TestSolveOrchestrator:
 
         # Mock evolution engine
         mock_engine_instance = Mock()
-        # Mock evolve_population to return a Population mock with get_best_fitness
-        mock_population = Mock()
-        mock_population.get_best_fitness.return_value = 0.8
-        mock_population.get_best.return_value = Mock(fitness=0.8, genome=Mock())
-        mock_population.size.return_value = 10
-        mock_population.get_average_fitness.return_value = 0.6
-        mock_population.get_worst_fitness.return_value = 0.4
-        mock_population.get_fitness_range.return_value = (0.4, 0.8)
-        mock_engine_instance.evolve_population.return_value = mock_population
+        # Mock evolve_population to return a Population mock
+        mock_evolved_population = Mock()
+        mock_evolved_population.get_best_fitness.return_value = 0.8
+        mock_evolved_population.get_best.return_value = Mock(fitness=0.8, genome=Mock())
+        mock_evolved_population.size.return_value = 10
+        mock_evolved_population.get_average_fitness.return_value = 0.6
+        mock_evolved_population.get_worst_fitness.return_value = 0.4
+        mock_evolved_population.get_fitness_range.return_value = (0.4, 0.8)
+        mock_evolved_population.get_top_n.return_value = []
+        mock_engine_instance.evolve_population.return_value = mock_evolved_population
         mock_evolution_engine.return_value = mock_engine_instance
 
         # Also mock the log_progress method to avoid formatting issues
@@ -242,7 +251,7 @@ class TestScheduleGenomeDTO:
         worker_id1 = uuid4()
         worker_id2 = uuid4()
 
-        from scheduler_api.solves.schedule.genome import ScheduleGenome
+        from scheduler_api.solves.schedule_solve.genome import ScheduleGenome
 
         domain_genome = ScheduleGenome(assignments={shift_id: [worker_id1, worker_id2]})
 

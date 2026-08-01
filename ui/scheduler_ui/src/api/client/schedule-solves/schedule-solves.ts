@@ -27,8 +27,9 @@ import type {
   HTTPValidationError,
   ScheduleSolveCreateResponse,
   ScheduleSolveRequest,
+  ScheduleSolveResponse,
   ScheduleSolveResult,
-  ScheduleSolveStatus
+  SchedulerApiSchemasSolveScheduleSolveStatus
 } from '../../models';
 
 
@@ -49,6 +50,125 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export type listScheduleSolvesResponse200 = {
+  data: ScheduleSolveResponse[]
+  status: 200
+}
+
+export type listScheduleSolvesResponseSuccess = (listScheduleSolvesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type listScheduleSolvesResponse = (listScheduleSolvesResponseSuccess)
+
+export const getListScheduleSolvesUrl = () => {
+
+
+
+
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/solves/schedule/`
+}
+
+/**
+ * @summary List Schedule Solves
+ */
+export const listScheduleSolves = async ( options?: RequestInit): Promise<listScheduleSolvesResponse> => {
+
+  const res = await fetch(getListScheduleSolvesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+)
+
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listScheduleSolvesResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as listScheduleSolvesResponse
+}
+
+
+
+
+
+export const getListScheduleSolvesQueryKey = () => {
+    return [
+    `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/solves/schedule/`
+    ] as const;
+    }
+
+
+export const getListScheduleSolvesQueryOptions = <TData = Awaited<ReturnType<typeof listScheduleSolves>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listScheduleSolves>>, TError, TData>>, fetch?: RequestInit}
+) => {
+
+const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListScheduleSolvesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listScheduleSolves>>> = ({ signal }) => listScheduleSolves({ signal, ...fetchOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listScheduleSolves>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListScheduleSolvesQueryResult = NonNullable<Awaited<ReturnType<typeof listScheduleSolves>>>
+export type ListScheduleSolvesQueryError = unknown
+
+
+export function useListScheduleSolves<TData = Awaited<ReturnType<typeof listScheduleSolves>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listScheduleSolves>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listScheduleSolves>>,
+          TError,
+          Awaited<ReturnType<typeof listScheduleSolves>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListScheduleSolves<TData = Awaited<ReturnType<typeof listScheduleSolves>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listScheduleSolves>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listScheduleSolves>>,
+          TError,
+          Awaited<ReturnType<typeof listScheduleSolves>>
+        > , 'initialData'
+      >, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListScheduleSolves<TData = Awaited<ReturnType<typeof listScheduleSolves>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listScheduleSolves>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Schedule Solves
+ */
+
+export function useListScheduleSolves<TData = Awaited<ReturnType<typeof listScheduleSolves>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listScheduleSolves>>, TError, TData>>, fetch?: RequestInit}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListScheduleSolvesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
 
 export type createScheduleSolveResponse202 = {
   data: ScheduleSolveCreateResponse
@@ -74,7 +194,7 @@ export const getCreateScheduleSolveUrl = () => {
 
 
 
-  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/solves/schedule`
+  return `${process.env.NEXT_PUBLIC_V1_API_BASE_URL}/solves/schedule/`
 }
 
 /**
@@ -151,7 +271,7 @@ export const useCreateScheduleSolve = <TError = HTTPValidationError,
       return useMutation(getCreateScheduleSolveMutationOptions(options), queryClient);
     }
     export type getScheduleSolveStatusResponse200 = {
-  data: ScheduleSolveStatus
+  data: SchedulerApiSchemasSolveScheduleSolveStatus
   status: 200
 }
 

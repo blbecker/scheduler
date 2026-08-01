@@ -7,10 +7,12 @@ from scheduler_api.db.models.associations.shift_skill_link import ShiftSkillLink
 from scheduler_api.db.models.associations.shift_template_skill import (
     ShiftTemplateSkillModel,
 )
+from scheduler_api.db.models.associations.worker_skill_link import WorkerSkillLinkModel
 
 if TYPE_CHECKING:
     from scheduler_api.db.models.schedules.shift import ShiftModel
     from scheduler_api.db.models.templates.shift_template import ShiftTemplateModel
+    from scheduler_api.db.models.core.worker import WorkerModel
 
 
 class SkillModel(BaseModel, table=True):
@@ -25,4 +27,8 @@ class SkillModel(BaseModel, table=True):
 
     shift_templates: list["ShiftTemplateModel"] = Relationship(
         back_populates="skills", link_model=ShiftTemplateSkillModel
+    )
+
+    workers: list["WorkerModel"] = Relationship(
+        back_populates="skills", link_model=WorkerSkillLinkModel
     )

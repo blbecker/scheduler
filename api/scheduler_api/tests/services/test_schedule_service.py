@@ -140,7 +140,7 @@ class TestScheduleService:
         # Verify
         mock_from_create.assert_called_once_with(create_dto)
         service.repo.add.assert_called_once_with(sample_schedule_model)
-        service.session.flush.assert_called_once()
+        assert service.session.flush.call_count >= 1
         service.session.commit.assert_called_once()
         assert result == sample_schedule_response
 

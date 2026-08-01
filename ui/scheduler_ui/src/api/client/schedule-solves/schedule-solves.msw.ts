@@ -16,22 +16,40 @@ import type {
   RequestHandlerOptions
 } from 'msw';
 
+import {
+  SchedulerApiDbModelsEnumsScheduleSolveStatus
+} from '../../models';
 import type {
   ScheduleSolveCreateResponse,
+  ScheduleSolveResponse,
   ScheduleSolveResult,
-  ScheduleSolveStatus
+  SchedulerApiSchemasSolveScheduleSolveStatus
 } from '../../models';
 
 
+export const getListScheduleSolvesResponseMock = (): ScheduleSolveResponse[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.string.uuid(), schedule_template_id: faker.string.uuid(), schedule_id: faker.helpers.arrayElement([faker.string.uuid(),null,]), status: faker.helpers.arrayElement(Object.values(SchedulerApiDbModelsEnumsScheduleSolveStatus)), started_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), finished_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), parameters: {}, celery_task_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), current_generation: faker.helpers.arrayElement([faker.number.int(),null,]), best_fitness: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), progress: faker.number.float({fractionDigits: 2}), error_details: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', updated_at: faker.date.past().toISOString().slice(0, 19) + 'Z'})))
+
 export const getCreateScheduleSolveResponseMock = (overrideResponse: Partial<Extract<ScheduleSolveCreateResponse, object>> = {}): ScheduleSolveCreateResponse => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), template_id: faker.string.uuid(), parameters: {population_size: faker.number.int({min: 5, max: 1000}), max_generations: faker.number.int({min: 1, max: 10000}), mutation_rate: faker.number.float({min: 0, max: 1, fractionDigits: 2}), selection_top_n: faker.number.int({min: 1, max: 1000}), elite_size: faker.number.int({min: 0, max: 100})}, schedule_solve_id: faker.string.uuid(), ...overrideResponse})
 
-export const getGetScheduleSolveStatusResponseMock = (overrideResponse: Partial<Extract<ScheduleSolveStatus, object>> = {}): ScheduleSolveStatus => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), template_id: faker.string.uuid(), parameters: {population_size: faker.number.int({min: 5, max: 1000}), max_generations: faker.number.int({min: 1, max: 10000}), mutation_rate: faker.number.float({min: 0, max: 1, fractionDigits: 2}), selection_top_n: faker.number.int({min: 1, max: 1000}), elite_size: faker.number.int({min: 0, max: 100})}, created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', started_at: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), undefined]), finished_at: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), undefined]), current_generation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(),null,]), undefined]), best_fitness: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), undefined]), progress: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({min: 0, max: 1, fractionDigits: 2}),null,]), undefined]), result: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), error_message: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), undefined]), ...overrideResponse})
+export const getGetScheduleSolveStatusResponseMock = (overrideResponse: Partial<Extract<SchedulerApiSchemasSolveScheduleSolveStatus, object>> = {}): SchedulerApiSchemasSolveScheduleSolveStatus => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), template_id: faker.string.uuid(), parameters: {population_size: faker.number.int({min: 5, max: 1000}), max_generations: faker.number.int({min: 1, max: 10000}), mutation_rate: faker.number.float({min: 0, max: 1, fractionDigits: 2}), selection_top_n: faker.number.int({min: 1, max: 1000}), elite_size: faker.number.int({min: 0, max: 100})}, created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', started_at: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), undefined]), finished_at: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z',null,]), undefined]), current_generation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.int(),null,]), undefined]), best_fitness: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}),null,]), undefined]), progress: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.number.float({min: 0, max: 1, fractionDigits: 2}),null,]), undefined]), result: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), error_message: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}),null,]), undefined]), ...overrideResponse})
 
 export const getGetScheduleSolveResultResponseMock = (overrideResponse: Partial<Extract<ScheduleSolveResult, object>> = {}): ScheduleSolveResult => ({id: faker.string.uuid(), status: faker.string.alpha({length: {min: 10, max: 20}}), best_genome: faker.helpers.arrayElement([faker.helpers.arrayElement([null,]), undefined]), best_fitness: faker.number.float({fractionDigits: 2}), generations: faker.number.int(), elapsed_time: faker.number.float({fractionDigits: 2}), metrics: faker.helpers.arrayElement([{}, undefined]), created_at: faker.date.past().toISOString().slice(0, 19) + 'Z', ...overrideResponse})
 
 
+export const getListScheduleSolvesMockHandler = (overrideResponse?: ScheduleSolveResponse[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ScheduleSolveResponse[]> | ScheduleSolveResponse[]), options?: RequestHandlerOptions) => {
+  return http.get('*/solves/schedule/', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+
+
+    return HttpResponse.json(overrideResponse !== undefined
+    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
+    : getListScheduleSolvesResponseMock(),
+      { status: 200
+      })
+  }, options)
+}
+
 export const getCreateScheduleSolveMockHandler = (overrideResponse?: ScheduleSolveCreateResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<ScheduleSolveCreateResponse> | ScheduleSolveCreateResponse), options?: RequestHandlerOptions) => {
-  return http.post('*/solves/schedule', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+  return http.post('*/solves/schedule/', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
 
 
     return HttpResponse.json(overrideResponse !== undefined
@@ -42,7 +60,7 @@ export const getCreateScheduleSolveMockHandler = (overrideResponse?: ScheduleSol
   }, options)
 }
 
-export const getGetScheduleSolveStatusMockHandler = (overrideResponse?: ScheduleSolveStatus | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<ScheduleSolveStatus> | ScheduleSolveStatus), options?: RequestHandlerOptions) => {
+export const getGetScheduleSolveStatusMockHandler = (overrideResponse?: SchedulerApiSchemasSolveScheduleSolveStatus | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<SchedulerApiSchemasSolveScheduleSolveStatus> | SchedulerApiSchemasSolveScheduleSolveStatus), options?: RequestHandlerOptions) => {
   return http.get('*/solves/schedule/:solveId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
 
 
@@ -66,6 +84,7 @@ export const getGetScheduleSolveResultMockHandler = (overrideResponse?: Schedule
   }, options)
 }
 export const getScheduleSolvesMock = () => [
+  getListScheduleSolvesMockHandler(),
   getCreateScheduleSolveMockHandler(),
   getGetScheduleSolveStatusMockHandler(),
   getGetScheduleSolveResultMockHandler()

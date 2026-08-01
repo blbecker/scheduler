@@ -15,6 +15,7 @@ if TYPE_CHECKING:
         ScheduleTemplateModel,
     )
     from scheduler_api.db.models.core.skill import SkillModel
+    from scheduler_api.db.models.schedules.shift import ShiftModel
 
 
 class ShiftTemplateModel(BaseModel, table=True):
@@ -36,6 +37,8 @@ class ShiftTemplateModel(BaseModel, table=True):
     schedule_template: "ScheduleTemplateModel" = Relationship(
         back_populates="shift_templates"
     )
+
+    shifts: list["ShiftModel"] = Relationship(back_populates="shift_template")
 
     skills: list["SkillModel"] = Relationship(
         back_populates="shift_templates", link_model=ShiftTemplateSkillModel

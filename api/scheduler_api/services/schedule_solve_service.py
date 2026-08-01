@@ -178,15 +178,17 @@ class ScheduleSolveService:
         if not model:
             raise ValueError(f"Schedule solve with id {solve_id} not found")
 
-        # Create schedule
+        # Create schedule (no schedule_solve_id since solve owns the relationship)
         schedule = ScheduleModel(
             name=name,
             schedule_template_id=model.schedule_template_id,
-            schedule_solve_id=model.id,
         )
 
         self.session.add(schedule)
         self.session.flush()
         self.session.commit()
+
+        # Update solve with schedule reference
+        self.complete_schedule_solve(solve_id, schedule.id)
 
         return schedule

@@ -6,7 +6,6 @@ from scheduler_api.schemas.shift import ShiftCreate, ShiftResponse, ShiftUpdate
 def to_response(model: ShiftModel) -> ShiftResponse:
     return ShiftResponse(
         id=model.id,
-        schedule_id=model.schedule_id,
         shift_template_id=model.shift_template_id,
         name=model.name,
         start_time=model.start_time,

@@ -21,6 +21,9 @@ class ScheduleSolveParameters(BaseModel):
     selection_top_n: int = Field(
         default=25, ge=1, le=1000, description="Top N to select"
     )
+    crossover_rate: float = Field(
+        default=0.8, ge=0.0, le=1.0, description="Crossover/recombination probability"
+    )
     elite_size: int = Field(
         default=1, ge=0, le=100, description="Number of elites to preserve"
     )
@@ -32,6 +35,7 @@ class ScheduleSolveParameters(BaseModel):
                 "max_generations": 20,
                 "mutation_rate": 0.1,
                 "selection_top_n": 5,
+                "crossover_rate": 0.8,
                 "elite_size": 1,
             }
         }

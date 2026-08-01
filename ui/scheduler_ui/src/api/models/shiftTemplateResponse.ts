@@ -11,6 +11,7 @@ export interface ShiftTemplateResponse {
   name: string;
   start_time: string;
   end_time: string;
+  skill_ids?: string[];
   created_at: string;
   updated_at: string;
 }

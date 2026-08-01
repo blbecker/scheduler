@@ -15,17 +15,29 @@ from scheduler_api.schemas.schedule_solve import (
     ScheduleSolveCreate,
     ScheduleSolveResponse,
 )
-from scheduler_api.tasks.solve_tasks import schedule_solve_pseudo_task
+from scheduler_api.tasks.celery_tasks.solve_tasks import schedule_solve_task
+
+# Use the imported schedule_solve_task directly
+# Since it's decorated with @shared_task, it should have .delay() method
 from scheduler_api.celery import app
 from scheduler_api.api.v1.routes.deps import get_schedule_solve_service
 from scheduler_api.services.schedule_solve_service import ScheduleSolveService
 from scheduler_api.db.models.enums import ScheduleSolveStatus as StatusEnum
 
-router = APIRouter(prefix="/solves", tags=["schedule-solves"])
+router = APIRouter(prefix="/solves/schedule", tags=["schedule-solves"])
+
+
+@router.get(
+    "/", response_model=list[ScheduleSolveResponse], operation_id="list_schedule_solves"
+)
+def list_schedule_solves(
+    service: ScheduleSolveService = Depends(get_schedule_solve_service),
+):
+    return service.list_schedule_solves()
 
 
 @router.post(
-    "/schedule",
+    "/",
     response_model=ScheduleSolveCreateResponse,
     operation_id="create_schedule_solve",
     status_code=status.HTTP_202_ACCEPTED,
@@ -49,11 +61,14 @@ def create_schedule_solve(
     schedule_solve = service.create_schedule_solve(solve_create)
 
     # Start the Celery task with the schedule solve ID
-    task = schedule_solve_pseudo_task.delay(str(schedule_solve.id))
+    celery_task = schedule_solve_task.apply_async(
+        args=[str(schedule_solve.id), "default"]
+    )
+    task_id = celery_task.id
 
     # Update the schedule solve with the celery task ID
     service.update_schedule_solve_status(
-        schedule_solve.id, StatusEnum.queued, celery_task_id=task.id
+        schedule_solve.id, StatusEnum.queued, celery_task_id=task_id
     )
 
     return ScheduleSolveCreateResponse(
@@ -66,7 +81,7 @@ def create_schedule_solve(
 
 
 @router.get(
-    "/schedule/{solve_id}",
+    "/{solve_id}",
     response_model=ScheduleSolveStatus,
     operation_id="get_schedule_solve_status",
 )
@@ -121,7 +136,7 @@ def get_schedule_solve_status(
 
 
 @router.get(
-    "/schedule/{solve_id}/result",
+    "/{solve_id}/result",
     response_model=ScheduleSolveResult,
     operation_id="get_schedule_solve_result",
 )
@@ -146,15 +161,6 @@ def get_schedule_solve_result(
             status_code=status.HTTP_202_ACCEPTED,
             detail=f"Solve is {schedule_solve.status}, not completed",
         )
-
-    # Try to get additional result data from Celery if available
-    result_data = {}
-    if schedule_solve.celery_task_id:
-        celery_result = AsyncResult(schedule_solve.celery_task_id, app=app)
-        if celery_result.ready() and celery_result.successful():
-            celery_data = celery_result.result
-            if isinstance(celery_data, dict):
-                result_data = celery_data
 
     # Calculate elapsed time
     elapsed_time = 0.0

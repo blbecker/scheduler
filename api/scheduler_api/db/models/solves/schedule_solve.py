@@ -1,12 +1,18 @@
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 from sqlalchemy import Column, String, ForeignKey, DateTime, Integer, Float
 from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlmodel import Field
+from sqlmodel import Field, Relationship
 
 from scheduler_api.db.models.base import BaseModel
 from scheduler_api.db.models.enums import ScheduleSolveStatus
+
+if TYPE_CHECKING:
+    from scheduler_api.db.models.templates.schedule_template import (
+        ScheduleTemplateModel,
+    )
+    from scheduler_api.db.models.schedules.schedule import ScheduleModel
 
 
 class ScheduleSolveModel(BaseModel, table=True):
@@ -68,3 +74,9 @@ class ScheduleSolveModel(BaseModel, table=True):
     parameters: dict[str, Any] = Field(
         sa_column=Column(JSONB, nullable=False), default_factory=dict
     )
+
+    # Relationships
+    schedule_template: "ScheduleTemplateModel" = Relationship(
+        back_populates="schedule_solves"
+    )
+    schedule: "ScheduleModel" = Relationship()

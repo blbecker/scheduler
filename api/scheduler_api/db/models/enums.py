@@ -8,3 +8,11 @@ class ScheduleSolveStatus(str, Enum):
     completed = "completed"
     failed = "failed"
     cancelled = "cancelled"
+
+
+class ShiftAssignmentStatus(str, Enum):
+    ASSIGNED = "assigned"
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"

@@ -12,6 +12,7 @@ import {
   AvTimer as AvTimerIcon,
   CalendarMonth as CalendarMonthIcon,
   Work as WorkIcon,
+  Calculate as CalculateIcon,
 } from "@mui/icons-material";
 import {
   Box,
@@ -42,6 +43,7 @@ const navigationItems = [
   { label: "Shift Templates", icon: <AvTimerIcon />, path: "/shift-templates" },
   { label: "Schedules", icon: <CalendarMonthIcon />, path: "/schedules" },
   { label: "Shifts", icon: <WorkIcon />, path: "/shifts" },
+  { label: "Schedule Solves", icon: <CalculateIcon />, path: "/solves" },
 ];
 
 export function SidePanel() {

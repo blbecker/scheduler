@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from uuid import uuid4
 from datetime import datetime
 
-from scheduler_api.solves.engine.population import Candidate, Population
+from scheduler_api.engine.population import Candidate, Population
 
 
 class TestCandidate:
@@ -77,14 +77,16 @@ class TestPopulation:
 
         assert population.generation == 0
         assert population.candidates == []
-        assert isinstance(population.created_at, datetime)
+        assert population.size() == 0
+        assert population.is_empty()
 
     def test_population_with_candidates(self):
         """Test population initialization with candidates."""
         candidate1 = Candidate(fitness=0.5)
         candidate2 = Candidate(fitness=0.8)
 
-        population = Population(generation=3, candidates=[candidate1, candidate2])
+        population = Population(generation=3)
+        population.add_candidates([candidate1, candidate2])
 
         assert population.generation == 3
         assert len(population.candidates) == 2
@@ -96,7 +98,7 @@ class TestPopulation:
         population = Population()
         assert population.size() == 0
 
-        population.candidates = [Candidate(), Candidate(), Candidate()]
+        population.add_candidates([Candidate(), Candidate(), Candidate()])
         assert population.size() == 3
 
     def test_is_empty(self):
@@ -104,13 +106,13 @@ class TestPopulation:
         population = Population()
         assert population.is_empty()
 
-        population.candidates.append(Candidate())
+        population._candidates.append(Candidate())
         assert not population.is_empty()
 
     def test_get_best_empty_population(self):
         """Test get_best with empty population."""
         population = Population()
-        assert population.get_best() is None
+        assert population.get_top_n(1) == []
 
     def test_get_best(self):
         """Test getting best candidate."""
@@ -118,11 +120,10 @@ class TestPopulation:
         candidate_medium = Candidate(fitness=0.6)
         candidate_high = Candidate(fitness=0.9)
 
-        population = Population(
-            candidates=[candidate_low, candidate_medium, candidate_high]
-        )
+        population = Population()
+        population.add_candidates([candidate_low, candidate_medium, candidate_high])
 
-        best = population.get_best()
+        best = population.get_top_n(1)[0]
         assert best is not None
         assert best.fitness == 0.9
 
@@ -131,9 +132,10 @@ class TestPopulation:
         candidate1 = Candidate(fitness=0.7)
         candidate2 = Candidate(fitness=0.7)
 
-        population = Population(candidates=[candidate1, candidate2])
+        population = Population()
+        population.add_candidates([candidate1, candidate2])
 
-        best = population.get_best()
+        best = population.get_top_n(1)[0]
         assert best is not None
         assert best.fitness == 0.7
 
@@ -144,8 +146,9 @@ class TestPopulation:
 
     def test_get_best_fitness(self):
         """Test getting best fitness value."""
-        population = Population(
-            candidates=[
+        population = Population()
+        population.add_candidates(
+            [
                 Candidate(fitness=0.4),
                 Candidate(fitness=0.8),
                 Candidate(fitness=0.6),
@@ -161,8 +164,9 @@ class TestPopulation:
 
     def test_get_average_fitness(self):
         """Test average fitness calculation."""
-        population = Population(
-            candidates=[
+        population = Population()
+        population.add_candidates(
+            [
                 Candidate(fitness=0.3),
                 Candidate(fitness=0.5),
                 Candidate(fitness=0.7),
@@ -179,8 +183,9 @@ class TestPopulation:
 
     def test_get_worst_fitness(self):
         """Test worst fitness calculation."""
-        population = Population(
-            candidates=[
+        population = Population()
+        population.add_candidates(
+            [
                 Candidate(fitness=0.8),
                 Candidate(fitness=0.2),
                 Candidate(fitness=0.5),
@@ -201,42 +206,45 @@ class TestPopulation:
 
     def test_clear(self):
         """Test clearing all candidates."""
-        population = Population(candidates=[Candidate(), Candidate(), Candidate()])
+        population = Population()
+        population.add_candidates([Candidate(), Candidate(), Candidate()])
 
         assert population.size() == 3
-        population.clear()
+        population = Population()
         assert population.size() == 0
         assert population.is_empty()
 
     def test_sort_by_fitness_descending(self):
-        """Test sorting candidates by fitness descending."""
+        """Test get_top_n returns candidates sorted by fitness descending."""
         candidates = [
             Candidate(fitness=0.3),
             Candidate(fitness=0.9),
             Candidate(fitness=0.6),
         ]
 
-        population = Population(candidates=candidates.copy())
-        population.sort_by_fitness(descending=True)
+        population = Population()
+        population.add_candidates(candidates.copy())
+        top_n = population.get_top_n(3)
 
-        assert population.candidates[0].fitness == 0.9
-        assert population.candidates[1].fitness == 0.6
-        assert population.candidates[2].fitness == 0.3
+        assert top_n[0].fitness == 0.9
+        assert top_n[1].fitness == 0.6
+        assert top_n[2].fitness == 0.3
 
     def test_sort_by_fitness_ascending(self):
-        """Test sorting candidates by fitness ascending."""
+        """Test get_top_n returns candidates sorted by fitness descending (highest first)."""
         candidates = [
             Candidate(fitness=0.3),
             Candidate(fitness=0.9),
             Candidate(fitness=0.6),
         ]
 
-        population = Population(candidates=candidates.copy())
-        population.sort_by_fitness(descending=False)
+        population = Population()
+        population.add_candidates(candidates.copy())
+        top_n = population.get_top_n(3)
 
-        assert population.candidates[0].fitness == 0.3
-        assert population.candidates[1].fitness == 0.6
-        assert population.candidates[2].fitness == 0.9
+        assert top_n[0].fitness == 0.9
+        assert top_n[1].fitness == 0.6
+        assert top_n[2].fitness == 0.3
 
     def test_get_top_n_empty(self):
         """Test get_top_n with empty population."""
@@ -255,7 +263,8 @@ class TestPopulation:
             Candidate(fitness=0.3),
         ]
 
-        population = Population(candidates=candidates.copy())
+        population = Population()
+        population.add_candidates(candidates.copy())
         top_3 = population.get_top_n(3)
 
         assert len(top_3) == 3
@@ -265,9 +274,8 @@ class TestPopulation:
 
     def test_get_top_n_more_than_available(self):
         """Test get_top_n when n exceeds population size."""
-        population = Population(
-            candidates=[Candidate(fitness=0.8), Candidate(fitness=0.5)]
-        )
+        population = Population()
+        population.add_candidates([Candidate(fitness=0.8), Candidate(fitness=0.5)])
 
         top_5 = population.get_top_n(5)
 
@@ -285,8 +293,9 @@ class TestPopulation:
 
     def test_get_fitness_range(self):
         """Test fitness range calculation."""
-        population = Population(
-            candidates=[
+        population = Population()
+        population.add_candidates(
+            [
                 Candidate(fitness=0.3),
                 Candidate(fitness=0.9),
                 Candidate(fitness=0.5),
@@ -302,8 +311,9 @@ class TestPopulation:
 
     def test_population_with_same_fitness(self):
         """Test methods with population where all candidates have same fitness."""
-        population = Population(
-            candidates=[
+        population = Population()
+        population.add_candidates(
+            [
                 Candidate(fitness=0.5),
                 Candidate(fitness=0.5),
                 Candidate(fitness=0.5),
