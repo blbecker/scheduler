@@ -59,7 +59,7 @@ services:
       - "6379:6379"
 
   db:
-    image: postgres:15-alpine@sha256:09e4f20b14ddb3dfe3a0c825b206032aaf8f28300ba2070c0b60fc1c10c6abc7
+    image: postgres:15-alpine@sha256:a8e042598834300dfaa17a54f695b87b7f25d3490433bbbe2ef3bffbb9747f24
     environment:
       POSTGRES_DB: scheduler_db
       POSTGRES_USER: scheduler_user
