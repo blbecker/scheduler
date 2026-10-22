@@ -54,7 +54,7 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
   redis:
-    image: redis:7-alpine@sha256:7aec734b2bb298a1d769fd8729f13b8514a41bf90fcdd1f38ec52267fbaa8ee6
+    image: redis:7-alpine@sha256:57e4255cc971b1c8d6f8a6ca283ac01bc3ecdd914273ef6bfaede87aaecd6541
     ports:
       - "6379:6379"
 
