@@ -6,3 +6,5 @@ exclude =
     .env
     .venv
 max-line-length = 180
+# E203 conflicts with black's slice formatting; black owns whitespace.
+extend-ignore = E203

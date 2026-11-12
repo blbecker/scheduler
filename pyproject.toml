@@ -14,3 +14,24 @@ pythonpath = [
 testpaths = [
   "api/scheduler_api/tests"
 ]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = "api"
+files = [
+  "api/scheduler_api/engine",
+  "api/scheduler_api/mappers/candidate_schedule_mapper.py",
+]
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unused_ignores = false
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "celery.*"
+ignore_missing_imports = true
