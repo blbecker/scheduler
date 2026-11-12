@@ -39,6 +39,9 @@ jobs:
         working-directory: ./api
         run: flake8 .
 
+      - name: Type check the engine with mypy
+        run: mypy
+
   test-api:
     name: Test API
     runs-on: ubuntu-latest
