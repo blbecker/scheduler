@@ -2,3 +2,6 @@ __pycache__
 .aider*
 .coverage
 .pnpm-store
+
+# beads workspace gate locks live beside .beads/, so .beads/.gitignore cannot cover them
+*.gate.lock*
