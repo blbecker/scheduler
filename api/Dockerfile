@@ -10,9 +10,9 @@ WORKDIR /app
 # install deps
 RUN pip install --upgrade pip
 
-# copy requirements first for caching
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# copy base requirements first for caching
+COPY requirements-base.txt .
+RUN pip install -r requirements-base.txt
 
 # copy source
 COPY . .
@@ -22,8 +22,8 @@ ENV PYTHONUNBUFFERED=1
 # Switch to the non-root user
 USER appuser
 
-# expose dev port
+# expose port
 EXPOSE 8000
 
-# run dev server with autoreload
-CMD ["uvicorn", "scheduler_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# run production server with workers
+CMD ["uvicorn", "scheduler_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
