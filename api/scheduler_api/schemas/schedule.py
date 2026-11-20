@@ -1,4 +1,17 @@
-from pydantic import BaseModel, Field
+from datetime import datetime
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class CoalescedShift(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    worker_id: UUID
+    job_id: UUID
+    start: datetime
+    end: datetime
+    slot_indices: tuple[int, ...]
 
 
 class GenerateScheduleInput(BaseModel):
