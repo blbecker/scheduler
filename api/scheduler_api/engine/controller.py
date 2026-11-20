@@ -289,7 +289,12 @@ class GeneticAlgorithmController:
         self, newly_scored: Population
     ) -> tuple[Individual | None, float | None, tuple[Individual, ...]]:
         assert self._state is not None
-        ordered = list(self._state.elite_individuals) + list(newly_scored.individuals)
+        ordered: list[Individual] = []
+        previous_best = self._state.best_individual
+        if previous_best is not None:
+            ordered.append(previous_best)
+        ordered.extend(self._state.elite_individuals)
+        ordered.extend(newly_scored.individuals)
         deduped: dict[UUID, Individual] = {}
         for individual in ordered:
             deduped.setdefault(individual.id, individual)

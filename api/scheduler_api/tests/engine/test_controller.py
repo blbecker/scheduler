@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from uuid import UUID, uuid4
 
 import pytest
@@ -16,11 +17,74 @@ from scheduler_api.engine.models.execution import (
     ExecutionStatus,
     FailureInfo,
 )
-from scheduler_api.engine.models.phase import PhaseResult, PhaseType
+from scheduler_api.engine.models.assignment import Individual
+from scheduler_api.engine.models.component_io import MutateResult
+from scheduler_api.engine.models.phase import (
+    ComponentCategory,
+    PhaseResult,
+    PhaseType,
+)
+from scheduler_api.engine.models.population import Population
 from scheduler_api.engine.models.results import ExecutionResult
-from scheduler_api.engine.solver import build_mvp_solver
+from scheduler_api.engine.solver import MutatorBinding, build_mvp_solver
 
-from .factories import make_problem
+from .factories import make_assignment, make_job, make_problem
+
+
+class EmptyingMutator:
+    component_category = ComponentCategory.MUTATOR
+
+    def mutate(self, input):
+        return MutateResult(
+            category="mutator",
+            offspring=Population(
+                individuals=tuple(
+                    Individual(id=uuid4(), assignments=())
+                    for _ in range(input.offspring_count)
+                )
+            ),
+        )
+
+
+class UnqualifiedMutator:
+    component_category = ComponentCategory.MUTATOR
+
+    def mutate(self, input):
+        job_id = input.problem.jobs[-1].job_id
+        return MutateResult(
+            category="mutator",
+            offspring=Population(
+                individuals=tuple(
+                    Individual(
+                        id=uuid4(),
+                        assignments=(
+                            make_assignment(
+                                worker_id=1,
+                                job_id=job_id.int,
+                                slot_index=0,
+                            ),
+                        ),
+                    )
+                    for _ in range(input.offspring_count)
+                )
+            ),
+        )
+
+
+def make_custom_controller(mutator, *, problem=None, elitism_count=0):
+    solver = build_mvp_solver(
+        population_size=4,
+        max_generations=2,
+        random_seed=7,
+        elitism_count=elitism_count,
+    )
+    solver = replace(
+        solver,
+        mutators=(MutatorBinding("custom_mutator", mutator, 1),),
+    )
+    controller = solver.create_controller(problem or make_problem())
+    runner = TypedComponentRunner(solver.build_registry())
+    return controller, runner
 
 
 def make_controller(
@@ -283,3 +347,39 @@ def test_single_generation_stops_after_first_cull():
     result = controller.get_result(UUID(int=13))
     assert result.status is ExecutionStatus.COMPLETED
     assert result.generation == 1
+
+
+def test_elitism_zero_keeps_previous_best_against_degrading_offspring():
+    controller, runner = make_custom_controller(EmptyingMutator())
+    execution_id = UUID(int=20)
+
+    drive(controller, runner, execution_id)
+
+    result = controller.get_result(execution_id)
+    assert result.best_individual is not None
+    assert len(result.best_individual.assignments) == 4
+    assert result.best_total_score == 2.0
+    assert result.best_feasible is True
+    state = controller.get_state(execution_id)
+    assert (
+        max(
+            individual.scores["coverage"] for individual in state.population.individuals
+        )
+        == 1.0
+    )
+
+
+def test_elitism_zero_keeps_feasible_best_against_infeasible_offspring():
+    problem = make_problem(jobs=(make_job(11), make_job(12)))
+    controller, runner = make_custom_controller(UnqualifiedMutator(), problem=problem)
+    execution_id = UUID(int=21)
+
+    drive(controller, runner, execution_id)
+
+    result = controller.get_result(execution_id)
+    assert result.best_individual is not None
+    assert result.best_feasible is True
+    assert result.best_individual.violations == ()
+    assert result.best_total_score == 2.0
+    state = controller.get_state(execution_id)
+    assert all(individual.feasible for individual in state.population.individuals)
