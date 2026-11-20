@@ -157,6 +157,7 @@ class GeneticAlgorithmSolver:
             tuple(binding.component_id for binding in self.seeders),
             "seeder",
         )
+        _check_unique((self.selector.component_id,), "selector")
         _check_unique(
             tuple(binding.component_id for binding in self.scorers),
             "scorer",
@@ -165,6 +166,7 @@ class GeneticAlgorithmSolver:
             tuple(binding.component_id for binding in self.mutators),
             "mutator",
         )
+        _check_unique((self.culler.component_id,), "culler")
         _check_unique(
             tuple(binding.component_id for binding in self.stoppers),
             "stopper",

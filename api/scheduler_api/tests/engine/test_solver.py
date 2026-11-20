@@ -10,8 +10,10 @@ from scheduler_api.engine.components.seeders.random import (
 from scheduler_api.engine.exceptions import SolverConfigurationError
 from scheduler_api.engine.models.phase import ComponentCategory
 from scheduler_api.engine.solver import (
+    CullerBinding,
     ScorerBinding,
     SeederBinding,
+    SelectorBinding,
     build_mvp_solver,
 )
 
@@ -116,4 +118,24 @@ def test_component_category_must_match_binding():
         replace(
             solver,
             seeders=(SeederBinding("wrong", WrongCategorySeeder(), 4),),
+        )
+
+
+def test_empty_selector_id_is_rejected():
+    solver = build_mvp_solver()
+
+    with pytest.raises(SolverConfigurationError, match="selector"):
+        replace(
+            solver,
+            selector=SelectorBinding("", solver.selector.component),
+        )
+
+
+def test_empty_culler_id_is_rejected():
+    solver = build_mvp_solver()
+
+    with pytest.raises(SolverConfigurationError, match="culler"):
+        replace(
+            solver,
+            culler=CullerBinding("", solver.culler.component),
         )
