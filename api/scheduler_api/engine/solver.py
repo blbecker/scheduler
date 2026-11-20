@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from scheduler_api.engine.components.cullers.top_n import TopNCuller
 from scheduler_api.engine.components.mutators.random_replacement import (
@@ -44,6 +45,9 @@ from scheduler_api.engine.protocols import (
     Selector,
     Stopper,
 )
+
+if TYPE_CHECKING:
+    from scheduler_api.engine.controller import GeneticAlgorithmController
 
 
 @dataclass(frozen=True)
@@ -237,7 +241,9 @@ class GeneticAlgorithmSolver:
             stopper_ids=tuple(binding.component_id for binding in self.stoppers),
         )
 
-    def create_controller(self, problem: SchedulingProblem):
+    def create_controller(
+        self, problem: SchedulingProblem
+    ) -> GeneticAlgorithmController:
         from scheduler_api.engine.controller import (
             GeneticAlgorithmController,
         )
