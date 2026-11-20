@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import get_args
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 import pytest
 from pydantic import TypeAdapter, ValidationError
@@ -516,3 +517,40 @@ def test_execution_state_status_invariants():
 
     with pytest.raises(ValidationError, match="failure info"):
         ExecutionState(**base, status=ExecutionStatus.FAILED)
+
+
+def test_folded_time_slot_uses_instants_for_ordering():
+    zone = ZoneInfo("America/New_York")
+    start = datetime(2026, 11, 1, 5, 30, tzinfo=timezone.utc).astimezone(zone)
+    end = datetime(2026, 11, 1, 6, 0, tzinfo=timezone.utc).astimezone(zone)
+
+    slot = TimeSlot(index=0, start=start, end=end)
+
+    assert slot.start.utcoffset() != slot.end.utcoffset()
+    assert slot.end.timestamp() > slot.start.timestamp()
+
+
+def test_adjacent_slots_are_contiguous_across_fold():
+    zone = ZoneInfo("America/New_York")
+    starts = (
+        datetime(2026, 11, 1, 5, 30, tzinfo=timezone.utc),
+        datetime(2026, 11, 1, 6, 0, tzinfo=timezone.utc),
+    )
+    slots = tuple(
+        TimeSlot(
+            index=index,
+            start=start.astimezone(zone),
+            end=(start + timedelta(minutes=30)).astimezone(zone),
+        )
+        for index, start in enumerate(starts)
+    )
+
+    problem = SchedulingProblem(
+        timezone="America/New_York",
+        slots=slots,
+        staffing_requirements=(),
+        workers=(),
+        jobs=(),
+    )
+
+    assert problem.slot_count == 2

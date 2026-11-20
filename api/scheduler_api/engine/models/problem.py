@@ -20,7 +20,7 @@ class TimeSlot(EngineModel):
             raise ValueError("slot start must be timezone-aware")
         if self.end.tzinfo is None or self.end.utcoffset() is None:
             raise ValueError("slot end must be timezone-aware")
-        if self.end <= self.start:
+        if self.end.timestamp() <= self.start.timestamp():
             raise ValueError("slot end must be after slot start")
         return self
 
@@ -91,7 +91,7 @@ class SchedulingProblem(EngineModel):
                 )
             if position + 1 < slot_count:
                 following = self.slots[position + 1]
-                if slot.end != following.start:
+                if slot.end.timestamp() != following.start.timestamp():
                     raise ValueError("adjacent slots must share contiguous instants")
 
         job_ids = [job.job_id for job in self.jobs]
