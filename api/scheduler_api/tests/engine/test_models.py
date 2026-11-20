@@ -554,3 +554,29 @@ def test_adjacent_slots_are_contiguous_across_fold():
     )
 
     assert problem.slot_count == 2
+
+
+def test_adjacent_slots_with_same_wall_time_but_different_folds_are_rejected():
+    zone = ZoneInfo("America/New_York")
+    first = TimeSlot(
+        index=0,
+        start=datetime(2026, 11, 1, 1, 0, tzinfo=zone, fold=0),
+        end=datetime(2026, 11, 1, 1, 30, tzinfo=zone, fold=0),
+    )
+    second = TimeSlot(
+        index=1,
+        start=datetime(2026, 11, 1, 1, 30, tzinfo=zone, fold=1),
+        end=datetime(2026, 11, 1, 2, 0, tzinfo=zone, fold=1),
+    )
+
+    assert first.end == second.start
+    assert first.end.timestamp() != second.start.timestamp()
+
+    with pytest.raises(ValidationError, match="contiguous instants"):
+        SchedulingProblem(
+            timezone="America/New_York",
+            slots=(first, second),
+            staffing_requirements=(),
+            workers=(),
+            jobs=(),
+        )
