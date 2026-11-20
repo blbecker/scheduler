@@ -6,7 +6,6 @@ from uuid import UUID
 from scheduler_api.engine.models.execution import ExecutionState
 from scheduler_api.engine.models.phase import PhasePlan, PhaseResult
 from scheduler_api.engine.models.results import ExecutionResult, FailureInfo
-from scheduler_api.engine.protocols.solver import Solver
 
 
 class SolverController(Protocol):
@@ -23,4 +22,4 @@ class SolverController(Protocol):
     def get_result(self, execution_id: UUID) -> ExecutionResult: ...
 
 
-__all__ = ["SolverController", "Solver"]
+__all__ = ["SolverController"]
