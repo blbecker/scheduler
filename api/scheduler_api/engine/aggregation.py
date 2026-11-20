@@ -156,6 +156,8 @@ def aggregate_select(
     result: PhaseResult,
     source: Population,
 ) -> Population:
+    if len(plan.invocations) != 1:
+        raise InvalidPhaseResultError("select phase requires exactly one invocation")
     results = _result_map(result)
     invocation = plan.invocations[0]
     select_input = cast(SelectInput, _require_input(invocation, SelectInput))
@@ -237,6 +239,8 @@ def aggregate_cull(
     target_size: int,
     elite_individuals: tuple[Individual, ...],
 ) -> Population:
+    if len(plan.invocations) != 1:
+        raise InvalidPhaseResultError("cull phase requires exactly one invocation")
     results = _result_map(result)
     invocation = plan.invocations[0]
     cast(CullInput, _require_input(invocation, CullInput))
