@@ -29,6 +29,7 @@ from scheduler_api.engine.models.execution import (
     ExecutionStatus,
 )
 from scheduler_api.engine.models.phase import (
+    PHASE_CATEGORY,
     ComponentCategory,
     ComponentInvocation,
     ComponentResult,
@@ -352,19 +353,28 @@ def test_category_literals_match_component_category_enum():
     assert literals == {category.value for category in ComponentCategory}
 
 
-def test_phase_plan_and_result_json_round_trip():
-    payload = make_component_payloads()[0]
+@pytest.mark.parametrize(
+    ("phase", "payload", "payload_result"),
+    list(zip(PhaseType, make_component_payloads(), make_component_results())),
+    ids=[phase.value for phase in PhaseType],
+)
+def test_phase_plan_and_result_json_round_trip(
+    phase: PhaseType,
+    payload: ComponentInputPayload,
+    payload_result: ComponentResultPayload,
+):
+    category = PHASE_CATEGORY[phase]
     invocation = ComponentInvocation(
         invocation_id=UUID(int=1),
-        component_id="random_schedule",
-        category=ComponentCategory.SEEDER,
+        component_id=f"{category.value}_component",
+        category=category,
         input=payload,
     )
     plan = PhasePlan(
         execution_id=UUID(int=2),
         phase_execution_id=UUID(int=3),
         generation=0,
-        phase=PhaseType.SEED,
+        phase=phase,
         invocations=(invocation,),
     )
 
@@ -373,9 +383,9 @@ def test_phase_plan_and_result_json_round_trip():
 
     result = ComponentResult(
         invocation_id=UUID(int=1),
-        component_id="random_schedule",
-        category=ComponentCategory.SEEDER,
-        result=make_component_results()[0],
+        component_id=f"{category.value}_component",
+        category=category,
+        result=payload_result,
     )
     phase_result = PhaseResult(
         execution_id=UUID(int=2),
@@ -385,6 +395,32 @@ def test_phase_plan_and_result_json_round_trip():
 
     restored_result = PhaseResult.model_validate_json(phase_result.model_dump_json())
     assert restored_result == phase_result
+
+
+@pytest.mark.parametrize(
+    "payload",
+    (make_component_payloads()[0], make_component_payloads()[1]),
+    ids=("seed", "score"),
+)
+def test_component_payloads_forbid_extra_fields(payload):
+    data = payload.model_dump(mode="json")
+    data["unexpected"] = "rejected"
+
+    with pytest.raises(ValidationError, match="Extra inputs"):
+        type(payload).model_validate(data)
+
+
+@pytest.mark.parametrize(
+    "payload_result",
+    (make_component_results()[0], make_component_results()[5]),
+    ids=("seed", "stop"),
+)
+def test_component_results_forbid_extra_fields(payload_result):
+    data = payload_result.model_dump(mode="json")
+    data["unexpected"] = "rejected"
+
+    with pytest.raises(ValidationError, match="Extra inputs"):
+        type(payload_result).model_validate(data)
 
 
 def test_phase_plan_rejects_category_mismatch():
