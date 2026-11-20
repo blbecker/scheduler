@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 import pytest
 from pydantic import ValidationError
@@ -194,3 +195,76 @@ def test_coalesced_shift_is_frozen():
 
     with pytest.raises(ValidationError):
         shift.worker_id = make_worker(2).worker_id
+
+
+def make_dst_slots(start, count, zone):
+    return tuple(
+        TimeSlot(
+            index=index,
+            start=(start + timedelta(minutes=30 * index)).astimezone(zone),
+            end=(start + timedelta(minutes=30 * (index + 1))).astimezone(zone),
+        )
+        for index in range(count)
+    )
+
+
+def test_spring_forward_coalesces_across_missing_hour():
+    zone = ZoneInfo("America/New_York")
+    start = datetime(2026, 3, 8, 6, 0, tzinfo=timezone.utc)
+    slots = make_dst_slots(start, 4, zone)
+    problem = make_problem(
+        slots=slots,
+        workers=(
+            make_worker(
+                worker_id=1,
+                job_ids=(11,),
+                slot_indices=tuple(range(len(slots))),
+            ),
+        ),
+        jobs=(make_job(11),),
+        staffing_requirements=(),
+        timezone_name="America/New_York",
+    )
+    individual = make_individual(
+        assignments=tuple(make_assignment(slot_index=i) for i in range(4))
+    )
+
+    shifts = coalesce_assignments(problem, individual)
+
+    assert len(shifts) == 1
+    assert shifts[0].start == slots[0].start
+    assert shifts[0].end == slots[-1].end
+    assert shifts[0].slot_indices == (0, 1, 2, 3)
+    assert shifts[0].start.utcoffset() == timedelta(hours=-5)
+    assert shifts[0].end.utcoffset() == timedelta(hours=-4)
+
+
+def test_fall_back_coalesces_across_repeated_hour():
+    zone = ZoneInfo("America/New_York")
+    start = datetime(2026, 11, 1, 4, 30, tzinfo=timezone.utc)
+    slots = make_dst_slots(start, 6, zone)
+    problem = make_problem(
+        slots=slots,
+        workers=(
+            make_worker(
+                worker_id=1,
+                job_ids=(11,),
+                slot_indices=tuple(range(len(slots))),
+            ),
+        ),
+        jobs=(make_job(11),),
+        staffing_requirements=(),
+        timezone_name="America/New_York",
+    )
+    individual = make_individual(
+        assignments=tuple(make_assignment(slot_index=i) for i in range(6))
+    )
+
+    shifts = coalesce_assignments(problem, individual)
+
+    assert len(shifts) == 1
+    assert shifts[0].start == slots[0].start
+    assert shifts[0].end == slots[-1].end
+    assert shifts[0].slot_indices == (0, 1, 2, 3, 4, 5)
+    assert shifts[0].start.utcoffset() == timedelta(hours=-4)
+    assert shifts[0].end.utcoffset() == timedelta(hours=-5)
