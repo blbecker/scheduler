@@ -8,17 +8,29 @@ import pytest
 from scheduler_api.engine.controller import GeneticAlgorithmController
 from scheduler_api.engine.exceptions import (
     DuplicateInvocationError,
+    DuplicateScoreError,
     InvalidPhaseResultError,
+    MissingScorerOutputError,
+    PopulationSizeMismatchError,
     StalePhaseResultError,
     UnknownExecutionError,
 )
 from scheduler_api.engine.execution.runner import TypedComponentRunner
+from scheduler_api.engine.models.assignment import Individual
+from scheduler_api.engine.models.component_io import (
+    CullResult,
+    MutateResult,
+    ScoreResult,
+    ScoreUpdate,
+    SeedResult,
+    SelectResult,
+    StopResult,
+)
 from scheduler_api.engine.models.execution import (
+    ExecutionState,
     ExecutionStatus,
     FailureInfo,
 )
-from scheduler_api.engine.models.assignment import Individual
-from scheduler_api.engine.models.component_io import MutateResult
 from scheduler_api.engine.models.phase import (
     ComponentCategory,
     PhaseResult,
@@ -26,7 +38,12 @@ from scheduler_api.engine.models.phase import (
 )
 from scheduler_api.engine.models.population import Population
 from scheduler_api.engine.models.results import ExecutionResult
-from scheduler_api.engine.solver import MutatorBinding, build_mvp_solver
+from scheduler_api.engine.solver import (
+    MutatorBinding,
+    ScorerBinding,
+    StopperBinding,
+    build_mvp_solver,
+)
 
 from .factories import make_assignment, make_job, make_problem
 
@@ -68,6 +85,36 @@ class UnqualifiedMutator:
                     for _ in range(input.offspring_count)
                 )
             ),
+        )
+
+
+class ConstantScorer:
+    component_category = ComponentCategory.SCORER
+
+    def __init__(self, score: float):
+        self._score = score
+
+    def score(self, input):
+        return ScoreResult(
+            category="scorer",
+            updates=tuple(
+                ScoreUpdate(individual_id=individual.id, score=self._score)
+                for individual in input.population.individuals
+            ),
+        )
+
+
+class ConstantStopper:
+    component_category = ComponentCategory.STOPPER
+
+    def __init__(self, reason: str):
+        self._reason = reason
+
+    def should_stop(self, input):
+        return StopResult(
+            category="stopper",
+            should_stop=True,
+            reason=self._reason,
         )
 
 
@@ -129,7 +176,32 @@ def drive(
         phases.append(plan.phase)
         result = run_plan(controller, runner, plan)
         plan = controller.complete_phase(plan, result)
+        state = controller.get_state(execution_id)
+        assert ExecutionState.model_validate(state.model_dump()) == state
     return phases
+
+
+def advance_to_phase(
+    controller: GeneticAlgorithmController,
+    runner: TypedComponentRunner,
+    execution_id: UUID,
+    target: PhaseType,
+):
+    plan = controller.start(execution_id)
+    assert plan is not None
+    while plan.phase is not target:
+        plan = controller.complete_phase(plan, run_plan(controller, runner, plan))
+        assert plan is not None
+    return plan
+
+
+def replace_first_result(result: PhaseResult, payload) -> PhaseResult:
+    first = result.results[0].model_copy(update={"result": payload})
+    return PhaseResult(
+        execution_id=result.execution_id,
+        phase_execution_id=result.phase_execution_id,
+        results=(first,) + result.results[1:],
+    )
 
 
 def test_controller_runs_full_generation_order():
@@ -383,3 +455,222 @@ def test_elitism_zero_keeps_feasible_best_against_infeasible_offspring():
     assert result.best_total_score == 2.0
     state = controller.get_state(execution_id)
     assert all(individual.feasible for individual in state.population.individuals)
+
+
+def test_multiple_scorers_aggregate_in_spec_order():
+    solver = build_mvp_solver(population_size=4, max_generations=1, random_seed=7)
+    solver = replace(
+        solver,
+        scorers=(
+            ScorerBinding("first_scorer", ConstantScorer(0.2), 0.25),
+            ScorerBinding("second_scorer", ConstantScorer(0.8), 0.75),
+        ),
+    )
+    controller = solver.create_controller(make_problem())
+    runner = TypedComponentRunner(solver.build_registry())
+    execution_id = UUID(int=22)
+
+    plan = controller.start(execution_id)
+    plan = controller.complete_phase(plan, run_plan(controller, runner, plan))
+    controller.complete_phase(plan, run_plan(controller, runner, plan))
+
+    state = controller.get_state(execution_id)
+    individual = state.population.individuals[0]
+    assert list(individual.scores) == ["first_scorer", "second_scorer"]
+    assert individual.scores == {"first_scorer": 0.2, "second_scorer": 0.8}
+    assert state.best_total_score == pytest.approx(0.65)
+
+
+def test_duplicate_scorer_output_is_rejected():
+    controller, runner = make_controller()
+    execution_id = UUID(int=23)
+    seed_plan = controller.start(execution_id)
+    score_plan = controller.complete_phase(
+        seed_plan, run_plan(controller, runner, seed_plan)
+    )
+    result = run_plan(controller, runner, score_plan)
+    first = result.results[0].result
+    assert isinstance(first, ScoreResult)
+
+    malformed = replace_first_result(
+        result,
+        ScoreResult(
+            category="scorer",
+            updates=(first.updates[0], first.updates[0]),
+        ),
+    )
+
+    with pytest.raises(DuplicateScoreError):
+        controller.complete_phase(score_plan, malformed)
+
+
+def test_missing_scorer_output_is_rejected():
+    controller, runner = make_controller()
+    execution_id = UUID(int=24)
+    seed_plan = controller.start(execution_id)
+    score_plan = controller.complete_phase(
+        seed_plan, run_plan(controller, runner, seed_plan)
+    )
+    result = run_plan(controller, runner, score_plan)
+
+    malformed = replace_first_result(
+        result,
+        ScoreResult(category="scorer", updates=()),
+    )
+
+    with pytest.raises(MissingScorerOutputError):
+        controller.complete_phase(score_plan, malformed)
+
+
+def test_seed_result_size_mismatch_is_rejected():
+    controller, runner = make_controller()
+    plan = controller.start(UUID(int=25))
+    result = run_plan(controller, runner, plan)
+
+    malformed = replace_first_result(
+        result,
+        SeedResult(
+            category="seeder",
+            population=Population(individuals=()),
+        ),
+    )
+
+    with pytest.raises(PopulationSizeMismatchError):
+        controller.complete_phase(plan, malformed)
+
+
+def test_select_result_size_mismatch_is_rejected():
+    controller, runner = make_controller()
+    execution_id = UUID(int=26)
+    plan = advance_to_phase(controller, runner, execution_id, PhaseType.SELECT)
+    result = run_plan(controller, runner, plan)
+    selected = result.results[0].result
+    assert isinstance(selected, SelectResult)
+
+    malformed = replace_first_result(
+        result,
+        SelectResult(
+            category="selector",
+            selected=Population(individuals=selected.selected.individuals[:-1]),
+        ),
+    )
+
+    with pytest.raises(PopulationSizeMismatchError):
+        controller.complete_phase(plan, malformed)
+
+
+def test_mutate_result_size_mismatch_is_rejected():
+    controller, runner = make_controller()
+    execution_id = UUID(int=27)
+    plan = advance_to_phase(controller, runner, execution_id, PhaseType.MUTATE)
+    result = run_plan(controller, runner, plan)
+    mutated = result.results[0].result
+    assert isinstance(mutated, MutateResult)
+
+    malformed = replace_first_result(
+        result,
+        MutateResult(
+            category="mutator",
+            offspring=Population(individuals=mutated.offspring.individuals[:-1]),
+        ),
+    )
+
+    with pytest.raises(PopulationSizeMismatchError):
+        controller.complete_phase(plan, malformed)
+
+
+def test_cull_result_size_mismatch_is_rejected():
+    controller, runner = make_controller()
+    execution_id = UUID(int=28)
+    plan = advance_to_phase(controller, runner, execution_id, PhaseType.CULL)
+    result = run_plan(controller, runner, plan)
+    retained = result.results[0].result
+    assert isinstance(retained, CullResult)
+
+    malformed = replace_first_result(
+        result,
+        CullResult(
+            category="culler",
+            population=Population(individuals=retained.population.individuals[:-1]),
+        ),
+    )
+
+    with pytest.raises(PopulationSizeMismatchError):
+        controller.complete_phase(plan, malformed)
+
+
+def test_cull_must_keep_every_elite():
+    controller, runner = make_controller()
+    execution_id = UUID(int=29)
+    plan = advance_to_phase(controller, runner, execution_id, PhaseType.CULL)
+    result = run_plan(controller, runner, plan)
+    state = controller.get_state(execution_id)
+    retained = result.results[0].result
+    assert isinstance(retained, CullResult)
+    assert state.offspring is not None
+
+    elite_id = state.elite_individuals[0].id
+    retained_ids = {individual.id for individual in retained.population.individuals}
+    assert elite_id in retained_ids
+    candidates = state.population.individuals + state.offspring.individuals
+    replacement = next(
+        individual for individual in candidates if individual.id not in retained_ids
+    )
+    dropped = tuple(
+        replacement if individual.id == elite_id else individual
+        for individual in retained.population.individuals
+    )
+
+    malformed = replace_first_result(
+        result,
+        CullResult(
+            category="culler",
+            population=Population(individuals=dropped),
+        ),
+    )
+
+    with pytest.raises(InvalidPhaseResultError, match="elite"):
+        controller.complete_phase(plan, malformed)
+
+
+def test_first_stopping_stopper_reason_wins():
+    solver = build_mvp_solver(population_size=2, max_generations=1)
+    solver = replace(
+        solver,
+        stoppers=(
+            StopperBinding("first_stopper", ConstantStopper("first")),
+            StopperBinding("second_stopper", ConstantStopper("second")),
+        ),
+    )
+    controller = solver.create_controller(make_problem())
+    runner = TypedComponentRunner(solver.build_registry())
+    execution_id = UUID(int=30)
+
+    drive(controller, runner, execution_id)
+
+    assert controller.get_result(execution_id).termination_reason == "first"
+
+
+def test_fail_is_a_no_op_without_state():
+    controller, _ = make_controller()
+    failure = FailureInfo(error_type="RuntimeError", message="boom")
+
+    controller.fail(UUID(int=31), failure)
+
+    with pytest.raises(UnknownExecutionError):
+        controller.get_state(UUID(int=31))
+
+
+def test_fail_is_a_no_op_for_terminal_execution():
+    controller, runner = make_controller(max_generations=1)
+    execution_id = UUID(int=32)
+    drive(controller, runner, execution_id)
+    before = controller.get_result(execution_id)
+    failure = FailureInfo(error_type="RuntimeError", message="late failure")
+
+    controller.fail(execution_id, failure)
+
+    after = controller.get_result(execution_id)
+    assert after.status is ExecutionStatus.COMPLETED
+    assert after.failure is None
+    assert after == before
