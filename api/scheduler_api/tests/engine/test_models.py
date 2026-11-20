@@ -1,12 +1,41 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from typing import get_args
 from uuid import UUID
 
 import pytest
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from scheduler_api.engine.models.assignment import Assignment, Individual
+from scheduler_api.engine.models.component_io import (
+    ComponentInputPayload,
+    ComponentResultPayload,
+    CullInput,
+    CullResult,
+    MutateInput,
+    MutateResult,
+    ScoreInput,
+    ScoreResult,
+    SeedInput,
+    SeedResult,
+    SelectInput,
+    SelectResult,
+    StopInput,
+    StopResult,
+)
+from scheduler_api.engine.models.execution import (
+    ExecutionState,
+    ExecutionStatus,
+)
+from scheduler_api.engine.models.phase import (
+    ComponentCategory,
+    ComponentInvocation,
+    ComponentResult,
+    PhasePlan,
+    PhaseResult,
+    PhaseType,
+)
 from scheduler_api.engine.models.population import Population
 from scheduler_api.engine.models.problem import (
     JobInfo,
@@ -14,6 +43,12 @@ from scheduler_api.engine.models.problem import (
     StaffingRequirement,
     TimeSlot,
     WorkerInfo,
+)
+from scheduler_api.engine.models.scores import ScorerWeight, ScoringPolicy
+from scheduler_api.engine.models.solver_spec import (
+    MutatorPlan,
+    SeederContribution,
+    SolverSpec,
 )
 
 UTC = timezone.utc
@@ -215,3 +250,233 @@ def test_frozen_models_reject_mutation():
 
     with pytest.raises(ValidationError):
         individual.id = UUID(int=101)
+
+
+def make_policy() -> ScoringPolicy:
+    return ScoringPolicy(
+        weights=(
+            ScorerWeight(component_id="coverage", weight=1.0),
+            ScorerWeight(component_id="shift_length", weight=0.5),
+        )
+    )
+
+
+def make_component_payloads() -> tuple[ComponentInputPayload, ...]:
+    problem = make_problem()
+    population = Population(individuals=())
+    policy = make_policy()
+    return (
+        SeedInput(
+            category="seeder",
+            problem=problem,
+            population_size=3,
+            rng_seed=7,
+        ),
+        ScoreInput(category="scorer", problem=problem, population=population),
+        SelectInput(
+            category="selector",
+            population=population,
+            count=0,
+            scoring_policy=policy,
+        ),
+        MutateInput(
+            category="mutator",
+            problem=problem,
+            parents=population,
+            offspring_count=0,
+            rng_seed=3,
+        ),
+        CullInput(
+            category="culler",
+            population=population,
+            target_size=1,
+            scoring_policy=policy,
+        ),
+        StopInput(
+            category="stopper",
+            execution_id=UUID(int=1),
+            generation=0,
+            population_size=0,
+        ),
+    )
+
+
+def make_component_results() -> tuple[ComponentResultPayload, ...]:
+    population = Population(individuals=())
+    return (
+        SeedResult(category="seeder", population=population),
+        ScoreResult(category="scorer", updates=()),
+        SelectResult(category="selector", selected=population),
+        MutateResult(category="mutator", offspring=population),
+        CullResult(category="culler", population=population),
+        StopResult(category="stopper", should_stop=False),
+    )
+
+
+def test_component_payload_union_accepts_every_category():
+    adapter = TypeAdapter(ComponentInputPayload)
+
+    for payload in make_component_payloads():
+        restored = adapter.validate_python(adapter.dump_python(payload, mode="json"))
+        assert type(restored) is type(payload)
+
+
+def test_component_result_union_accepts_every_category():
+    adapter = TypeAdapter(ComponentResultPayload)
+
+    for result in make_component_results():
+        restored = adapter.validate_python(adapter.dump_python(result, mode="json"))
+        assert type(restored) is type(result)
+
+
+def test_category_literals_match_component_category_enum():
+    payload_classes = (
+        SeedInput,
+        ScoreInput,
+        SelectInput,
+        MutateInput,
+        CullInput,
+        StopInput,
+        SeedResult,
+        ScoreResult,
+        SelectResult,
+        MutateResult,
+        CullResult,
+        StopResult,
+    )
+
+    literals = {
+        get_args(cls.model_fields["category"].annotation)[0] for cls in payload_classes
+    }
+
+    assert literals == {category.value for category in ComponentCategory}
+
+
+def test_phase_plan_and_result_json_round_trip():
+    payload = make_component_payloads()[0]
+    invocation = ComponentInvocation(
+        invocation_id=UUID(int=1),
+        component_id="random_schedule",
+        category=ComponentCategory.SEEDER,
+        input=payload,
+    )
+    plan = PhasePlan(
+        execution_id=UUID(int=2),
+        phase_execution_id=UUID(int=3),
+        generation=0,
+        phase=PhaseType.SEED,
+        invocations=(invocation,),
+    )
+
+    restored_plan = PhasePlan.model_validate_json(plan.model_dump_json())
+    assert restored_plan == plan
+
+    result = ComponentResult(
+        invocation_id=UUID(int=1),
+        component_id="random_schedule",
+        category=ComponentCategory.SEEDER,
+        result=make_component_results()[0],
+    )
+    phase_result = PhaseResult(
+        execution_id=UUID(int=2),
+        phase_execution_id=UUID(int=3),
+        results=(result,),
+    )
+
+    restored_result = PhaseResult.model_validate_json(phase_result.model_dump_json())
+    assert restored_result == phase_result
+
+
+def test_phase_plan_rejects_category_mismatch():
+    payload = make_component_payloads()[1]
+    invocation = ComponentInvocation(
+        invocation_id=UUID(int=1),
+        component_id="coverage",
+        category=ComponentCategory.SCORER,
+        input=payload,
+    )
+
+    with pytest.raises(ValidationError):
+        PhasePlan(
+            execution_id=UUID(int=2),
+            phase_execution_id=UUID(int=3),
+            generation=0,
+            phase=PhaseType.SEED,
+            invocations=(invocation,),
+        )
+
+
+def test_phase_plan_rejects_duplicate_invocations():
+    payload = make_component_payloads()[0]
+    invocation = ComponentInvocation(
+        invocation_id=UUID(int=1),
+        component_id="random_schedule",
+        category=ComponentCategory.SEEDER,
+        input=payload,
+    )
+
+    with pytest.raises(ValidationError, match="duplicate invocation"):
+        PhasePlan(
+            execution_id=UUID(int=2),
+            phase_execution_id=UUID(int=3),
+            generation=0,
+            phase=PhaseType.SEED,
+            invocations=(invocation, invocation),
+        )
+
+
+def make_solver_spec(**overrides) -> SolverSpec:
+    values = {
+        "population_size": 4,
+        "random_seed": 0,
+        "elitism_count": 1,
+        "seeders": (SeederContribution(component_id="seed", contribution=4),),
+        "scorer_ids": ("coverage", "shift_length"),
+        "scoring_policy": make_policy(),
+        "selector_id": "top_n",
+        "mutators": (MutatorPlan(component_id="mutate", offspring_per_parent=1),),
+        "culler_id": "top_n",
+        "stopper_ids": ("generations",),
+    }
+    values.update(overrides)
+    return SolverSpec(**values)
+
+
+def test_solver_spec_accepts_valid_configuration():
+    spec = make_solver_spec()
+
+    assert spec.population_size == 4
+
+
+def test_solver_spec_requires_contributions_to_match_population():
+    with pytest.raises(ValidationError, match="contributions"):
+        make_solver_spec(
+            seeders=(SeederContribution(component_id="seed", contribution=3),)
+        )
+
+
+def test_solver_spec_requires_scorer_ids_to_match_weights():
+    with pytest.raises(ValidationError, match="scorer_ids"):
+        make_solver_spec(scorer_ids=("coverage",))
+
+
+def test_solver_spec_requires_elitism_within_population():
+    with pytest.raises(ValidationError, match="elitism_count"):
+        make_solver_spec(elitism_count=5)
+
+
+def test_execution_state_status_invariants():
+    problem = make_problem()
+    base = {
+        "execution_id": UUID(int=1),
+        "problem": problem,
+        "population": Population(individuals=()),
+    }
+
+    assert ExecutionState(**base).status is ExecutionStatus.RUNNING
+
+    with pytest.raises(ValidationError, match="termination reason"):
+        ExecutionState(**base, status=ExecutionStatus.COMPLETED)
+
+    with pytest.raises(ValidationError, match="failure info"):
+        ExecutionState(**base, status=ExecutionStatus.FAILED)
