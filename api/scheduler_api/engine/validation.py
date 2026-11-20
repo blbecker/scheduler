@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from uuid import UUID
+
 from scheduler_api.engine.exceptions import InvalidIndividualError
 from scheduler_api.engine.models.assignment import Individual
 from scheduler_api.engine.models.population import Population
@@ -14,7 +16,7 @@ def validate_individual_structure(
 
     worker_ids = {worker.worker_id for worker in problem.workers}
     job_ids = {job.job_id for job in problem.jobs}
-    seen: set[tuple[object, object, int]] = set()
+    seen: set[tuple[UUID, UUID, int]] = set()
 
     for assignment in individual.assignments:
         if assignment.worker_id not in worker_ids:
