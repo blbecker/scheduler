@@ -18,6 +18,39 @@ FORBIDDEN_MODULES = {
     "sqlalchemy",
     "scheduler_api.db",
 }
+SHARED_HELPER_MODULES = {
+    "scheduler_api.engine.exceptions",
+    "scheduler_api.engine.ranking",
+    "scheduler_api.engine.randomness",
+    "scheduler_api.engine.validation",
+}
+LAYER_ALLOWED_ENGINE_IMPORTS = {
+    "models/": ("scheduler_api.engine.models",),
+    "protocols/": (
+        "scheduler_api.engine.models",
+        "scheduler_api.engine.protocols",
+        "scheduler_api.engine.execution.registry",
+    ),
+    "components/": (
+        "scheduler_api.engine.components",
+        "scheduler_api.engine.models",
+        "scheduler_api.engine.protocols",
+        *SHARED_HELPER_MODULES,
+    ),
+    "aggregation.py": (
+        "scheduler_api.engine.models",
+        *SHARED_HELPER_MODULES,
+    ),
+    "execution/": (
+        "scheduler_api.engine.execution",
+        "scheduler_api.engine.models",
+        "scheduler_api.engine.protocols",
+        *SHARED_HELPER_MODULES,
+    ),
+}
+FORBIDDEN_INTERNAL_IMPORTS = {
+    "controller.py": {"scheduler_api.engine.solver"},
+}
 
 
 def engine_files() -> list[Path]:
@@ -31,7 +64,27 @@ def imported_modules(tree: ast.AST) -> set[str]:
             modules.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module:
             modules.add(node.module)
+            modules.update(f"{node.module}.{alias.name}" for alias in node.names)
     return modules
+
+
+def engine_imports(tree: ast.AST) -> set[str]:
+    return {
+        module
+        for module in imported_modules(tree)
+        if module == "scheduler_api.engine"
+        or module.startswith("scheduler_api.engine.")
+    }
+
+
+def matches_prefix(module: str, prefix: str) -> bool:
+    return module == prefix or module.startswith(prefix + ".")
+
+
+def test_import_scan_catches_from_scheduler_api_import_db():
+    modules = imported_modules(ast.parse("from scheduler_api import db"))
+
+    assert "scheduler_api.db" in modules
 
 
 def test_engine_has_no_forbidden_imports():
@@ -42,6 +95,35 @@ def test_engine_has_no_forbidden_imports():
             for forbidden in FORBIDDEN_MODULES:
                 if module == forbidden or module.startswith(forbidden + "."):
                     violations.append(f"{path}: {module}")
+    assert not violations
+
+
+def test_engine_internal_layers_respect_dependency_rules():
+    violations: list[str] = []
+    for path in engine_files():
+        relative = path.relative_to(ENGINE_DIR).as_posix()
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        modules = engine_imports(tree)
+
+        for layer, allowed in LAYER_ALLOWED_ENGINE_IMPORTS.items():
+            is_member = (
+                relative.startswith(layer)
+                if layer.endswith("/")
+                else (relative == layer)
+            )
+            if not is_member:
+                continue
+            for module in modules:
+                if not any(matches_prefix(module, prefix) for prefix in allowed):
+                    violations.append(f"{relative}: {module}")
+
+        for name, forbidden in FORBIDDEN_INTERNAL_IMPORTS.items():
+            if relative != name:
+                continue
+            for module in modules:
+                if any(matches_prefix(module, prefix) for prefix in forbidden):
+                    violations.append(f"{relative}: {module}")
+
     assert not violations
 
 
