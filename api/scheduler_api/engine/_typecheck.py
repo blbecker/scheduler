@@ -9,6 +9,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from scheduler_api.engine.components import (
+        CoverageScorer,
+        GenerationCountStopper,
+        RandomReplacementMutator,
+        RandomScheduleSeeder,
+        ShiftLengthScorer,
+        SkillsMatchScorer,
+        TopNCuller,
+        TopNSelector,
+        WorkerOverlapScorer,
+    )
     from scheduler_api.engine.protocols import (
         Culler,
         Mutator,
@@ -18,11 +29,12 @@ if TYPE_CHECKING:
         Stopper,
     )
 
-    _component_protocols: tuple[object, ...] = (
-        Seeder,
-        Scorer,
-        Selector,
-        Mutator,
-        Culler,
-        Stopper,
-    )
+    _seeder: Seeder = RandomScheduleSeeder()
+    _skills: Scorer = SkillsMatchScorer()
+    _overlap: Scorer = WorkerOverlapScorer()
+    _coverage: Scorer = CoverageScorer()
+    _shift_length: Scorer = ShiftLengthScorer()
+    _selector: Selector = TopNSelector()
+    _mutator: Mutator = RandomReplacementMutator()
+    _culler: Culler = TopNCuller()
+    _stopper: Stopper = GenerationCountStopper()
