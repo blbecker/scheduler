@@ -114,9 +114,7 @@ class GeneticAlgorithmController:
             return
         if self._state.status is not ExecutionStatus.RUNNING:
             return
-        self._state = self._state.model_copy(
-            update={"status": ExecutionStatus.FAILED, "failure": failure}
-        )
+        self._transition(status=ExecutionStatus.FAILED, failure=failure)
         self._pending_plan = None
 
     def get_state(self, execution_id: UUID) -> ExecutionState:
@@ -182,11 +180,9 @@ class GeneticAlgorithmController:
                 self._spec.population_size,
                 self._problem,
             )
-            self._state = self._state.model_copy(
-                update={
-                    "population": population,
-                    "score_target": ScoreTarget.POPULATION,
-                }
+            self._transition(
+                population=population,
+                score_target=ScoreTarget.POPULATION,
             )
             return self._score_plan(population)
 
@@ -195,7 +191,7 @@ class GeneticAlgorithmController:
 
         if plan.phase is PhaseType.SELECT:
             selected = aggregate_select(plan, result, self._state.population)
-            self._state = self._state.model_copy(update={"selected_parents": selected})
+            self._transition(selected_parents=selected)
             return self._mutate_plan(selected)
 
         if plan.phase is PhaseType.MUTATE:
@@ -203,11 +199,9 @@ class GeneticAlgorithmController:
             if parents is None:
                 raise InvalidPhaseResultError("cannot mutate without selected parents")
             offspring = aggregate_mutate(plan, result, parents, self._problem)
-            self._state = self._state.model_copy(
-                update={
-                    "offspring": offspring,
-                    "score_target": ScoreTarget.OFFSPRING,
-                }
+            self._transition(
+                offspring=offspring,
+                score_target=ScoreTarget.OFFSPRING,
             )
             return self._score_plan(offspring)
 
@@ -217,11 +211,9 @@ class GeneticAlgorithmController:
         if plan.phase is PhaseType.CHECK_STOP:
             should_stop, reason = aggregate_stop(plan, result)
             if should_stop:
-                self._state = self._state.model_copy(
-                    update={
-                        "status": ExecutionStatus.COMPLETED,
-                        "termination_reason": reason,
-                    }
+                self._transition(
+                    status=ExecutionStatus.COMPLETED,
+                    termination_reason=reason,
                 )
                 return None
             return self._select_plan()
@@ -253,7 +245,7 @@ class GeneticAlgorithmController:
         else:
             update["offspring"] = scored
 
-        self._state = state.model_copy(update=update)
+        self._transition(**update)
         if state.score_target is ScoreTarget.POPULATION:
             return self._select_plan()
         return self._cull_plan()
@@ -274,16 +266,20 @@ class GeneticAlgorithmController:
             self._spec.population_size,
             state.elite_individuals,
         )
-        self._state = state.model_copy(
-            update={
-                "population": retained,
-                "selected_parents": None,
-                "offspring": None,
-                "score_target": None,
-                "generation": state.generation + 1,
-            }
+        self._transition(
+            population=retained,
+            selected_parents=None,
+            offspring=None,
+            score_target=None,
+            generation=state.generation + 1,
         )
         return self._check_stop_plan()
+
+    def _transition(self, **updates: object) -> None:
+        state = self._state
+        assert state is not None
+        candidate = state.model_copy(update=updates)
+        self._state = ExecutionState.model_validate(candidate.model_dump())
 
     def _select_best(
         self, newly_scored: Population
